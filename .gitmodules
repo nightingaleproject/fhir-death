@@ -1,9 +1,6 @@
 [submodule "Resources/GIT-FHIR"]
 	path = Resources/GIT-FHIR
 	url = https://github.com/i3l/GT-FHIR
-[submodule "SMART-on-FHIR"]
-	path = SMART-on-FHIR
-	url = https://github.com/smart-on-fhir/client-py
 [submodule "Resources/SMART-on-FHIR"]
 	path = Resources/SMART-on-FHIR
 	url = https://github.com/smart-on-fhir/client-py
