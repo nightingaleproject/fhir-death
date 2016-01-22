@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <meta>
+    <lastUpdated value="2015-09-22T20:02:49.724+10:00" />
+  </meta>
+  <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm">
+    <valueInteger value="2" />
+  </extension>
+  <url value="http://cdcfire.bme.gatech.edu/fhir/StructureDefinition/deathcertificatecomposition/" />
+  <name value="DeathCertificateComposition" />
+  <status value="draft" />
+  <date value="2015-09-22T20:02:49+10:00" />
+  <description value="The composition which contains the values and narratives associated with a DeathCertificate object" />
+  <requirements value="To support documents, and also to capture the EN13606 notion of an attested commit to the patient EHR, and to allow a set of disparate resources at the information/engineering level to be gathered into a clinical statement." />
+  <fhirVersion value="1.0.1" />
+  <mapping>
+    <identity value="rim" />
+    <uri value="http://hl7.org/v3" />
+    <name value="RIM" />
+  </mapping>
+  <mapping>
+    <identity value="cda" />
+    <uri value="http://hl7.org/v3/cda" />
+    <name value="CDA (R2)" />
+  </mapping>
+  <mapping>
+    <identity value="w5" />
+    <uri value="http://hl7.org/fhir/w5" />
+    <name value="W5 Mapping" />
+  </mapping>
+  <kind value="resource" />
+  <constrainedType value="Composition" />
+  <abstract value="false" />
+  <base value="http://hl7.org/fhir/StructureDefinition/Composition" />
+  <differential>
+    <element>
+      <path value="Composition" />
+      <short value="A set of resources composed into a single coherent clinical statement with clinical attestation" />
+      <definition value="A set of healthcare-related information that is assembled together into a single logical document that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement. While a Composition defines the structure, it does not actually contain the content: rather the full content of a document is contained in a Bundle, of which the Composition is the first resource contained." />
+      <comments value="While the focus of this specification is on patient-specific clinical statements, this resource can also apply to other healthcare-related statements such as study protocol designs, healthcare invoices and other activities that are not necessarily patient-specific or clinical." />
+      <min value="0" />
+      <max value="*" />
+      <type>
+        <code value="Composition" />
+      </type>
+      <mapping>
+        <identity value="rim" />
+        <map value="Document[classCode=&quot;DOC&quot; and moodCode=&quot;EVN&quot; and isNormalAct()]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value="ClinicalDocument" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="infrastructure.documents" />
+      </mapping>
+    </element>
+  </differential>
+</StructureDefinition>
