@@ -116,17 +116,30 @@
       <type>
         <code value="BackboneElement" />
       </type>
+      <constraint>
+        <key value="bdl-5" />
+        <severity value="error" />
+        <human value="must be a resource unless there's a transaction or transaction response" />
+        <xpath value="f:resource or f:request or f:response" />
+      </constraint>
+      <constraint>
+        <key value="bdl-6" />
+        <severity value="error" />
+        <human value="The fullUrl element must be present when a resource is present, and not present otherwise" />
+        <xpath value="(not(exists(f:fullUrl)) and not(exists(f:resource))) or (exists(f:fullUrl) and exists(f:resource))" />
+      </constraint>
       <isSummary value="true" />
     </element>
     <element>
       <path value="Bundle.entry.resource" />
-      <short value="A resource in the bundle" />
-      <definition value="The Resources for the entry." />
+      <short value="The death certificate composition" />
+      <definition value="A single composition" />
+      <requirements value="References a specific death certificate composition profile for standardized reporting." />
       <min value="1" />
       <max value="1" />
       <type>
         <code value="Composition" />
-        <aggregation value="contained" />
+        <profile value="http://cdcfire.bme.gatech.edu/fhir/StructureDefinition/deathcertificatecomposition/" />
       </type>
       <isSummary value="true" />
     </element>
@@ -140,6 +153,18 @@
       <type>
         <code value="BackboneElement" />
       </type>
+      <constraint>
+        <key value="bdl-5" />
+        <severity value="error" />
+        <human value="must be a resource unless there's a transaction or transaction response" />
+        <xpath value="f:resource or f:request or f:response" />
+      </constraint>
+      <constraint>
+        <key value="bdl-6" />
+        <severity value="error" />
+        <human value="The fullUrl element must be present when a resource is present, and not present otherwise" />
+        <xpath value="(not(exists(f:fullUrl)) and not(exists(f:resource))) or (exists(f:fullUrl) and exists(f:resource))" />
+      </constraint>
       <isSummary value="true" />
     </element>
   </differential>

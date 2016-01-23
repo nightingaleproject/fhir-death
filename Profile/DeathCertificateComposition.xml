@@ -7,11 +7,26 @@
     <valueInteger value="2" />
   </extension>
   <url value="http://cdcfire.bme.gatech.edu/fhir/StructureDefinition/deathcertificatecomposition/" />
+  <version value="0.1" />
   <name value="DeathCertificateComposition" />
   <status value="draft" />
-  <date value="2015-09-22T20:02:49+10:00" />
+  <experimental value="true" />
+  <publisher value="Georgia Institute of Technology" />
+  <contact>
+    <name value="Bio-MIBLab" />
+    <telecom>
+      <system value="email" />
+      <value value="biomiblab@bme.gatech.edu" />
+      <use value="work" />
+    </telecom>
+  </contact>
+  <date value="2016-02-27T00:00:00-05:00" />
   <description value="The composition which contains the values and narratives associated with a DeathCertificate object" />
-  <requirements value="To support documents, and also to capture the EN13606 notion of an attested commit to the patient EHR, and to allow a set of disparate resources at the information/engineering level to be gathered into a clinical statement." />
+  <useContext>
+    <text value="US" />
+  </useContext>
+  <requirements value="To support documents, specifically CDC 2003-style death certificates." />
+  <copyright value="© 2016 Georgia Institute of Technology. All rights reserved." />
   <fhirVersion value="1.0.1" />
   <mapping>
     <identity value="rim" />
@@ -54,6 +69,194 @@
       <mapping>
         <identity value="w5" />
         <map value="infrastructure.documents" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.type" />
+      <short value="Kind of composition (LOINC 69409-1)" />
+      <definition value="69409-1: U.S. standard certificate of death - 2003 revision" />
+      <comments value="Limits profile to use as U.S. standard certificate of death - 2003 revision" />
+      <requirements value="Key metadata element describing the composition, used in searching/filtering." />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <mustSupport value="true" />
+      <isSummary value="true" />
+      <binding>
+        <strength value="preferred" />
+        <description value="Type of a composition." />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/doc-typecodes" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".code" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="class" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.type.coding.system" />
+      <short value="Identity of the terminology system" />
+      <definition value="The identification of the code system that defines the meaning of the symbol in the code." />
+      <comments value="The URI may be an OID (urn:oid:...) or a UUID (urn:uuid:...).  OIDs and UUIDs SHALL be references to the HL7 OID registry. Otherwise, the URI should come from HL7's list of FHIR defined special URIs or it should de-reference to some definition that establish the system clearly and unambiguously." />
+      <requirements value="Need to be unambiguous about the source of the definition of the symbol." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://loinc.org" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./codeSystem" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.system rdfs:subPropertyOf dt:CDCoding.codeSystem" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.type.coding.code" />
+      <short value="Symbol in syntax defined by the system" />
+      <definition value="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination)." />
+      <requirements value="Need to refer to a particular code in the system." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="69409-1" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.1" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.code rdfs:subPropertyOf dt:CDCoding.code" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.class" />
+      <short value="Categorization of Composition" />
+      <definition value="A categorization for the type of the composition - helps for indexing and searching. This may be implied by or derived from the code specified in the Composition Type." />
+      <comments value="LP173392-4: Death certificate" />
+      <requirements value="Limits this profile to use as a death certificate" />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <isSummary value="true" />
+      <binding>
+        <strength value="example" />
+        <description value="High-level kind of a clinical document at a macro level." />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/doc-classcodes" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="rim" />
+        <map value=".outboundRelationship[typeCode=&quot;COMP].target[classCode=&quot;LIST&quot;, moodCode=&quot;EVN&quot;].code" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value="n/a" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="class" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.class.coding.system" />
+      <short value="Identity of the terminology system" />
+      <definition value="The identification of the code system that defines the meaning of the symbol in the code." />
+      <comments value="The URI may be an OID (urn:oid:...) or a UUID (urn:uuid:...).  OIDs and UUIDs SHALL be references to the HL7 OID registry. Otherwise, the URI should come from HL7's list of FHIR defined special URIs or it should de-reference to some definition that establish the system clearly and unambiguously." />
+      <requirements value="Need to be unambiguous about the source of the definition of the symbol." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://loinc.org" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./codeSystem" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.system rdfs:subPropertyOf dt:CDCoding.codeSystem" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.class.coding.code" />
+      <short value="Symbol in syntax defined by the system" />
+      <definition value="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination)." />
+      <requirements value="Need to refer to a particular code in the system." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="LP173392-4" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.1" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.code rdfs:subPropertyOf dt:CDCoding.code" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.title" />
+      <short value="Human Readable name/title" />
+      <definition value="Official human-readable label for the composition." />
+      <comments value="For many compositions, the title is the same as the text or a display name of Composition.type (e.g. a &quot;consultation&quot; or &quot;progress note&quot;). Note that CDA does not make title mandatory, but there are no known cases where it is useful for title to be omitted, so it is mandatory here. Feedback on this requirement is welcome during the trial use period." />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <fixedString value="U.S. Standard Certificate of Death" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="rim" />
+        <map value="./title" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".title" />
       </mapping>
     </element>
   </differential>
