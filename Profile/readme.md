@@ -6,4 +6,5 @@ See for reference:
 
 - http://hl7.org/fhir/profiling.html
 - http://www.hl7.org/implement/standards/fhir/documents.html
+- http://www.hl7.org/implement/standards/fhir/composition-operations.html
 - http://www.hl7.org/implement/standards/fhir/structuredefinition.html

@@ -9,7 +9,7 @@
   </extension>
   <url value="http://cdcfire.bme.gatech.edu/fhir/StructureDefinition/deathcertificate/" />
   <version value="0.1" />
-  <name value="DeathCertificate" />
+  <name value="DeathCertificateBundle" />
   <status value="draft" />
   <experimental value="true" />
   <publisher value="Georgia Institute of Technology" />
@@ -108,7 +108,7 @@
     </element>
     <element>
       <path value="Bundle.entry" />
-      <name value="DeathCertificateComposition" />
+      <name value="DCDocumentComposition" />
       <short value="First entry in the bundle - the Composition at the root of the document" />
       <definition value="An entry in a bundle resource - will either contain a resource, or information about a resource (transactions and history only)." />
       <min value="1" />
@@ -137,15 +137,11 @@
       <requirements value="References a specific death certificate composition profile for standardized reporting." />
       <min value="1" />
       <max value="1" />
-      <type>
-        <code value="Composition" />
-        <profile value="http://cdcfire.bme.gatech.edu/fhir/StructureDefinition/deathcertificatecomposition/" />
-      </type>
       <isSummary value="true" />
     </element>
     <element>
       <path value="Bundle.entry" />
-      <name value="SupportingResources" />
+      <name value="DCSupportingResources" />
       <short value="Entry in the bundle - will have a resource, or information" />
       <definition value="An entry in a bundle resource - will either contain a resource, or information about a resource (transactions and history only)." />
       <min value="0" />

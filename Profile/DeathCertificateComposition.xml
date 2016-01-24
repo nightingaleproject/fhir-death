@@ -9,6 +9,7 @@
   <url value="http://cdcfire.bme.gatech.edu/fhir/StructureDefinition/deathcertificatecomposition/" />
   <version value="0.1" />
   <name value="DeathCertificateComposition" />
+  <display value="Death Certificate" />
   <status value="draft" />
   <experimental value="true" />
   <publisher value="Georgia Institute of Technology" />
@@ -21,11 +22,10 @@
     </telecom>
   </contact>
   <date value="2016-02-27T00:00:00-05:00" />
-  <description value="The composition which contains the values and narratives associated with a DeathCertificate object" />
+  <description value="The composition which contains the values and narratives associated with a U.S Standard Death Certificate (rev. 2003) " />
   <useContext>
     <text value="US" />
   </useContext>
-  <requirements value="To support documents, specifically CDC 2003-style death certificates." />
   <copyright value="© 2016 Georgia Institute of Technology. All rights reserved." />
   <fhirVersion value="1.0.1" />
   <mapping>
@@ -156,6 +156,32 @@
       </mapping>
     </element>
     <element>
+      <path value="Composition.type.text" />
+      <short value="Plain text representation of the concept" />
+      <definition value="A human language representation of the concept as seen/selected/uttered by the user who entered the data and/or which represents the intended meaning of the user." />
+      <comments value="Very often the text is the same as a displayName of one of the codings." />
+      <requirements value="The codes from the terminologies do not always capture the correct meaning with all the nuances of the human using them, or sometimes there is no appropriate code at all. In these cases, the text is used to capture the full meaning of the source." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <fixedString value="U.S. standard certificate of death - 2003 revision" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.9. But note many systems use C*E.2 for this" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./originalText[mediaType/code=&quot;text/plain&quot;]/data" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:CodeableConcept.text rdfs:subPropertyOf dt:CD.originalText" />
+      </mapping>
+    </element>
+    <element>
       <path value="Composition.class" />
       <short value="Categorization of Composition" />
       <definition value="A categorization for the type of the composition - helps for indexing and searching. This may be implied by or derived from the code specified in the Composition Type." />
@@ -248,7 +274,7 @@
       <type>
         <code value="string" />
       </type>
-      <fixedString value="U.S. Standard Certificate of Death" />
+      <fixedString value="Death Certificate" />
       <isSummary value="true" />
       <mapping>
         <identity value="rim" />
@@ -257,6 +283,485 @@
       <mapping>
         <identity value="cda" />
         <map value=".title" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.subject" />
+      <short value="The decedent" />
+      <definition value="A patient resource describing the person who has died" />
+      <comments value="For clinical documents, this is usually the patient." />
+      <requirements value="Essential metadata for searching for the composition. Identifies who and/or what the composition/document is about." />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Patient" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="rim" />
+        <map value=".participation[typeCode=&quot;SBJ&quot;].role[typeCode=&quot;PAT&quot;]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".recordTarget" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="who.focus" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.author" />
+      <short value="Who and/or what authored the composition" />
+      <definition value="Identifies who is responsible for the information in the composition, not necessarily who typed it in." />
+      <requirements value="Identifies who is responsible for the content." />
+      <min value="1" />
+      <max value="*" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Practitioner" />
+      </type>
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/RelatedPerson" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="rim" />
+        <map value=".participation[typeCode=&quot;AUT&quot;].role[classCode=&quot;ASSIGNED&quot;]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".author.assignedAuthor" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="who.author" />
+      </mapping>
+    </element>
+    <element>
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+        <valueString value="Section" />
+      </extension>
+      <path value="Composition.section" />
+      <name value="section" />
+      <slicing>
+        <ordered value="true" />
+        <rules value="closed" />
+      </slicing>
+      <short value="Composition is broken into sections" />
+      <definition value="The root of the sections that make up the composition." />
+      <min value="4" />
+      <max value="4" />
+    </element>
+    <element>
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+        <valueString value="Section" />
+      </extension>
+      <path value="Composition.section" />
+      <name value="Identity" />
+      <short value="Patient Information" />
+      <definition value="The root of the sections that make up the composition." />
+      <comments value="Corresponds to DC questions 1-13" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="BackboneElement" />
+      </type>
+      <constraint>
+        <key value="cmp-1" />
+        <severity value="error" />
+        <human value="A section must at least one of text, entries, or sub-sections" />
+        <xpath value="exists(f:text) or exists(f:entry) or exists(f:section)" />
+      </constraint>
+      <constraint>
+        <key value="cmp-2" />
+        <severity value="error" />
+        <human value="A section can only have an emptyReason if it is empty" />
+        <xpath value="not(exists(f:emptyReason) and exists(f:entry))" />
+      </constraint>
+      <mapping>
+        <identity value="rim" />
+        <map value="./outboundRelationship[typeCode=&quot;COMP&quot; and isNormalActRelationship()]/target[moodCode=&quot;EVN&quot; and classCode=&quot;DOCSECT&quot; and isNormalAct]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".component.structuredBody.component.section" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.title" />
+      <short value="Label for section (e.g. for ToC)" />
+      <definition value="The label for this particular section.  This will be part of the rendered content for the document, and is often used to build a table of contents." />
+      <comments value="The title identifies the section for a human reader. The title must be consistent with the narrative of the resource that is the target of the section.content reference. Generally, sections SHOULD have titles, but in some documents it is unnecessary or inappropriate. Typically, this is where a section has subsections that have their own adequately distinguishing title,  or documents that only have a single section. Most Implementation Guides will make section title to be a required element." />
+      <requirements value="Section headings are often standardized for different types of documents.  They give guidance to humans on how the document is organized." />
+      <alias value="header" />
+      <alias value="label" />
+      <alias value="caption" />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <fixedString value="Decedent Identity" />
+      <mapping>
+        <identity value="rim" />
+        <map value="./title" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".title" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code.coding.system" />
+      <short value="Identity of the terminology system" />
+      <definition value="The identification of the code system that defines the meaning of the symbol in the code." />
+      <comments value="The URI may be an OID (urn:oid:...) or a UUID (urn:uuid:...).  OIDs and UUIDs SHALL be references to the HL7 OID registry. Otherwise, the URI should come from HL7's list of FHIR defined special URIs or it should de-reference to some definition that establish the system clearly and unambiguously." />
+      <requirements value="Need to be unambiguous about the source of the definition of the symbol." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://loinc.org" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./codeSystem" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.system rdfs:subPropertyOf dt:CDCoding.codeSystem" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code.coding.code" />
+      <short value="Symbol in syntax defined by the system" />
+      <definition value="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination)." />
+      <requirements value="Need to refer to a particular code in the system." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="52460-3" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.1" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.code rdfs:subPropertyOf dt:CDCoding.code" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.section" />
+      <short value="Nested Section" />
+      <definition value="A nested sub-section within this section." />
+      <comments value="Nested sections are primarily used to help human readers navigate to particular portions of the document." />
+      <min value="0" />
+      <max value="*" />
+      <nameReference value="section" />
+      <mapping>
+        <identity value="rim" />
+        <map value="./outboundRelationship[typeCode=&quot;COMP&quot; and isNormalActRelationship()]/target[moodCode=&quot;EVN&quot; and classCode=&quot;DOCSECT&quot; and isNormalAct]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".component.section" />
+      </mapping>
+    </element>
+    <element>
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+        <valueString value="Section" />
+      </extension>
+      <path value="Composition.section" />
+      <name value="Circumstances of Death" />
+      <short value="Circumstances of Death" />
+      <definition value="The root of the sections that make up the composition." />
+      <comments value="Corresponds to DC questions 14-21" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="BackboneElement" />
+      </type>
+      <constraint>
+        <key value="cmp-1" />
+        <severity value="error" />
+        <human value="A section must at least one of text, entries, or sub-sections" />
+        <xpath value="exists(f:text) or exists(f:entry) or exists(f:section)" />
+      </constraint>
+      <constraint>
+        <key value="cmp-2" />
+        <severity value="error" />
+        <human value="A section can only have an emptyReason if it is empty" />
+        <xpath value="not(exists(f:emptyReason) and exists(f:entry))" />
+      </constraint>
+      <mapping>
+        <identity value="rim" />
+        <map value="./outboundRelationship[typeCode=&quot;COMP&quot; and isNormalActRelationship()]/target[moodCode=&quot;EVN&quot; and classCode=&quot;DOCSECT&quot; and isNormalAct]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".component.structuredBody.component.section" />
+      </mapping>
+    </element>
+    <element>
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+        <valueString value="Section" />
+      </extension>
+      <path value="Composition.section" />
+      <name value="Cause of Death" />
+      <short value="Section of death certificate to be completed and attested by a medical professional" />
+      <definition value="The root of the sections that make up the composition." />
+      <comments value="Corresponds to DC questions 24-45" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="BackboneElement" />
+      </type>
+      <constraint>
+        <key value="cmp-1" />
+        <severity value="error" />
+        <human value="A section must at least one of text, entries, or sub-sections" />
+        <xpath value="exists(f:text) or exists(f:entry) or exists(f:section)" />
+      </constraint>
+      <constraint>
+        <key value="cmp-2" />
+        <severity value="error" />
+        <human value="A section can only have an emptyReason if it is empty" />
+        <xpath value="not(exists(f:emptyReason) and exists(f:entry))" />
+      </constraint>
+      <mapping>
+        <identity value="rim" />
+        <map value="./outboundRelationship[typeCode=&quot;COMP&quot; and isNormalActRelationship()]/target[moodCode=&quot;EVN&quot; and classCode=&quot;DOCSECT&quot; and isNormalAct]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".component.structuredBody.component.section" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.title" />
+      <short value="Label for section (e.g. for ToC)" />
+      <definition value="The label for this particular section.  This will be part of the rendered content for the document, and is often used to build a table of contents." />
+      <comments value="The title identifies the section for a human reader. The title must be consistent with the narrative of the resource that is the target of the section.content reference. Generally, sections SHOULD have titles, but in some documents it is unnecessary or inappropriate. Typically, this is where a section has subsections that have their own adequately distinguishing title,  or documents that only have a single section. Most Implementation Guides will make section title to be a required element." />
+      <requirements value="Section headings are often standardized for different types of documents.  They give guidance to humans on how the document is organized." />
+      <alias value="header" />
+      <alias value="label" />
+      <alias value="caption" />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <fixedString value="Cause of Death" />
+      <mapping>
+        <identity value="rim" />
+        <map value="./title" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".title" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code.coding.system" />
+      <short value="Identity of the terminology system" />
+      <definition value="The identification of the code system that defines the meaning of the symbol in the code." />
+      <comments value="The URI may be an OID (urn:oid:...) or a UUID (urn:uuid:...).  OIDs and UUIDs SHALL be references to the HL7 OID registry. Otherwise, the URI should come from HL7's list of FHIR defined special URIs or it should de-reference to some definition that establish the system clearly and unambiguously." />
+      <requirements value="Need to be unambiguous about the source of the definition of the symbol." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://loinc.org" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./codeSystem" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.system rdfs:subPropertyOf dt:CDCoding.codeSystem" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code.coding.code" />
+      <short value="Symbol in syntax defined by the system" />
+      <definition value="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination)." />
+      <requirements value="Need to refer to a particular code in the system." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="79378-6" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.1" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.code rdfs:subPropertyOf dt:CDCoding.code" />
+      </mapping>
+    </element>
+    <element>
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+        <valueString value="Section" />
+      </extension>
+      <path value="Composition.section" />
+      <name value="Demographics" />
+      <short value="Populatoin information on decedent" />
+      <definition value="The root of the sections that make up the composition." />
+      <comments value="Corresponds to DC questions 51-55" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="BackboneElement" />
+      </type>
+      <constraint>
+        <key value="cmp-1" />
+        <severity value="error" />
+        <human value="A section must at least one of text, entries, or sub-sections" />
+        <xpath value="exists(f:text) or exists(f:entry) or exists(f:section)" />
+      </constraint>
+      <constraint>
+        <key value="cmp-2" />
+        <severity value="error" />
+        <human value="A section can only have an emptyReason if it is empty" />
+        <xpath value="not(exists(f:emptyReason) and exists(f:entry))" />
+      </constraint>
+      <mapping>
+        <identity value="rim" />
+        <map value="./outboundRelationship[typeCode=&quot;COMP&quot; and isNormalActRelationship()]/target[moodCode=&quot;EVN&quot; and classCode=&quot;DOCSECT&quot; and isNormalAct]" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".component.structuredBody.component.section" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.title" />
+      <short value="Label for section (e.g. for ToC)" />
+      <definition value="The label for this particular section.  This will be part of the rendered content for the document, and is often used to build a table of contents." />
+      <comments value="The title identifies the section for a human reader. The title must be consistent with the narrative of the resource that is the target of the section.content reference. Generally, sections SHOULD have titles, but in some documents it is unnecessary or inappropriate. Typically, this is where a section has subsections that have their own adequately distinguishing title,  or documents that only have a single section. Most Implementation Guides will make section title to be a required element." />
+      <requirements value="Section headings are often standardized for different types of documents.  They give guidance to humans on how the document is organized." />
+      <alias value="header" />
+      <alias value="label" />
+      <alias value="caption" />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <fixedString value="Decedent Demographics" />
+      <mapping>
+        <identity value="rim" />
+        <map value="./title" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".title" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code" />
+      <short value="Classification of section (recommended)" />
+      <definition value="A code identifying the kind of content contained within the section. This must be consistent with the section title." />
+      <comments value="The code identifies the section for an automated processor of the document. This is particularly relevant when using profiles to control the structure of the document.   If the section has content (instead of sub-sections), the section.code does not change the meaning or interpretation of the resource that is the content of the section in the comments for the section.code." />
+      <requirements value="Provides computable standardized labels to topics within the document." />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <binding>
+        <strength value="example" />
+        <description value="Classification of a section of a composition/document." />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/doc-section-codes" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="cda" />
+        <map value=".code" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code.coding.system" />
+      <short value="Identity of the terminology system" />
+      <definition value="The identification of the code system that defines the meaning of the symbol in the code." />
+      <comments value="The URI may be an OID (urn:oid:...) or a UUID (urn:uuid:...).  OIDs and UUIDs SHALL be references to the HL7 OID registry. Otherwise, the URI should come from HL7's list of FHIR defined special URIs or it should de-reference to some definition that establish the system clearly and unambiguously." />
+      <requirements value="Need to be unambiguous about the source of the definition of the symbol." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://loinc.org" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./codeSystem" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.system rdfs:subPropertyOf dt:CDCoding.codeSystem" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Composition.section.code.coding.code" />
+      <short value="Symbol in syntax defined by the system" />
+      <definition value="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination)." />
+      <requirements value="Need to refer to a particular code in the system." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="29762-2" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="C*E.1" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./code" />
+      </mapping>
+      <mapping>
+        <identity value="orim" />
+        <map value="fhir:Coding.code rdfs:subPropertyOf dt:CDCoding.code" />
       </mapping>
     </element>
   </differential>
