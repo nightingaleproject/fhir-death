@@ -1,0 +1,54 @@
+<html>
+  <head>
+    
+    <title>GT / CDC Death Reporting FHIR Application</title>
+    <link rel="stylesheet" type="text/css" href="app.css">
+    
+  </head>
+  <body>
+    
+    <!-- MOST FIELDS LEFT EMPTY, TO BE FILLED BY JS -->
+    
+    <!-- GRID LAYOUT OF MAIN CONTENT -->
+    
+    <div class="layout-row" id="header-row">
+      <!-- first row, contains patient ID and some controls -->
+      <h2 id="fhir-pt-banner"></h2>
+      <a class="button-nav" href="back.html">Return to EHR Context</a>
+    </div>
+    
+    <div class="layout-row" id="patient-row">
+      <!-- second row, contains patient info and history -->
+      <div class="text-box" id="fhir-pt-detail"></div>
+      <div class="text-box" id="fhir-pt-history"></div>
+    </div>
+    
+    <div class="layout-row" id="timeline-row">
+      <!-- left totally empty, D3 will draw the SVG canvas here -->
+    </div>
+    
+    <div class="layout-row" id="cause-of-death-row">
+      <!-- cause of death grid section -->
+    </div>
+    
+    <div class="layout-row" id="bottom-nav-row">
+      <!-- navigation buttons -->
+    </div>
+    
+    
+    
+    
+    <!--  LOAD IN EXTERNAL JS RESOURCES  -->
+    
+    <script type="text/javascript" charset="utf-8" 
+            src="../Resources/d3/d3.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="../Resources/SMART-client-js/dist/fhir-client.min.js"></script>
+    
+    <!--  FINALLY, LOAD MAIN JS FILE TO RUN THE APP  -->
+    
+    <script type="text/javascript" charset="utf-8" 
+            src="app.js"></script>
+    
+  </body>
+</html>

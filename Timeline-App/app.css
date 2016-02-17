@@ -1,0 +1,23 @@
+body {
+  background-color: #ECECEC;
+}
+
+.layout-row {
+  min-height: 2em;
+  max-width: 1050px;
+  margin: 0.5em auto;
+  display: block;
+  
+}
+
+.text-box {
+  display: inline-block;
+  overflow: auto;
+  min-width: 100px;
+  min-height: 100px;
+}
+
+/* dev-only (AKA "ugly") styling */
+div {
+  border: 1px solid gray;
+}
