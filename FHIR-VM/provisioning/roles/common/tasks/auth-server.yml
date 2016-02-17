@@ -1,0 +1,128 @@
+- name: configure auth server service
+  tags: [auth]
+  template: src=auth-server.conf.j2
+            dest=/etc/init/auth-server.conf
+            owner=root group=root mode=0644
+  register: auth_service
+
+- name: checkout auth server
+  tags: [auth]
+  sudo_user: "{{username}}"
+  git: repo={{auth_server_repo}}
+       version={{auth_server_branch}}
+       dest={{install_dir}}/auth-server
+       update={{update_repositories}}
+  register: auth_checkout
+  
+- name: checkout auth ldap server
+  tags: [auth]
+  sudo_user: "{{username}}"
+  git: repo={{auth_ldap_server_repo}}
+       version={{auth_ldap_server_branch}}
+       dest={{install_dir}}/auth-server-ldap
+       update={{update_repositories}}
+  register: auth_ldap_checkout
+  
+- name: stop auth server
+  tags: [auth]
+  when: (auth_checkout.changed or auth_ldap_checkout.changed) or force_rebuild
+  service: name=auth-server state=stopped
+
+- name: clear auth server data
+  tags: [auth]
+  file: path={{auth_server_db_file}} state=absent
+  file: path={{auth_server_db_file}}.{{item}} state=absent
+  when: not auth_server_preserve_db
+  with_items: ["tmp", "properties", "script", "log"]
+
+# TODO should probably configure the data-context in the overlay project 
+# instead of configuring on-the-fly here. (When the overlay is working.)
+- name: disable memory-hsql
+  tags: [auth]
+  lineinfile:
+    dest={{auth_server_data_context}}
+    regexp="hsqldb:mem"
+    line='<!-- <property name="url" value="jdbc:hsqldb:mem:oic;sql.syntax_mys=true" /> -->'
+
+- name: enable file-hsql
+  tags: [auth]
+  lineinfile:
+    dest={{auth_server_data_context}}
+   regexp="hsqldb:file"
+   line='<property name="url" value="jdbc:hsqldb:file:{{auth_server_db_file}};sql.syntax_mys=true" />'
+
+- name: configure auth server client
+  tags: [auth]
+  replace: dest={{install_dir}}/auth-server/openid-connect-server-webapp/src/main/resources/db/clients.sql
+           regexp="\\'client\\'"
+           replace="'{{auth_server_client}}'"
+             
+- name: configure auth server client secret
+  tags: [auth]
+  replace: dest={{install_dir}}/auth-server/openid-connect-server-webapp/src/main/resources/db/clients.sql
+           regexp="\'secret\'"
+           replace="'{{auth_server_password}}'"
+
+- name: build auth server
+  tags: [auth]
+  sudo_user: "{{username}}"
+  when: auth_checkout.changed or force_rebuild
+  environment:
+    JAVA_HOME: "{{java_home_dir}}"
+  shell: chdir={{install_dir}}/auth-server
+       mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true
+       
+- name: configure auth ldap overlay for no-tls authentication 1 (if needed)
+  tags: [auth]
+  when: not ldap_server_tls
+  lineinfile: dest={{install_dir}}/auth-server-ldap/ldap-server-overlay/src/main/webapp/WEB-INF/user-context.xml
+              state=absent
+              regexp='authenticationStrategy'
+
+- name: configure auth ldap overlay for no-tls authentication 2 (if needed)
+  tags: [auth]
+  when: not ldap_server_tls
+  lineinfile: dest={{install_dir}}/auth-server-ldap/ldap-server-overlay/src/main/webapp/WEB-INF/user-context.xml
+              state=absent
+              regexp='authenticationSource'
+
+- name: build auth ldap overlay
+  tags: [auth]
+  sudo_user: "{{username}}"
+  when: (auth_checkout.changed or auth_ldap_checkout.changed) or force_rebuild
+  environment:
+    JAVA_HOME: "{{java_home_dir}}"
+  shell: chdir={{install_dir}}/auth-server-ldap
+       mvn clean package -DskipTests=true -Dmaven.javadoc.skip=true
+
+- name: restart auth server
+  tags: [auth]
+  when: auth_checkout.changed or auth_service.changed or auth_ldap_checkout.changed or force_rebuild
+  service: name=auth-server state=restarted
+
+- name: wait for auth server to become available
+  tags: [auth]
+  wait_for: port=4000
+
+- name: generate self-signed ssl certificate (auth server)
+  tags: [auth]
+  when: auth_server_secure_http and not use_custom_ssl_certificates
+  shell: creates=/etc/nginx/ssl/auth.crt
+         /bin/echo -e "{{auth_server_ssl_country}}\n{{auth_server_ssl_province}}\n{{auth_server_ssl_locality}}\n{{auth_server_ssl_organization}}\n{{auth_server_ssl_division}}\n{{auth_server_host}}\n{{auth_server_ssl_email}}\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/auth.key -out /etc/nginx/ssl/auth.crt
+         
+- name: import auth server certificate in truststore
+  tags: [auth]
+  when: auth_server_secure_http
+  shell: /bin/echo -e "{{keystore_password}}\nyes\n" | keytool
+           -importcert -trustcacerts
+           -alias auth
+           -file /etc/nginx/ssl/auth.crt
+           -keystore {{install_dir}}/keystore
+  
+- name: configure nginx (auth server)
+  tags: [auth,nginx]
+  template: src=nginx_auth.j2 dest=/etc/nginx/sites-enabled/auth owner=root group=root mode=0644
+  notify:
+        - restart nginx
+
+- meta: flush_handlers

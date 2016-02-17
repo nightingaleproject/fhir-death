@@ -1,0 +1,22 @@
+---
+keystore_password: "changeme"
+username: fhir
+userpass: secretpass
+auth_server_host: localhost
+fhir_server_host: localhost
+app_server_host: localhost
+docs_server_host: localhost
+#use_custom_ssl_certificates: false
+#custom_ssl_certificates_path: /example/local/path
+fhir_server_branch: v0.1.2
+auth_server_branch: f0.1.0
+auth_ldap_server_branch: f0.1.0
+sample_patients_branch: v0.1.0
+fhir_starter_branch: v0.1.2
+cardiac_risk_branch: v0.1.0
+bp_centiles_branch: v0.1.1
+growth_chart_branch: v0.1.1
+fhir_demo_app_branch: v0.1.0
+mpr_monitor_branch: v0.1.0
+diabetes_monograph_branch: v0.1.0
+disease_monograph_branch: v0.1.0
