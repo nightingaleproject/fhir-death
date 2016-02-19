@@ -1,8 +1,16 @@
+<!--
+  -- app.html
+  --   Ryan Hoffman, 2016
+  -- 
+  -- Main file for death app.
+  -- 
+  -->
 <html>
   <head>
     
     <title>GT / CDC Death Reporting FHIR Application</title>
     <link rel="stylesheet" type="text/css" href="app.css">
+    <link rel="stylesheet" type="text/css" href="../Resources/d3-tip/d3-tip.min.css">
     
   </head>
   <body>
@@ -13,14 +21,14 @@
     
     <div class="layout-row" id="header-row">
       <!-- first row, contains patient ID and some controls -->
-      <h2 id="fhir-pt-banner"></h2>
-      <a class="button-nav" href="back.html">Return to EHR Context</a>
+      <button class="nav right" id="back-button" onclick="unimplemented()">&#8617; Return to EHR Context</button>
+      <h2 id="fhir-pt-banner">Hello World</h2>
     </div>
     
     <div class="layout-row" id="patient-row">
       <!-- second row, contains patient info and history -->
-      <div class="text-box" id="fhir-pt-detail"></div>
-      <div class="text-box" id="fhir-pt-history"></div>
+      <div class="textbox" id="fhir-pt-detail"></div>
+      <div class="textbox right" id="fhir-pt-history"></div>
     </div>
     
     <div class="layout-row" id="timeline-row">
@@ -29,10 +37,38 @@
     
     <div class="layout-row" id="cause-of-death-row">
       <!-- cause of death grid section -->
+      <div class="right" id="cod-comments-contain">
+        <p class="small label">Additional Comments</p>
+        <textarea id="cod-comments">Enter text here.</textarea>
+      </div>
+      <div class="cod-row" id="cod-header">
+        <span class="cod-field label">Cause of Death:</span>
+        <span class="cod-time label right">Onset to Death:</span>
+        
+      </div>
+      <div class="cod-row" id="cod-row1">
+        <input id="cod1-text" class="cod-field" type="text">
+        <input id="cod1-time" class="cod-time right" type="text">
+      </div>
+      <div class="cod-row" id="cod-row2">
+        <input id="cod2-text" class="cod-field" type="text">
+        <input id="cod2-time" class="cod-time right" type="text">
+      </div>
+      <div class="cod-row" id="cod-row3">
+        <input id="cod3-text" class="cod-field" type="text">
+        <input id="cod3-time" class="cod-time right" type="text">
+      </div>
+      <div class="cod-row" id="cod-row4">
+        <input id="cod4-text" class="cod-field" type="text">
+        <input id="cod4-time" class="cod-time right" type="text">
+      </div>
     </div>
     
     <div class="layout-row" id="bottom-nav-row">
       <!-- navigation buttons -->
+      <button class="nav" id="nav1" onclick="unimplemented()">Nav 1</button>
+      <button class="nav" id="nav2" onclick="unimplemented()">Nav 2</button>
+      <span id="info-user" class="small right">Logged in as: unknown</span>
     </div>
     
     
@@ -42,6 +78,8 @@
     
     <script type="text/javascript" charset="utf-8" 
             src="../Resources/d3/d3.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="../Resources/d3-tip/d3-tip.min.js"></script>
     <script type="text/javascript" charset="utf-8" 
             src="../Resources/SMART-client-js/dist/fhir-client.min.js"></script>
     

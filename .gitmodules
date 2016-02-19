@@ -7,3 +7,6 @@
 [submodule "Resources/SMART-client-js"]
 	path = Resources/SMART-client-js
 	url = https://github.com/smart-on-fhir/client-js.git
+[submodule "Resources/d3-tip"]
+	path = Resources/d3-tip
+	url = https://github.com/Caged/d3-tip.git
