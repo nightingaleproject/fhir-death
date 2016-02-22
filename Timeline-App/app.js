@@ -1,13 +1,15 @@
 /*
- * app.js
- *   Ryan Hoffman, 2016
+ * app.js - Death on FHIR Prototype
+ *    Ryan Hoffman, 2016
+ *    v0.0.1
  * 
  * Main script for death app.
  * 
  * Resource constraints:
  *    Patient:
- *      - must have at lease one name
- *      - must have deathDateTime defined
+ *      - must have at lease one name (given+family)
+ *      - must have at lease one address (correct for DC)
+ *      - must have deceasedDateTime defined
  *      - must have birthDate defined
  *    Condition:
  *      - onset defined, but not by onsetString
@@ -58,8 +60,6 @@ timeline.zoom = d3.behavior.zoom()
                   .on("zoom", redraw_condition_markers)
                   .x(timeline.scale);
 
-// var datetime = d3.time.format("%Y-%m-%dT%X.%L%Z")
-
 // // MAIN CODE // //
 
 debug_code();
@@ -68,8 +68,6 @@ queue()
   .defer(d3.json, "test-data/gtcdc-patient.json")
   .defer(d3.json, "test-data/gtcdc-conditions.json")
   .await(init);
-
-// d3.json("sample-query.json", redraw_condition_markers);
 
 
 // // HELPER FUNCTIONS // //
@@ -94,14 +92,25 @@ function init(err, pat, cond) {
   
   // write in the parient info as appropriate
   
-  var namestr = fhirdata.patient.name[0]
+  var namestr = fhirdata.patient.name[0].family + ", " +
+                fhirdata.patient.name[0].given[0];
   
-  document.getElementById("fhir-pt-banner").innerHTML = "Doe, Jane A. -- MRN 123456";
+  document.getElementById("fhir-pt-banner").innerHTML = 
+    namestr + " -- MRN " + fhirdata.patient.id;
+  
+  
   document.getElementById("fhir-pt-detail").innerHTML = 
     '<p class="head">Patient Details</p> \
-     <p>Name: Jane Amy Doe</p> \
-     <p>Age at death: 45.2 years</p> \
-     <p>Residence: Alpha County, Oceania</p>';
+     <p>Name: ' + fhirdata.patient.name[0].given[0] + " " + 
+                  fhirdata.patient.name[0].family[0] + '</p> \
+     <p>Age at death: ' + 
+        d3.format("0.1f")((Date.parse(fhirdata.patient.deceasedDateTime) -
+                           Date.parse(fhirdata.patient.birthDate))
+                           / (1000*60*60*24*365)) + ' years</p> \
+     <p>Residence: ' + 
+              fhirdata.patient.address[0].city + ", " +
+              fhirdata.patient.address[0].state + " " + 
+              fhirdata.patient.address[0].postalCode + '</p>';
   
   
   // draw groups added to the SVG in draw order
