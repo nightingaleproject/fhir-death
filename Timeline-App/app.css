@@ -135,6 +135,7 @@ svg.timeline {
   width: 100%;
   padding: 0;
   margin: 0;
+  pointer-events: all;
   /* height: set by js, don't style this; */
 }
 
@@ -153,15 +154,89 @@ svg #timeline-proposed {
   fill: none;
 }
 
-svg rect.condition-marker {
-  height: 15;
-  width: 4;
+svg .condition-marker {
   fill: red;
+  stroke-width: 1.5;
   stroke: none;
 }
 
+svg .condition-marker circle {
+  fill: none;
+}
+svg .condition-marker.active circle {
+  fill: red;
+}
+
+svg .out-of-range {
+  display: none !important;
+}
+
+svg .condition-marker:hover circle {
+  stroke: red;
+}
+
+/* svg .condition-marker rect {
+  height: 15;
+  width: 4;
+} */
+
+svg .time-marker {
+  fill: black;
+  stroke: none;
+  text-anchor: middle;
+  font-size: 11;
+}
+
+
+/* borrowed heavily from d3-tip documentation */
+.tooltip {
+  line-height: 1;
+  /*font-weight: bold;*/
+  font-size: 12px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #000;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+
+.tooltip.conditions {
+  border-color: red;
+  
+}
+
+.tooltop.proposed {
+  border-color: orange;
+}
+
+.tooltip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  position: absolute;
+  pointer-events: none;
+  text-align: center;
+}
+
+/* Northward tooltips */
+.tooltip.conditions:after {
+  content: "\25BC";
+  top: 100%;
+  left: 0;
+  color: red;
+}
+
+/* Southward tooltips */
+.tooltip.proposed:after {
+  content: "\25B2";
+  top: -8px;
+  left: 0;
+  color: orange;
+}
 
 /*** dev-only (AKA "ugly") styling ***/
 div {
-  border: 1px solid gray;
+  border: 2px solid gray;
 }

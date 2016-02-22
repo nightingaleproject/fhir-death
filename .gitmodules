@@ -10,3 +10,6 @@
 [submodule "Resources/d3-tip"]
 	path = Resources/d3-tip
 	url = https://github.com/Caged/d3-tip.git
+[submodule "Resources/queue-js"]
+	path = Resources/queue-js
+	url = https://github.com/d3/d3-queue.git
