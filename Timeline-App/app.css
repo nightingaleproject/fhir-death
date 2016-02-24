@@ -255,5 +255,5 @@ span#fhir-server {
 
 /*** dev-only (AKA "ugly") styling ***/
 div {
-  border: 2px solid gray;
+  /*border: 2px solid gray;*/
 }

@@ -109,6 +109,8 @@ function init(err, pat, cond) {
   
   // write in the parient info as appropriate
   
+  document.getElementById("fhir-user").innerHTML = smart.userId ? smart.userId : "unknown";
+  
   var namestr = fhirdata.patient.name[0].family + ", " +
                 fhirdata.patient.name[0].given[0];
   
@@ -510,7 +512,7 @@ function debug_code() {
      <p>Age at death: 45.2 years</p> \
      <p>Residence: Alpha County, Oceania</p>';
   document.getElementById("fhir-pt-history").innerHTML = 
-    '<p class="head">Patient Details</p> \
+    '<p class="head">Patient History</p> \
      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit, enim vel dictum dapibus, tellus massa dapibus nibh, in auctor felis felis ut mauris. Nam sit amet lorem diam. Sed ullamcorper magna eget enim semper, eu maximus nisi porta. Proin congue ex quam, ac rhoncus ipsum hendrerit quis. Proin sollicitudin diam vel diam semper, ac porta felis convallis. Nulla faucibus, risus eget gravida aliquet, mi ante pharetra dolor, eu luctus ante sapien et dolor. Cras feugiat, eros a ornare faucibus, odio elit vehicula felis, eu vehicula nibh sem nec magna. Integer faucibus vitae diam eget suscipit. Pellentesque dictum tincidunt neque eget molestie. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras odio purus, pretium non sagittis et, hendrerit ut neque. Nulla facilisi. Pellentesque mattis augue felis, ac tempor sapien euismod eu. Pellentesque venenatis scelerisque felis.</p> \
      <p>Duis convallis tempus tellus quis consectetur. Ut nec nisl quam. Cras mollis luctus libero, nec eleifend augue molestie et. Cras mi sapien, semper sed eros at, viverra vehicula elit. Ut vulputate imperdiet accumsan. Pellentesque placerat non dolor in tristique. In hac habitasse platea dictumst. Maecenas id eros tincidunt, ullamcorper orci eget, aliquet tortor. Nullam scelerisque ut odio in volutpat.</p> \
      <p>Aliquam erat nisi, consequat eu erat eu, vestibulum cursus purus. Vivamus ornare odio odio. Nam facilisis odio mattis, congue enim id, euismod orci. Morbi eleifend porta congue. Sed sed urna urna. Integer malesuada blandit nisi, eget tincidunt tellus posuere aliquet. Sed efficitur laoreet libero vulputate tincidunt. In faucibus, arcu vitae scelerisque posuere, nisl arcu mattis mauris, id consequat justo urna vel justo.</p> \
