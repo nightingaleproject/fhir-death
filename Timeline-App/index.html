@@ -1,0 +1,61 @@
+<!--
+  -- Timeline-App/index.html
+  --   Ryan Hoffman, 2016
+  -- 
+  -- Landing page for death app.
+  -- 
+  -->
+<html>
+  <head>
+    
+    <title>GT / CDC Death Reporting FHIR Application</title>
+    <link rel="stylesheet" type="text/css" href="app.css">
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    
+  </head>
+  <body>
+    
+    <div class="landing-form">
+      
+      <h2>Patient ID Entry</h2>
+      <p>Connected to FHIR server: <span id="fhir-server">connecting....</span></p>
+      <p>Patient ID: <input id="fhir-id"></input></p>
+      <button class="nav" id="load" onclick="app_launch()">Launch</button>
+      
+    </div>
+    
+    <!--  LOAD IN EXTERNAL JS RESOURCES  -->
+    
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/fhir-client.min.js"></script>
+
+    <script type="text/javascript">
+      
+      var connected = false;
+      
+      var smart = new FHIR.client({
+                                    serviceUrl: 'http://fhirtest.uhn.ca/baseDstu2',
+                                    auth: {
+                                      type: 'none'
+                                    }
+                                  });
+      try {
+        // quickie query to check for valid connection
+        smart.api.search({type: "Conformance"}).then();
+        connected = true;
+        document.getElementById("fhir-server").innerHTML = smart.server.serviceUrl;
+        document.getElementById("fhir-id").value = 1869850;
+      } catch (err) {
+        // do nothing
+        document.getElementById("fhir-server").innerHTML = "ERROR, COULD NOT CONNECT";
+      }
+      
+      function app_launch() {
+        window.open("app.html?id=" + document.getElementById("fhir-id").value ,"_self")
+      }
+      
+    </script>
+    
+  </body>
+</html>

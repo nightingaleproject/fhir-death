@@ -236,6 +236,23 @@ svg .time-marker {
   color: orange;
 }
 
+
+/*** form page styles ***/
+
+div.landing-form {
+  min-width: 320px;
+  padding: 1em;
+  width: 30;
+  margin: 10% auto;
+  border: 2px solid gray;
+  border-radius: 20px;
+}
+
+span#fhir-server {
+  font-style: italic;
+}
+
+
 /*** dev-only (AKA "ugly") styling ***/
 div {
   border: 2px solid gray;

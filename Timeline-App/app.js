@@ -42,6 +42,21 @@ var marker_w = 3;
 // var csel, cdata, ccond;
 
 
+// // FHIR ACCESS // //
+
+var urlparams = {}
+location.search.substr(1).split("&").forEach(function(element) {
+  urlparams[element.split("=")[0]] = element.split("=")[1];
+}); // stackoverflow 5448545
+
+var smart = new FHIR.client({
+                              serviceUrl: 'http://fhirtest.uhn.ca/baseDstu2',
+                              auth: {
+                                type: 'none'
+                              }
+                            });
+
+
 // // CONDITION STORAGE AND STATE FIELDS // //
 
 timeline.conditions = {};
@@ -65,10 +80,12 @@ timeline.zoom = d3.behavior.zoom()
 debug_code();
 
 queue()
-  .defer(d3.json, "test-data/gtcdc-patient.json")
-  .defer(d3.json, "test-data/gtcdc-conditions.json")
+  .defer(fhir_load_patient, urlparams.id)
+  .defer(fhir_load_conditions, urlparams.id)
   .await(init);
 
+// .defer(d3.json, "test-data/gtcdc-conditions.json")
+// .defer(d3.json, "test-data/gtcdc-patient.json")
 
 // // HELPER FUNCTIONS // //
 
@@ -96,7 +113,7 @@ function init(err, pat, cond) {
                 fhirdata.patient.name[0].given[0];
   
   document.getElementById("fhir-pt-banner").innerHTML = 
-    namestr + " -- MRN " + fhirdata.patient.id;
+    namestr + " -- ID " + fhirdata.patient.id;
   
   
   document.getElementById("fhir-pt-detail").innerHTML = 
@@ -455,6 +472,34 @@ function draw_arrow() {
     .attr("r",arrow_dot_r);
 }
 
+function fhir_load_patient(pt_id, callback) {
+  try {
+    smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
+      if (r.data.total == 1) {
+        callback(null, r.data.entry[0].resource);
+      } else {
+        callback("could not find unique patient id="+pt_id);
+      }
+    })
+  } catch (err) {
+    callback("problem communicating with the FHIR server")
+  }
+}
+
+function fhir_load_conditions(pt_id, callback) {
+  try {
+    smart.api.search({type: "Condition", query: {patient: pt_id}}).then(function(r) {
+      if (r.data.total > 0) {
+        callback(null, r.data);
+      } else {
+        callback("could not find any conditions for patient id="+pt_id);
+      }
+    })
+  } catch (err) {
+    callback("problem communicating with the FHIR server")
+  }
+}
+
 // cheating
 function debug_code() {
   console.log("loaded app.js");
@@ -476,7 +521,7 @@ function debug_code() {
 
 function unimplemented() {
   console.warn("feature not yet implemented");
-  window.alert("this doesn't do anything yet");
+  window.alert("this button not yet implemented");
 }
 
 
