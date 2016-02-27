@@ -324,7 +324,12 @@ function redraw_proposed_causes() {
     return "translate(0,"+(arrow_pad_top + i*proposed_spacing + proposed_padding)+")";
   })
   .on('mouseenter.d3tip2', timeline.prop_tip.show)
-  .on('mouseleave.d3tip2', timeline.prop_tip.hide);
+  .on('mouseleave.d3tip2', timeline.prop_tip.hide)
+  .on('click', function(d) {
+    fhirdata.active = d;
+    zoom_redraw();
+    rewrite_cod_fields();
+  });
 
   
 }
@@ -591,9 +596,9 @@ function condition_lookup(id) {
 function analytics_engine() {
   // hashtag lol
   // hard-coded as hell, just for mr johnston
-  fhirdata.predictions = [[1878613, 1878617, 1878615, 1878614],
-                          [1878615, 1878614],
-                          [1878617, 1878616, 1878615, 1878614]];
+  fhirdata.predictions = [['1878613', '1878617', '1878615', '1878614'],
+                          ['1878615', '1878614'],
+                          ['1878617', '1878616', '1878615', '1878614']];
 }
 
 
