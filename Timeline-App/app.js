@@ -253,7 +253,7 @@ function redraw_condition_markers() {
           d3.select(this).append("circle")
             .attr("cx", marker_w/2)
             .attr("cy", -1.5)
-            .attr("r", marker_w);
+            .attr("r", marker_w*1.5);
       });
       
   csel.attr("transform",function(d,i) {
@@ -593,9 +593,9 @@ function condition_lookup(id) {
 function analytics_engine() {
   // hashtag lol
   // hard-coded as hell, just for mr johnston
-  fhirdata.predictions = [['1878613', '1878617', '1878615', '1878614'],
-                          ['1878615', '1878614'],
-                          ['1878617', '1878616', '1878615', '1878614']];
+  fhirdata.predictions = [['200001', '200005', '200003', '200002'],
+                          ['200003', '200002'],
+                          ['200005', '200004', '200003', '200002']];
 }
 
 
