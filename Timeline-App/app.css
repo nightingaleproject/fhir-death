@@ -236,6 +236,18 @@ svg .time-marker {
   color: orange;
 }
 
+/*** SVG button controls ***/
+
+svg .svg-button rect {
+  fill: gray;
+  width: 10;
+  height: 10;
+}
+
+svg .svg-button path {
+  stroke: white;
+}
+
 
 /*** form page styles ***/
 

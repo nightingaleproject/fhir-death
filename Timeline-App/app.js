@@ -21,6 +21,8 @@
 var timeline = {};
 var fhirdata = {};
 
+var DEBUG = false;
+
 // initialize now, so width exists to pull
 var svg_ht = 250; // px
 timeline.canvas = d3.select("#timeline-row").append("svg")
@@ -33,7 +35,7 @@ var svg_wd = timeline.canvas[0][0].getBoundingClientRect().width;
 var arrow_pad_top = 100; // px
 var arrow_wd = .85; // %
 var arrow_head_box = 8; // px
-var arrow_dot_r = 5; //px
+var arrow_dot_r = 3; //px
 
 var marker_h = 15;
 var marker_w = 3;
@@ -51,6 +53,7 @@ location.search.substr(1).split("&").forEach(function(element) {
 
 var smart = new FHIR.client({
                               serviceUrl: 'http://fhirtest.uhn.ca/baseDstu2',
+                              patientId: urlparams.id,
                               auth: {
                                 type: 'none'
                               }
@@ -61,31 +64,24 @@ var smart = new FHIR.client({
 
 timeline.conditions = {};
 timeline.zoomlevel = 86400*10; // seconds
+timeline.zoommax = Infinity;
+timeline.zoommin = 60*60;
 var zoomfactor = 1.1; // sensitivity
 
 timeline.scale = d3.scale.log()
                    .domain([10, timeline.zoomlevel])
                    .range([svg_wd*(arrow_wd + (1-arrow_wd)/2) , svg_wd*(1-arrow_wd)/2]);
 
-timeline.axis = d3.svg.axis() // ##TODO finish me?
-
-// set up the zoom behavior
-
-timeline.zoom = d3.behavior.zoom()
-                  .on("zoom", redraw_condition_markers)
-                  .x(timeline.scale);
 
 // // MAIN CODE // //
 
 debug_code();
 
 queue()
-  .defer(fhir_load_patient, urlparams.id)
-  .defer(fhir_load_conditions, urlparams.id)
+  .defer(fhir_load_patient)
+  .defer(fhir_load_conditions)
   .await(init);
 
-// .defer(d3.json, "test-data/gtcdc-conditions.json")
-// .defer(d3.json, "test-data/gtcdc-patient.json")
 
 // // HELPER FUNCTIONS // //
 
@@ -99,8 +95,11 @@ function init(err, pat, cond) {
   // data management
   
   fhirdata.patient = pat;
+  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
+                           Date.parse(fhirdata.patient.birthDate))/1000;
+  timeline.zoommax = pt_age_in_sec;
   
-  console.log(cond);
+  if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
@@ -120,12 +119,10 @@ function init(err, pat, cond) {
   
   document.getElementById("fhir-pt-detail").innerHTML = 
     '<p class="head">Patient Details</p> \
-     <p>Name: ' + fhirdata.patient.name[0].given[0] + " " + 
-                  fhirdata.patient.name[0].family[0] + '</p> \
+     <p>Name: ' + fhirdata.patient.name[0].given.join(" ") + " " + 
+                  fhirdata.patient.name[0].family.join(" ") + '</p> \
      <p>Age at death: ' + 
-        d3.format("0.1f")((Date.parse(fhirdata.patient.deceasedDateTime) -
-                           Date.parse(fhirdata.patient.birthDate))
-                           / (1000*60*60*24*365)) + ' years</p> \
+        d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + ' years</p> \
      <p>Residence: ' + 
               fhirdata.patient.address[0].city + ", " +
               fhirdata.patient.address[0].state + " " + 
@@ -190,28 +187,30 @@ function init(err, pat, cond) {
   redraw_condition_markers();
   
   // debugging: zoom controls!
-  timeline.canvas.append("rect")
+  timeline.zoom_controls = {};
+  timeline.zoom_controls.out = timeline.canvas.append("g")
     .classed("svg-button",true)
-    .attr("width",10)
-    .attr("height",10)
-    .attr("x",20)
-    .attr("y",20)
-    .style("fill","black")
+    .attr("id","zoom-out")
     .on("click", function() {
         timeline.zoomlevel = timeline.zoomlevel*3;
         zoom_redraw();
-    });
-  timeline.canvas.append("rect")
+    })
+    .attr("transform","translate(20,"+(svg_ht-30)+") scale(1.5)");
+  timeline.zoom_controls.out.append("rect");
+  timeline.zoom_controls.out.append("path")
+    .attr("d", "M1 5 L9 5");
+  
+  timeline.zoom_controls.in = timeline.canvas.append("g")
     .classed("svg-button",true)
-    .attr("width",10)
-    .attr("height",10)
-    .attr("x",50)
-    .attr("y",20)
-    .style("fill","black")
+    .attr("id","zoom-in")
     .on("click", function() {
         timeline.zoomlevel = timeline.zoomlevel/3;
         zoom_redraw();
-    });
+    })
+    .attr("transform","translate(50,"+(svg_ht-30)+") scale(1.5)");
+  timeline.zoom_controls.in.append("rect");
+  timeline.zoom_controls.in.append("path")
+    .attr("d", "M5 1 L5 9 M1 5 L9 5");
   
   timeline.canvas
     .on("wheel.timeline-scroll", function() {
@@ -226,6 +225,7 @@ function init(err, pat, cond) {
 }
 
 function zoom_redraw() {
+  timeline.zoomlevel = Math.min(Math.max(timeline.zoomlevel, timeline.zoommin), timeline.zoommax);
   timeline.scale.domain([10, timeline.zoomlevel]);
   redraw_condition_markers();
   redraw_time_markers();
@@ -262,8 +262,8 @@ function redraw_condition_markers() {
           return (d.app_onset/1000)>timeline.zoomlevel || // too far left
                  (timeline.scale(30)-timeline.scale(d.time/1000))<10; // too far right
       })
-      .on('mouseover.d3tip', timeline.cond_tip.show)
-      .on('mouseout.d3tip', timeline.cond_tip.hide)
+      .on('mouseenter.d3tip', timeline.cond_tip.show)
+      .on('mouseleave.d3tip', timeline.cond_tip.hide)
       .on("click.commit", commit_condition);
   
   csel.exit()
@@ -320,7 +320,7 @@ function condition_tooltop_formatter(cond) {
 }
 
 function commit_condition(cond) {
-  console.log(cond);
+  if (DEBUG) console.log(cond);
   if (fhirdata.active.indexOf(cond.resource.id)>=0) {
     // condition was already active, remove it
     fhirdata.active.splice(fhirdata.active.indexOf(cond.resource.id), 1);
@@ -346,11 +346,10 @@ function rewrite_cod_fields() {
     return a.app_onset - b.app_onset;
   }).slice(0,4);
   
-  console.log(active);
+  if (DEBUG) console.log(active);
   
   // fill in the data
   for (var i=0; i<Math.min(active.length,4); i++) {
-    console.log("cod"+(i+1)+"-text")
     document.getElementById("cod"+(i+1)+"-text").value = active[i].app_display;
     document.getElementById("cod"+(i+1)+"-time").value = active[i].app_interval_display;
   }
@@ -469,26 +468,38 @@ function draw_arrow() {
     .attr("y2",arrow_pad_top - arrow_head_box);
   timeline.arrow.append("circle")
     .attr("class", "arrow arrow-poly")
-    .attr("cx",svg_wd*(arrow_wd + (1-arrow_wd)/2) + arrow_dot_r)
+    .attr("cx",svg_wd*(arrow_wd + (1-arrow_wd)/2))
     .attr("cy",arrow_pad_top)
     .attr("r",arrow_dot_r);
+  timeline.arrow.append("g")
+      .classed("time-marker", true)
+      .each(function(d,i) {
+          d3.select(this).append("text")
+            .text("Time of Death")
+            .attr("y",marker_h/2+12);
+      })
+      .attr("transform","translate(" + (svg_wd*(arrow_wd + (1-arrow_wd)/2)) + "," + arrow_pad_top + ")");
 }
 
-function fhir_load_patient(pt_id, callback) {
+function fhir_load_patient(callback) {
   try {
-    smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
-      if (r.data.total == 1) {
-        callback(null, r.data.entry[0].resource);
-      } else {
-        callback("could not find unique patient id="+pt_id);
-      }
+    smart.patient.read().then(function(pat) {
+      callback(null, pat);
     })
+    //smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
+    //  if (r.data.total == 1) {
+    //    callback(null, r.data.entry[0].resource);
+    //  } else {
+    //    callback("could not find unique patient id="+pt_id);
+    //  }
+    //})
   } catch (err) {
     callback("problem communicating with the FHIR server")
   }
 }
 
-function fhir_load_conditions(pt_id, callback) {
+function fhir_load_conditions(callback) {
+  var pt_id = smart.patient.id;
   try {
     smart.api.search({type: "Condition", query: {patient: pt_id}}).then(function(r) {
       if (r.data.total > 0) {
@@ -504,20 +515,14 @@ function fhir_load_conditions(pt_id, callback) {
 
 // cheating
 function debug_code() {
-  console.log("loaded app.js");
-  document.getElementById("fhir-pt-banner").innerHTML = "Doe, Jane A. -- MRN 123456";
-  document.getElementById("fhir-pt-detail").innerHTML = 
-    '<p class="head">Patient Details</p> \
-     <p>Name: Jane Amy Doe</p> \
-     <p>Age at death: 45.2 years</p> \
-     <p>Residence: Alpha County, Oceania</p>';
+  document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
+  document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
+  document.getElementById("fhir-user").innerHTML = 'Loading...';
   document.getElementById("fhir-pt-history").innerHTML = 
     '<p class="head">Patient History</p> \
      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit, enim vel dictum dapibus, tellus massa dapibus nibh, in auctor felis felis ut mauris. Nam sit amet lorem diam. Sed ullamcorper magna eget enim semper, eu maximus nisi porta. Proin congue ex quam, ac rhoncus ipsum hendrerit quis. Proin sollicitudin diam vel diam semper, ac porta felis convallis. Nulla faucibus, risus eget gravida aliquet, mi ante pharetra dolor, eu luctus ante sapien et dolor. Cras feugiat, eros a ornare faucibus, odio elit vehicula felis, eu vehicula nibh sem nec magna. Integer faucibus vitae diam eget suscipit. Pellentesque dictum tincidunt neque eget molestie. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras odio purus, pretium non sagittis et, hendrerit ut neque. Nulla facilisi. Pellentesque mattis augue felis, ac tempor sapien euismod eu. Pellentesque venenatis scelerisque felis.</p> \
      <p>Duis convallis tempus tellus quis consectetur. Ut nec nisl quam. Cras mollis luctus libero, nec eleifend augue molestie et. Cras mi sapien, semper sed eros at, viverra vehicula elit. Ut vulputate imperdiet accumsan. Pellentesque placerat non dolor in tristique. In hac habitasse platea dictumst. Maecenas id eros tincidunt, ullamcorper orci eget, aliquet tortor. Nullam scelerisque ut odio in volutpat.</p> \
      <p>Aliquam erat nisi, consequat eu erat eu, vestibulum cursus purus. Vivamus ornare odio odio. Nam facilisis odio mattis, congue enim id, euismod orci. Morbi eleifend porta congue. Sed sed urna urna. Integer malesuada blandit nisi, eget tincidunt tellus posuere aliquet. Sed efficitur laoreet libero vulputate tincidunt. In faucibus, arcu vitae scelerisque posuere, nisl arcu mattis mauris, id consequat justo urna vel justo.</p> \
-     <p>Aenean at elit et urna maximus viverra. Integer nec aliquet nisl. Curabitur hendrerit nisi ut neque sollicitudin, at euismod lorem pretium. Praesent commodo, felis et rhoncus pellentesque, nulla turpis aliquam quam, ut egestas lectus magna id ex. Duis nulla dui, feugiat ac vulputate in, tincidunt a est. Fusce diam nulla, porttitor vitae libero quis, pulvinar elementum ipsum. Integer sit amet aliquam felis. Sed sed posuere lacus, quis suscipit risus. Etiam consequat, velit auctor ullamcorper convallis, nunc arcu vehicula magna, lacinia egestas sem lacus in tellus. Proin pellentesque fermentum arcu eget pulvinar. Morbi a congue elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed sit amet sapien quis lorem blandit convallis ac non erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer laoreet tellus et neque hendrerit, non egestas erat finibus. Phasellus enim felis, tempus ut metus eget, molestie porttitor est.</p> \
-     <p>Nam faucibus dictum nibh ut euismod. In ac tincidunt magna. Etiam euismod est condimentum maximus feugiat. Vivamus euismod vulputate velit vitae consectetur. Sed sollicitudin eget neque et tempus. Mauris vel tortor sem. Donec non convallis quam. Praesent arcu tortor, euismod vel rutrum quis, fermentum id urna. Sed vitae mollis libero. Nulla porta purus at neque faucibus lacinia. Integer sodales metus at elit fringilla, id facilisis massa consequat. Duis aliquam iaculis nisi ut lobortis.</p> \
      ';
 }
 
