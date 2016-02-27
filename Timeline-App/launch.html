@@ -47,14 +47,14 @@
         smart.api.search({type: "Conformance"}).then();
         connected = true;
         document.getElementById("fhir-server").innerHTML = smart.server.serviceUrl;
-        document.getElementById("fhir-id").value = 1869850;
+        document.getElementById("fhir-id").value = 1878611;
       } catch (err) {
         // do nothing
         document.getElementById("fhir-server").innerHTML = "ERROR, COULD NOT CONNECT";
       }
       
       function app_launch() {
-        window.open("app.html?id=" + document.getElementById("fhir-id").value ,"_self")
+        window.open("index.html?id=" + encodeURIComponent(document.getElementById("fhir-id").value) ,"_self")
       }
       
     </script>

@@ -21,7 +21,7 @@
 var timeline = {};
 var fhirdata = {};
 
-var DEBUG = false;
+var DEBUG = true;
 
 // initialize now, so width exists to pull
 var svg_ht = 250; // px
@@ -32,13 +32,16 @@ timeline.canvas = d3.select("#timeline-row").append("svg")
 var svg_wd = timeline.canvas[0][0].getBoundingClientRect().width;
 
 
-var arrow_pad_top = 100; // px
+var arrow_pad_top = 70; // px
 var arrow_wd = .85; // %
 var arrow_head_box = 8; // px
 var arrow_dot_r = 3; //px
 
 var marker_h = 15;
 var marker_w = 3;
+
+var proposed_spacing = 30; // b/w ea.
+var proposed_padding = 50; // b/w line+1st
 
 // debugging vars
 // var csel, cdata, ccond;
@@ -48,7 +51,7 @@ var marker_w = 3;
 
 var urlparams = {}
 location.search.substr(1).split("&").forEach(function(element) {
-  urlparams[element.split("=")[0]] = element.split("=")[1];
+  urlparams[element.split("=")[0]] = decodeURIComponent(element.split("=")[1]);
 }); // stackoverflow 5448545
 
 var smart = new FHIR.client({
@@ -104,6 +107,7 @@ function init(err, pat, cond) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   process_condition_metadata();
+  analytics_engine();
   fhirdata.active = [];
   
   // write in the parient info as appropriate
@@ -157,6 +161,13 @@ function init(err, pat, cond) {
           .html(condition_tooltop_formatter);
   timeline.canvas.call(timeline.cond_tip);
   
+  timeline.prop_tip = d3.tip()
+          .attr("class", "tooltip proposed")
+          .direction("s")
+          .offset([3,0])
+          .html(proposed_tooltop_formatter);
+  timeline.canvas.call(timeline.prop_tip);
+  
   // initialize time markers, manually for now, rough x3 steps
   // ##TODO, programmatic option?
   day = 60*60*24;
@@ -181,10 +192,6 @@ function init(err, pat, cond) {
     
   ];
   timeline.timemarkers = tmark;
-  redraw_time_markers();
-  
-  // initialize condition markers
-  redraw_condition_markers();
   
   // debugging: zoom controls!
   timeline.zoom_controls = {};
@@ -221,6 +228,8 @@ function init(err, pat, cond) {
       zoom_redraw();
     }, false)
     
+  // get things right
+  zoom_redraw();
   
 }
 
@@ -229,6 +238,7 @@ function zoom_redraw() {
   timeline.scale.domain([10, timeline.zoomlevel]);
   redraw_condition_markers();
   redraw_time_markers();
+  redraw_proposed_causes();
 }
 
 // update condition markers with new data
@@ -268,6 +278,54 @@ function redraw_condition_markers() {
   
   csel.exit()
       .remove();
+  
+}
+
+function redraw_proposed_causes() {
+  
+  var psel = timeline.proposed.selectAll("g.proposed-timeline")
+                     .data(fhirdata.predictions);
+  
+  psel.enter()
+    .append("g")
+    .classed("proposed-timeline",true)
+    .append("line")
+    .classed("prop-line",true)
+  
+  psel.each(function(d,i) {
+    d3.select(this).select("line.prop-line")
+      .attr("y1",0)
+      .attr("y2",0)
+      .attr("x1",timeline.scale(Math.min(timeline.zoomlevel, condition_lookup(d[         0]).app_onset/1000)))
+      .attr("x2",timeline.scale(Math.min(timeline.zoomlevel, condition_lookup(d[d.length-1]).app_onset/1000)));
+      
+    msel = d3.select(this).selectAll("rect.prop-marker").data(d);
+    msel.enter()
+      .append("rect")
+      .attr("width", marker_w)
+      .attr("height", marker_h)
+      .attr("y", -0.5*marker_h)
+      .classed("prop-marker",true);
+    msel
+      .attr("transform", function(dd,ii) {
+          return "translate(" +
+            timeline.scale(condition_lookup(dd).app_onset / 1000) + "," + // X
+            0 + ")";     // Y
+      })
+      .classed("out-of-range", function(dd) {
+          return (condition_lookup(dd).app_onset/1000)>timeline.zoomlevel || // too far left
+                 (timeline.scale(30)-timeline.scale(condition_lookup(dd).app_onset/1000))<10; // too far right
+      });
+    msel.exit()
+      .remove();
+    
+  })
+  .attr("transform",function(d,i) {
+    return "translate(0,"+(arrow_pad_top + i*proposed_spacing + proposed_padding)+")";
+  })
+  .on('mouseenter.d3tip2', timeline.prop_tip.show)
+  .on('mouseleave.d3tip2', timeline.prop_tip.hide);
+
   
 }
 
@@ -312,9 +370,22 @@ function condition_tooltop_formatter(cond) {
   // start with bold disease name
   str = "<strong>" + cond.app_display + "</strong><br /><br />";
   
+  if (DEBUG) str += "id: " + cond.resource.id + "<br />";
   // add in some details
   str += "Condition began: " + cond.app_onset_display + "<br />";
   str += "Interval to death: " + cond.app_interval_display;
+  
+  return str;
+}
+
+function proposed_tooltop_formatter(prop) {
+  // real easy, just lay our the progression
+  str = condition_lookup(prop[prop.length-1]).app_display;
+  str += " (" + condition_lookup(prop[prop.length-1]).app_interval_display + ")"
+  for (var i=prop.length-2; i>=0; i--) {
+    var cond = condition_lookup(prop[i]);
+    str += "<br />&#8627; " + cond.app_display + " (" + cond.app_interval_display + ")";
+  }
   
   return str;
 }
@@ -483,23 +554,20 @@ function draw_arrow() {
 
 function fhir_load_patient(callback) {
   try {
-    smart.patient.read().then(function(pat) {
-      callback(null, pat);
+    smart.api.search({type: "Patient", query: {_id: urlparams.id}}).then(function(r) {
+      if (r.data.total == 1) {
+        callback(null, r.data.entry[0].resource);
+      } else {
+        callback("could not find unique patient id="+pt_id);
+      }
     })
-    //smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
-    //  if (r.data.total == 1) {
-    //    callback(null, r.data.entry[0].resource);
-    //  } else {
-    //    callback("could not find unique patient id="+pt_id);
-    //  }
-    //})
   } catch (err) {
-    callback("problem communicating with the FHIR server")
+    callback("problem fetching patient context from the FHIR server")
   }
 }
 
 function fhir_load_conditions(callback) {
-  var pt_id = smart.patient.id;
+  var pt_id = urlparams.id;
   try {
     smart.api.search({type: "Condition", query: {patient: pt_id}}).then(function(r) {
       if (r.data.total > 0) {
@@ -509,9 +577,25 @@ function fhir_load_conditions(callback) {
       }
     })
   } catch (err) {
-    callback("problem communicating with the FHIR server")
+    callback("problem getting conditions from the FHIR server")
   }
 }
+
+function condition_lookup(id) {
+  var f = fhirdata.conditions.filter(function(e) {
+    return id == e.resource.id;
+  })
+  return f[0];
+}
+
+function analytics_engine() {
+  // hashtag lol
+  // hard-coded as hell, just for mr johnston
+  fhirdata.predictions = [[1878613, 1878617, 1878615, 1878614],
+                          [1878615, 1878614],
+                          [1878617, 1878616, 1878615, 1878614]];
+}
+
 
 // cheating
 function debug_code() {

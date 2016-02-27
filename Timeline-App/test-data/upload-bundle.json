@@ -324,6 +324,62 @@
                 "method": "POST",
                 "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc007"
             }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc008",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "127295002",
+                            "display": "Traumatic brain injury"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetDateTime": "2015-12-22T21:00:00.000-05:00"
+            },
+            "request": {
+                "method": "POST",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc008"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc009",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "2032001",
+                            "display": "Intracranial swelling"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetDateTime": "2015-12-28T21:00:00.000-05:00"
+            },
+            "request": {
+                "method": "POST",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc009"
+            }
         }
     ]
 }
