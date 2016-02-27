@@ -81,12 +81,18 @@ timeline.scale = d3.scale.log()
 
 debug_code();
 
-fhir_get_smart();
+FHIR.oauth2.ready(function(s) {
+  smart = s;
+  queue()
+    .defer(fhir_load_patient)
+    .defer(fhir_load_conditions)
+    .await(init);
+});
 
-queue()
-  .defer(fhir_load_patient)
-  .defer(fhir_load_conditions)
-  .await(init);
+//queue()
+//  .defer(fhir_load_patient)
+//  .defer(fhir_load_conditions)
+//  .await(init);
 
 
 // // HELPER FUNCTIONS // //
@@ -527,37 +533,51 @@ function fhir_get_smart() {
   
   fhirdata.auth = {};
   
-  req = {
-    url: stateparams.tokenUrl,
-    type: 'POST',
-    data: {
-      code: urlparams.code,
-      grant_type: 'authorization_code',
-      redirect_uri: stateparams.redirectUrl
-    }
-  };
-  if (DEBUG) console.log(JSON.stringify(req));
-  $.ajax(req).done(function(res){
-    // should get back the access token and the patient ID
-    if (DEBUG) console.log(JSON.stringify(res));
-    fhirdata.auth.accessToken = res.access_token;
-    fhirdata.auth.patientId = res.patient;
-  });
-  smart = new FHIR.client({
-                            serviceUrl: urlparams.iss,
-                            patientId: fhirdata.auth.patientId,
-                              auth: {
-                                bearer: fhirdata.auth.accessToken
-                              }
-                          });
-  
-//  FHIR.oauth2.ready(function(s) {
-//    smart = s;
-//    queue()
-//      .defer(fhir_load_patient)
-//      .defer(fhir_load_conditions)
-//      .await(init);
+//  req = {
+//    url: stateparams.tokenUrl + "?",
+//    type: 'POST',
+//    data: {
+//      client_id: stateparams.clientId,
+//      code: urlparams.code,
+//      grant_type: 'authorization_code',
+//      redirect_uri: stateparams.redirectUrl
+//    }
+//  };
+//  token_req = stateparams.tokenUrl + "?" +
+//              "client_id="     + encodeURIComponent(stateparams.clientId   ) + "&" +
+//              "code="          + encodeURIComponent(urlparams.code         ) + "&" +
+//              "redirect_uri="  + encodeURIComponent(stateparams.redirectUrl) ;
+//  d3.xhr(token_req, function(t) {
+//    
+//    fhirdata.auth.accessToken = t.access_token;
+//    fhirdata.auth.patientId = t.patient;
+//    
+//    smart = new FHIR.client({
+//                              serviceUrl: urlparams.iss,
+//                              patientId: fhirdata.auth.patientId,
+//                                auth: {
+//                                  bearer: fhirdata.auth.accessToken
+//                                }
+//                            });
+//    
+//  })
+//    
+//  if (DEBUG) console.log(JSON.stringify(req));
+//  $.ajax(req).done(function(res){
+//    // should get back the access token and the patient ID
+//    if (DEBUG) console.log(JSON.stringify(res));
+//    fhirdata.auth.accessToken = res.access_token;
+//    fhirdata.auth.patientId = res.patient;
 //  });
+//  smart = new FHIR.client({
+//                            serviceUrl: urlparams.iss,
+//                            patientId: fhirdata.auth.patientId,
+//                              auth: {
+//                                bearer: fhirdata.auth.accessToken
+//                              }
+//                          });
+//  
+
 }
 
 // cheating

@@ -41,7 +41,7 @@
       
       var connected = false;
       // var clientId = "gt-cdc-fhir-death"
-      var clientId = "e850b7a4-0be6-406b-91d9-d15a81bd911b"
+      var clientId = "gt-cdc-fhir-death"
       // reg token: "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOlsiZTg1MGI3YTQtMGJlNi00MDZiLTkxZDktZDE1YTgxYmQ5MTFiIl0sImlzcyI6Imh0dHBzOlwvXC9hdXRob3JpemUtZHN0dTIuc21hcnRoZWFsdGhpdC5vcmdcLyIsImp0aSI6ImQ2N2FmYmM5LTM3ZTktNDAzYy1iMWMxLTNiNWM0ZDc0OGQ2OSIsImlhdCI6MTQ1NjU2MjU4MH0.AwoNdjpGnnsme-06xF8Rw__SGbr0nHNIVMKK6R8utSNb9Q8gnziGPRoZijvUL1zUFpcR2g0NnnvTuSyeRA9fibrhyQAy1V6vArRs6KgEl_i6TQuixFc1d_QC2WAD9jWaIkVGm_hCOBDKO6WNs5YYiI0TXiBtBOfQLDkMtLsIMWM"
       var secret = null;
       
@@ -88,21 +88,21 @@
             tokenUrl: tokenUrl
         });
         
-//        FHIR.oauth2.authorize({
-//          client_id: clientId,
-//          scope: scope,
-//          state: state
-//        })
+        FHIR.oauth2.authorize({
+          client_id: clientId,
+          scope: scope,
+          state: state
+        });
         
-        window.location.href = authUrl + "?" +
-            "response_type=code&" +
-            "client_id=" + encodeURIComponent(clientId) + "&" +
-            "scope=" + encodeURIComponent(scope) + "&" +
-            "redirect_uri=" + encodeURIComponent(redirectUrl) + "&" +
-            "aud=" + encodeURIComponent(serviceUrl) + "&" +
-            "launch=" + launchContextId + "&" +
-            "state=" + state;
-        
+//        window.location.href = authUrl + "?" +
+//            "response_type=code&" +
+//            "client_id=" + encodeURIComponent(clientId) + "&" +
+//            "scope=" + encodeURIComponent(scope) + "&" +
+//            "redirect_uri=" + encodeURIComponent(redirectUrl) + "&" +
+//            "aud=" + encodeURIComponent(serviceUrl) + "&" +
+//            "launch=" + launchContextId + "&" +
+//            "state=" + state;
+//        
       })
       
     </script>
