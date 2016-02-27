@@ -21,7 +21,7 @@
 var timeline = {};
 var fhirdata = {};
 
-var DEBUG = false;
+var DEBUG = true;
 
 // initialize now, so width exists to pull
 var svg_ht = 250; // px
@@ -46,18 +46,22 @@ var marker_w = 3;
 
 // // FHIR ACCESS // //
 
-var urlparams = {}
+var urlparams = {};
 location.search.substr(1).split("&").forEach(function(element) {
-  urlparams[element.split("=")[0]] = element.split("=")[1];
+  urlparams[element.split("=")[0]] = decodeURIComponent(element.split("=")[1]);
 }); // stackoverflow 5448545
 
-var smart = new FHIR.client({
-                              serviceUrl: 'http://fhirtest.uhn.ca/baseDstu2',
-                              patientId: urlparams.id,
-                              auth: {
-                                type: 'none'
-                              }
-                            });
+var stateparams = JSON.parse(sessionStorage[urlparams.state]);
+
+var smart = [];
+
+//var smart = new FHIR.client({
+//                              serviceUrl: 'http://fhirtest.uhn.ca/baseDstu2',
+//                              patientId: urlparams.id,
+//                              auth: {
+//                                type: 'none'
+//                              }
+//                            });
 
 
 // // CONDITION STORAGE AND STATE FIELDS // //
@@ -76,6 +80,8 @@ timeline.scale = d3.scale.log()
 // // MAIN CODE // //
 
 debug_code();
+
+fhir_get_smart();
 
 queue()
   .defer(fhir_load_patient)
@@ -511,6 +517,47 @@ function fhir_load_conditions(callback) {
   } catch (err) {
     callback("problem communicating with the FHIR server")
   }
+}
+
+function fhir_get_smart() {
+  
+  // can't do this right :(
+  // manually exchange auth code for token, create session
+  if (DEBUG) console.log("getting smart...");
+  
+  fhirdata.auth = {};
+  
+  req = {
+    url: stateparams.tokenUrl,
+    type: 'POST',
+    data: {
+      code: urlparams.code,
+      grant_type: 'authorization_code',
+      redirect_uri: stateparams.redirectUrl
+    }
+  };
+  if (DEBUG) console.log(JSON.stringify(req));
+  $.ajax(req).done(function(res){
+    // should get back the access token and the patient ID
+    if (DEBUG) console.log(JSON.stringify(res));
+    fhirdata.auth.accessToken = res.access_token;
+    fhirdata.auth.patientId = res.patient;
+  });
+  smart = new FHIR.client({
+                            serviceUrl: urlparams.iss,
+                            patientId: fhirdata.auth.patientId,
+                              auth: {
+                                bearer: fhirdata.auth.accessToken
+                              }
+                          });
+  
+//  FHIR.oauth2.ready(function(s) {
+//    smart = s;
+//    queue()
+//      .defer(fhir_load_patient)
+//      .defer(fhir_load_conditions)
+//      .await(init);
+//  });
 }
 
 // cheating

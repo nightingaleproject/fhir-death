@@ -3,6 +3,8 @@
     <head>
         <title>Simple Auth App - Launch</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script type="text/javascript" charset="utf-8" 
+            src="../lib/fhir-client.min.js"></script>
     </head>
     <body>
         Loading...
@@ -62,13 +64,15 @@
 
             // retain a couple parameters in the session for later use
             sessionStorage[state] = JSON.stringify({
-                clientId: clientId,
+                client_id: clientId,
                 secret: secret,
                 serviceUri: serviceUri,
                 redirectUri: redirectUri,
-                tokenUri: tokenUri
+                tokenUri: tokenUri,
+                scope: scope
             });
 
+          
             // finally, redirect the browser to the authorizatin server and pass the needed
             // parameters for the authorization request in the URL
             window.location.href = authUri + "?" +

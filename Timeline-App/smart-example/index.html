@@ -3,6 +3,8 @@
   <head>
      <title>Simple Auth App</title>
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="../lib/fhir-client.min.js"></script>
   </head>
   <body>
     <script>
@@ -10,6 +12,11 @@
         var state = getUrlParameter("state");  // session key
         var code = getUrlParameter("code");    // authorization code
 
+//      FHIR.oauth2.ready(function(s) {
+//        console.log("made it");
+//        s;
+//      })
+      
         // load the app parameters stored in the session
         var params = JSON.parse(sessionStorage[state]);  // load app session
         var tokenUri = params.tokenUri;
@@ -36,7 +43,7 @@
         if (secret) {
             options['headers'] = {'Authorization': 'Basic ' + btoa(clientId + ':' + secret)};
         }
-
+        console.log(JSON.stringify(options));
         // obtain authorization token from the authorization service using the authorization code
         $.ajax(options).done(function(res){
             // should get back the access token and the patient ID
