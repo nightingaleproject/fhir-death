@@ -54,14 +54,6 @@ location.search.substr(1).split("&").forEach(function(element) {
   urlparams[element.split("=")[0]] = decodeURIComponent(element.split("=")[1]);
 }); // stackoverflow 5448545
 
-var smart = new FHIR.client({
-                              serviceUrl: 'http://fhirtest.uhn.ca/baseDstu2',
-                              patientId: urlparams.id,
-                              auth: {
-                                type: 'none'
-                              }
-                            });
-
 
 // // CONDITION STORAGE AND STATE FIELDS // //
 
@@ -80,10 +72,14 @@ timeline.scale = d3.scale.log()
 
 debug_code();
 
-queue()
-  .defer(fhir_load_patient)
-  .defer(fhir_load_conditions)
-  .await(init);
+FHIR.oauth2.ready(function(s) {
+  if (DEBUG) console.log("got smart");
+  smart = s;
+  queue()
+    .defer(fhir_load_patient)
+    .defer(fhir_load_conditions)
+    .await(init);
+});
 
 
 // // HELPER FUNCTIONS // //
@@ -257,7 +253,7 @@ function redraw_condition_markers() {
           d3.select(this).append("circle")
             .attr("cx", marker_w/2)
             .attr("cy", -1.5)
-            .attr("r", marker_w);
+            .attr("r", marker_w*1.5);
       });
       
   csel.attr("transform",function(d,i) {
@@ -559,7 +555,8 @@ function draw_arrow() {
 
 function fhir_load_patient(callback) {
   try {
-    smart.api.search({type: "Patient", query: {_id: urlparams.id}}).then(function(r) {
+    var pt_id = smart.patient.id;
+    smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
       if (r.data.total == 1) {
         callback(null, r.data.entry[0].resource);
       } else {
@@ -572,8 +569,8 @@ function fhir_load_patient(callback) {
 }
 
 function fhir_load_conditions(callback) {
-  var pt_id = urlparams.id;
   try {
+    var pt_id = smart.patient.id;
     smart.api.search({type: "Condition", query: {patient: pt_id}}).then(function(r) {
       if (r.data.total > 0) {
         callback(null, r.data);
@@ -596,9 +593,9 @@ function condition_lookup(id) {
 function analytics_engine() {
   // hashtag lol
   // hard-coded as hell, just for mr johnston
-  fhirdata.predictions = [['1878613', '1878617', '1878615', '1878614'],
-                          ['1878615', '1878614'],
-                          ['1878617', '1878616', '1878615', '1878614']];
+  fhirdata.predictions = [['200001', '200005', '200003', '200002'],
+                          ['200003', '200002'],
+                          ['200005', '200004', '200003', '200002']];
 }
 
 
@@ -619,7 +616,6 @@ function unimplemented() {
   console.warn("feature not yet implemented");
   window.alert("this button not yet implemented");
 }
-
 
 
 
