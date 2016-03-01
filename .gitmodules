@@ -13,6 +13,3 @@
 [submodule "Resources/queue-js"]
 	path = Resources/queue-js
 	url = https://github.com/d3/d3-queue.git
-[submodule "Resources/jQuery"]
-	path = Resources/jQuery
-	url = https://github.com/jquery/jquery.git
