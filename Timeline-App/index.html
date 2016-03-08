@@ -69,11 +69,12 @@
     <div class="layout-row" id="bottom-nav-row">
       <!-- navigation buttons -->
       <button class="nav" id="nav1" onclick="unimplemented()">Demographic Information</button>
-      <button class="nav" id="nav2" onclick="unimplemented()">Validate and Submit</button>
+      <button class="nav" id="nav2" onclick="umls_popup()">Validate and Submit</button>
       <p class="small right">Logged in as: <span id="fhir-user"></span></p>
     </div>
     
-    
+    <div id="fade"></div>
+    <div id="login-container"></div>
     
     
     <!--  LOAD IN EXTERNAL JS RESOURCES  -->
@@ -91,6 +92,8 @@
     
     <!--  FINALLY, LOAD MAIN JS FILE TO RUN THE APP  -->
     
+    <script type="text/javascript" charset="utf-8" 
+            src="umls.js"></script>
     <script type="text/javascript" charset="utf-8" 
             src="app.js"></script>
     

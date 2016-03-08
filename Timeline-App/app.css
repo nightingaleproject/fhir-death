@@ -122,7 +122,7 @@ div.textbox {
   margin: 0 0.5em;
 }
 
-.textbox p.head {
+p.head {
   text-align: center;
   padding-bottom: 0.5em;
   text-decoration: underline;
@@ -269,7 +269,65 @@ span#fhir-server {
 }
 
 
+/*** UMLS Login Window Popup ***/
+
+div#fade {
+  opacity:0.8;
+  filter: alpha(opacity=80); /* IE <9 tweak */
+  background-color: #ECECEC; 
+  width: 100%; 
+  height: 100%; 
+  z-index: 98;
+  top: 0; 
+  left: 0; 
+  position: fixed;
+  visibility: hidden;
+}
+
+div.popover {
+  opacity: 1;
+  filter: alpha(opacity=100);
+  background-color: #ECECEC;
+  position: absolute;
+  top: 25%;
+  margin: 0 40%; /* tb lr */
+  width: 20%;
+  z-index: 99;
+  border: 2px solid black;
+  border-radius: 10px;
+  visibility: hidden;
+}
+
+.popover p {
+  width: 80%;
+  margin: 5px 10%;
+  text-align: center;
+}
+
+
 /*** dev-only (AKA "ugly") styling ***/
 div {
   /*border: 2px solid gray;*/
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

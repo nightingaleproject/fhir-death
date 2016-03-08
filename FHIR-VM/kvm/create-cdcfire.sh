@@ -2,18 +2,35 @@
 #
 #  fhir-death project VM
 #  This is how the KVM guest was originally created
+#  Run as root
 
 
-virt-install                                                  \
-  --hvm                                                       \
-  --name=cdcfire                                              \
-  --vcpus=2                                                   \
-  --ram=2048                                                  \
-  --network bridge:br0                                        \
-  --location /data/kvm/CentOS-6.7-x86_64-netinstall.iso       \
-  --disk path=/data/kvm/cdcfire.img                           \
-  --disk path=/data/kvm/CentOS-6.7-x86_64-minimal.iso         \
-  --extra-args="console=tty0 console=ttyS0,115200n8 edd=off"
+# # #
+#
+#  Install
+#
+# # #
+
+DISK=/data/kvm/miblab-fhir.img
+
+fallocate -l 20G $DISK
+chown qemu:qemu $DISK
+chmod 0744 $DISK
+virt-install                                  \
+  --hvm                                       \
+  --name=miblab-fhir                          \
+  --vcpus=2                                   \
+  --ram=2048                                  \
+  --network bridge:br0,mac=52:54:00:1f:23:8b  \
+  --disk path=$DISK                           \
+  --cdrom=ubuntu-14.04.4-server-amd64.iso         
+
+
+# # #
+#
+#  Final Setup
+#
+# # #
 
 
 # After installation, log in using the virsh console and start the netowork

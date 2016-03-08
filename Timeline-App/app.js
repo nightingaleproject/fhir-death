@@ -1,7 +1,7 @@
 /*
  * app.js - Death on FHIR Prototype
  *    Ryan Hoffman, 2016
- *    v0.0.1
+ *    v0.0.2
  * 
  * Main script for death app.
  * 
@@ -12,7 +12,8 @@
  *      - must have deceasedDateTime defined
  *      - must have birthDate defined
  *    Condition:
- *      - onset defined, but not by onsetString
+ *      - onset defined, other than by onsetString
+ *      - coded in SNOMED or ICD10
  */
 
 
