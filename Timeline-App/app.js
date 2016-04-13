@@ -592,7 +592,7 @@ function condition_lookup(id) {
 }
 
 function analytics_engine() {
-  // hashtag lol
+  // #lol
   // hard-coded as hell, just for mr johnston
   fhirdata.predictions = [['200001', '200005', '200003', '200002'],
                           ['200003', '200002'],
