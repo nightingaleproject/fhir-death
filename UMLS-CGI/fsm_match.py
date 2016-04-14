@@ -35,7 +35,7 @@ def brute_match(fsqs, conditions,lim=5):
     '''
     res = {}
     for r in reversed(range(2, len(conditions)+1)):
-        print r
+        # print r
         r_subseq = itertools.combinations(conditions, r)
         for ele in r_subseq:
             if ele in fsqs:
@@ -44,7 +44,6 @@ def brute_match(fsqs, conditions,lim=5):
             break
     res = sorted(res.items(), key = lambda x: x[1],reverse = True)
     return res
-
 
 cgitb.enable() # pretty tracebacks for cgi scripts
 
@@ -61,11 +60,10 @@ form = cgi.FieldStorage()
 raw = form.getfirst("conditions")
 conditions = ast.literal_eval(raw)
 
-print conditions
-print type(conditions)
-print conditions[0]
-print type(conditions[0])
-
+## debug
+#print conditions
+#print len(conditions)
+#sys.exit()
 
 ### Get the files
 f = open('./mort2012_o_seqs_50_3codes.p','rb')
@@ -75,7 +73,7 @@ f.close()
 ### The match functions we are using, see comments above
 p = brute_match(o_seqs, conditions)
 
-print p
+# print p
 results = {}
 results['res'] = p
 ### Dump the HTTP response body

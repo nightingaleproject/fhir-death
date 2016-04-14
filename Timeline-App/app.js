@@ -63,6 +63,7 @@ timeline.zoomlevel = 86400*10; // seconds
 timeline.zoommax = Infinity;
 timeline.zoommin = 60*60;
 var zoomfactor = 1.1; // sensitivity
+timeline.stop_animate = false;
 
 timeline.scale = d3.scale.log()
                    .domain([10, timeline.zoomlevel])
@@ -104,7 +105,7 @@ function init(err, pat, cond) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   process_condition_metadata();
-  analytics_engine();
+  // analytics_engine();
   fhirdata.active = [];
   
   // write in the parient info as appropriate
@@ -224,6 +225,37 @@ function init(err, pat, cond) {
                                      : timeline.zoomlevel/zoomfactor;
       zoom_redraw();
     }, false)
+  
+  // analytics controls
+  b1 = timeline.canvas.append("g")
+             .classed("analytics-button", true)
+             .attr("transform","translate(200," + (arrow_pad_top+proposed_padding) + ")");
+  b1.append("rect")
+    .attr("height",50)
+    .attr("width",200)
+    .style("fill","#ECECEC")
+    .style("stroke","black");
+  b1.append("text")
+    .text("Load sample analytics")
+    .attr("text-anchor", "middle")
+    .attr("x", 100)
+    .attr("y",30)
+  b1.on("click",hardcoded_predictions);
+
+  b2 = timeline.canvas.append("g")
+               .classed("analytics-button", true)
+               .attr("transform","translate(550," + (arrow_pad_top+proposed_padding) + ")");
+  b2.append("rect")
+    .attr("height",50)
+    .attr("width",300)
+    .style("fill","#ECECEC")
+    .style("stroke","black");
+  b2.append("text")
+    .text("Load data mining (requires ICD-10)")
+    .attr("text-anchor", "middle")
+    .attr("x", 150)
+    .attr("y",30)
+  b2.on("click",analytics_engine);
     
   // get things right
   zoom_redraw();
@@ -279,6 +311,14 @@ function redraw_condition_markers() {
 }
 
 function redraw_proposed_causes() {
+  
+  if (!fhirdata.hasOwnProperty("predictions")) {
+    
+    return;
+    
+  } else {
+    d3.selectAll(".analytics-button").style("display","none");
+  }
   
   var psel = timeline.proposed.selectAll("g.proposed-timeline")
                      .data(fhirdata.predictions);
@@ -604,13 +644,89 @@ function condition_lookup(id) {
 }
 
 function analytics_engine() {
-  // #lol
-  // hard-coded as hell, just for mr johnston
-  fhirdata.predictions = [['200001', '200005', '200003', '200002'],
-                          ['200003', '200002'],
-                          ['200005', '200004', '200003', '200002']];
+  // hang'sl v1
+  
+  animate_load_label();
+  
+  var conditions = [];
+  var lookup = {};
+  for (var i=0; i<fhirdata.conditions.length; i++) {
+    for (var k=0; k<fhirdata.conditions[i].resource.code.coding.length; k++) {
+      try {
+        if (fhirdata.conditions[i].resource.code.coding[k].system.indexOf("ICD10")>-1) {
+          code = fhirdata.conditions[i].resource.code.coding[k].code;
+          code = code.split(".")[0]; // strip the end
+          conditions.push(code);
+          lookup[code] = fhirdata.conditions[i].resource.id;
+        }
+      } catch(e) {}
+    }
+  }
+  
+  fhirdata.lookup = lookup;
+  
+  d3.xhr("http://apollo.bme.gatech.edu/cgi-bin/fsm_match.py")
+    .header("Content-Type", "application/x-www-form-urlencoded")
+    .post("conditions=['"+conditions.join("','")+"']", function(err,data) {
+        
+        if (err) {
+          console.error(err);
+          return;
+        }
+    
+        // fhirdata.debug = data.response;
+        seqs = JSON.parse(data.response);
+    
+        fhirdata.predictions = [];
+        for (var i=0; i<seqs.res.length; i++) {
+          fhirdata.predictions[i] = [];
+          seq = seqs.res[i][0].split("->");
+          for (j=0; j<seq.length; j++) {
+            fhirdata.predictions[i].push(fhirdata.lookup[seq[j]])
+          }
+        }
+    
+        console.log("got predictions from analytical engine server");
+        loading_done();
+        redraw_proposed_causes();
+    
+    });
+  
+  
+  //// #lol
+  //// hard-coded as hell, just for mr johnston
+  //fhirdata.predictions = [['200001', '200005', '200003', '200002'],
+  //                        ['200003', '200002'],
+  //                        ['200005', '200004', '200003', '200002']];
 }
 
+function hardcoded_predictions() {
+  fhirdata.predictions = [['210001', '210005', '210003', '210002'],
+                          ['210003', '210002'],
+                          ['210005', '210004', '210003', '210002']];
+  redraw_proposed_causes();
+}
+
+// inspired by the transitions coolness from alignedleft
+function animate_load_label() {
+    d3.select("#load-label")
+        .style("display","block")
+        .transition()
+        .attr("fill", "hsl("+(Math.random()*360)+",100,50)")
+        .each("end",function() {
+            if (timeline.stop_animate) {
+                d3.select(this).style("display","none")
+                timeline.stop_animate = false; // reset the trigger
+            } else {
+                animate_load_label();
+            }
+        });
+}
+function loading_done() {
+    // map1.selectAll(".overlay")
+    //     .remove();
+    timeline.stop_animate = true;
+}
 
 // cheating
 function debug_code() {

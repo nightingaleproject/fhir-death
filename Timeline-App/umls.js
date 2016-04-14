@@ -9,7 +9,6 @@
 
 
 umls = {};
-umls.stop_animate = false;
 
 d3.select("#login-container")
   .append("div")
@@ -94,24 +93,4 @@ function bundle_conditions() {
   
 }
 
-// inspired by the transitions coolness from alignedleft
-function animate_load_label() {
-    d3.select("#load-label")
-        .style("display","block")
-        .transition()
-        .attr("fill", "hsl("+(Math.random()*360)+",100,50)")
-        .each("end",function() {
-            if (umls.stop_animate) {
-                d3.select(this).style("display","none")
-                umls.stop_animate = false; // reset the trigger
-            } else {
-                animate_load_label();
-            }
-        });
-}
-function loading_done() {
-    // map1.selectAll(".overlay")
-    //     .remove();
-    umls.stop_animate = true;
-}
 
