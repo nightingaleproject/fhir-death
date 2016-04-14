@@ -46,7 +46,8 @@ mt = UMLS(user,passwd)
 
 for i, e in enumerate(bundle["entry"]):
   if "resource" in e and "code" in e["resource"] and \
-      "coding" in e["resource"]["code"]:
+      "coding" in e["resource"]["code"] and \
+      not "ICD10" in e["resource"]["code"]["coding"][-1]["system"]:
     cui = mt.cui_search_by_code(e["resource"]["code"]["coding"][0]["code"])
     try:
       code = mt.code_search_by_cui(cui,"ICD10,ICD10CM,ICD10PCS")
