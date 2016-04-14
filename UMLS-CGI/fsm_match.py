@@ -21,7 +21,7 @@ from collections import OrderedDict
 import cPickle as pickle
 import ast
 
-def brute_match(fsqs, conditions):
+def brute_match(fsqs, conditions,lim=5):
     '''
     INPUT:
         fsqs: dictionary of rules we have, (tuple, int)
@@ -34,12 +34,14 @@ def brute_match(fsqs, conditions):
                 the string is the join of all the conditions
     '''
     res = {}
-    for r in xrange(2, len(conditions)+1):
-        # print r
+    for r in reversed(range(2, len(conditions)+1)):
+        print r
         r_subseq = itertools.combinations(conditions, r)
         for ele in r_subseq:
             if ele in fsqs:
                 res['->'.join(ele)] = fsqs[ele]
+        if len(res)>=lim:
+            break
     res = sorted(res.items(), key = lambda x: x[1],reverse = True)
     return res
 
@@ -56,9 +58,14 @@ print #newline
 
 form = cgi.FieldStorage()
 
-conditions = form.getfirst("conditions")
-# conditions = ast.literal_eval(raw)
-# conditions = json.loads(raw)
+raw = form.getfirst("conditions")
+conditions = ast.literal_eval(raw)
+
+print conditions
+print type(conditions)
+print conditions[0]
+print type(conditions[0])
+
 
 ### Get the files
 f = open('./mort2012_o_seqs_50_3codes.p','rb')
@@ -68,10 +75,9 @@ f.close()
 ### The match functions we are using, see comments above
 p = brute_match(o_seqs, conditions)
 
-# print p
+print p
 results = {}
 results['res'] = p
-
 ### Dump the HTTP response body
 
 print json.dumps(results)
