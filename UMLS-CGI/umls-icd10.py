@@ -49,7 +49,7 @@ for i, e in enumerate(bundle["entry"]):
       "coding" in e["resource"]["code"]:
     cui = mt.cui_search_by_code(e["resource"]["code"]["coding"][0]["code"])
     try:
-      code = mt.code_search_by_cui(cui,"ICD10,ICD10CM")
+      code = mt.code_search_by_cui(cui,"ICD10,ICD10CM,ICD10PCS")
       newcode = {"code": code, "system": "ICD10"}
       bundle["entry"][i]["resource"]["code"]["coding"].append(newcode)
     except UMLSNoMatchingCodesException:

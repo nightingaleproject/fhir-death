@@ -9,7 +9,7 @@
 
 
 umls = {};
-foo = [];
+umls.stop_animate = false;
 
 d3.select("#login-container")
   .append("div")
@@ -18,8 +18,14 @@ d3.select("#login-container")
   .html("<p class=\"head\">UMLS Login</p> \
          <p>Username: <input type=\"text\" id=\"umls-username\" name=\"umls-username\"></p> \
          <p>Password: <input type=\"password\" id=\"umls-password\" name=\"umls-password\"></p> \
-         <p><button onclick=\"umls_login()\">Login and Convert to ICD10</button></p>"
+         <p><button onclick=\"umls_convert()\">Log In and Convert to ICD10</button></p>"
   );
+d3.select("#timeline-canvas").append("text")
+    .attr("id", "load-label")
+    .attr("x",25)
+    .attr("y",38)
+    .text("Loading...")
+    .style("display","none");
 
 function umls_popup() {
   
@@ -29,17 +35,37 @@ function umls_popup() {
   
 }
 
-function umls_login() {
+function umls_convert() {
   
-  // window.alert("login");
+  console.log("kicked off login");
   
-  user = document.getElementById("umls-username").value;
-  pass = document.getElementById("umls-password").value;
-  url = "https://utslogin.nlm.nih.gov/cas/v1/tickets?username="+user+";password="+pass;
+  umls.user = document.getElementById("umls-username").value;
+  var pass = document.getElementById("umls-password").value;
   
-  d3.xhr("https://utslogin.nlm.nih.gov/cas/v1/tickets")
-    .post("username="+user+"&password="+pass, function(err,data) { foo = data; })
-    
+  d3.xhr('http://apollo.bme.gatech.edu/cgi-bin/umls-icd10.py')
+    .header("Content-Type", "application/x-www-form-urlencoded")
+    .post("username="+umls.user+"&password="+pass+"&data="+JSON.stringify(bundle_conditions()), 
+      function(err,data) { 
+        umls.raw = data.response;
+        umls.response = JSON.parse(umls.raw);
+        // reintegrate with main data scrtucture
+        for (i=0; i<umls.response.entry.length; i++) {
+          fhirdata.conditions[i].resource = umls.response.entry[i].resource;
+          for (k=0; k<fhirdata.conditions[i].resource.code.coding.length; k++) {
+            if (fhirdata.conditions[i].resource.code.coding[k].system.indexOf("ICD10")>-1) {
+              fhirdata.conditions[i].app_icd10 = 
+                fhirdata.conditions[i].resource.code.coding[k].code;
+            }
+          }
+        }
+        loading_done();
+        console.log("UMLS resources all loaded in");
+    })
+  
+  // un-draw the interface
+  d3.select("#fade").style("visibility","hidden");
+  d3.select("#umls-login").style("visibility","hidden");
+  animate_load_label();
   
 }
 
@@ -51,22 +77,41 @@ function bundle_conditions() {
   bundle.type = "batch";
   bundle.entry = [];
   
-  for (var i=0; i<fhirdata.conditions.length; i++) {
-    
+  for (var i=0; i<fhirdata.conditions.length; i++) { 
     bundle.entry[i] = {};
     bundle.entry[i].resource = fhirdata.conditions[i].resource;
-    
   }
   
-  d3.xhr('http://apollo.bme.gatech.edu/cgi-bin/umls-icd10.py')
-    .header("Content-Type", "application/x-www-form-urlencoded")
-    .post("username=rhoffman12&password=!WangLab2016&data="+JSON.stringify(bundle), function(err,data) { 
-      fhirdata.debug = data.response;
-      fhirdata.translation = JSON.parse(data.response);
-    })
+  return bundle;
+
+  //// DEBUGGING REQUEST
+  //d3.xhr('http://apollo.bme.gatech.edu/cgi-bin/umls-icd10.py')
+  //  .header("Content-Type", "application/x-www-form-urlencoded")
+  //  .post("username=rhoffman12&password=!WangLab2016&data="+JSON.stringify(bundle), function(err,data) { 
+  //    fhirdata.debug = data.response;
+  //    fhirdata.translation = JSON.parse(data.response);
+  //  })
   
 }
 
-
-
+// inspired by the transitions coolness from alignedleft
+function animate_load_label() {
+    d3.select("#load-label")
+        .style("display","block")
+        .transition()
+        .attr("fill", "hsl("+(Math.random()*360)+",100,50)")
+        .each("end",function() {
+            if (umls.stop_animate) {
+                d3.select(this).style("display","none")
+                umls.stop_animate = false; // reset the trigger
+            } else {
+                animate_load_label();
+            }
+        });
+}
+function loading_done() {
+    // map1.selectAll(".overlay")
+    //     .remove();
+    umls.stop_animate = true;
+}
 

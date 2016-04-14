@@ -7,4 +7,5 @@ print "tgt: "+u.tgt
 
 print u.cui_search_by_code("386.11","ICD9CM")
 print u.code_search_by_cui("C0155502","ICD10,ICD10CM,ICD9CM")
-
+print u.cui_search_by_string("Benign Paroxysmal Positional Vertigo")
+print u.code_search_by_cui("C0155502")

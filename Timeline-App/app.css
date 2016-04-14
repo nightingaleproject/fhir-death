@@ -304,6 +304,9 @@ div.popover {
   text-align: center;
 }
 
+.icd10 {
+  color: blue;
+}
 
 /*** dev-only (AKA "ugly") styling ***/
 div {

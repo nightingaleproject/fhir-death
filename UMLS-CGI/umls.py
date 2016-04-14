@@ -9,6 +9,7 @@
 
 import requests
 import json
+import re
 
 class UMLS:
   """ UMLS session class """
@@ -57,7 +58,6 @@ class UMLS:
     url = self.restbase+"/search/current?"
     for key in params.iterkeys():
       url += key + "=" + params[key] + "&"
-    #print url[:-1]
     
     h = {"Accept": "application/json", 
          "User-Agent": "python" }
@@ -67,12 +67,30 @@ class UMLS:
     
     return res['result']['results'][0]['ui']
   
-  def code_search_by_cui(self, cui, system):
+  def cui_search_by_string(self, string):
+    
+    params = {'string'    : string,
+              'searchType': "words",
+              'inputType' : "code",
+              'ticket'    : self.service_ticket() }
+    url = self.restbase+"/search/current?"
+    for key in params.iterkeys():
+      url += key + "=" + params[key] + "&"
+    
+    h = {"Accept": "application/json", 
+         "User-Agent": "python" }
+    
+    r = requests.get(url[:-1], headers=h)
+    res = json.loads(r.text)
+    
+    return res['result']['results'][0]['ui']
+  
+  def code_search_by_cui(self, cui, systems=[]):
     
     url = self.restbase + "/content/current/CUI/" + cui
-    url += "/atoms?sabs=" + system # + "&ttys=PT,SY"
-    url += "&ticket=" + self.service_ticket()
-    #print url
+    url += "/atoms?ticket=" + self.service_ticket()
+    if len(systems)>0:
+      url += "&sabs=" + systems
     
     h = {"Accept": "application/json", 
          "User-Agent": "python" }
@@ -80,7 +98,8 @@ class UMLS:
     try:
       r = requests.get(url, headers=h)
       res = json.loads(r.text)
-      return res['result'][0]['code'].rsplit('/',1)[-1]
+      code = res['result'][0]['code'].rsplit('/',1)[-1]
+      return re.split('[.-]',code)[0]
     except:
       raise UMLSNoMatchingCodesException("code_search_by_cui")
   

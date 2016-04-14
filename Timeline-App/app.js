@@ -155,14 +155,14 @@ function init(err, pat, cond) {
           .attr("class", "tooltip conditions")
           .direction("n")
           .offset([-10,0])
-          .html(condition_tooltop_formatter);
+          .html(condition_tooltip_formatter);
   timeline.canvas.call(timeline.cond_tip);
   
   timeline.prop_tip = d3.tip()
           .attr("class", "tooltip proposed")
           .direction("s")
           .offset([3,0])
-          .html(proposed_tooltop_formatter);
+          .html(proposed_tooltip_formatter);
   timeline.canvas.call(timeline.prop_tip);
   
   // initialize time markers, manually for now, rough x3 steps
@@ -367,12 +367,17 @@ function redraw_time_markers() {
   
 }
 
-function condition_tooltop_formatter(cond) {
+function condition_tooltip_formatter(cond) {
   
   // start with bold disease name
   str = "<strong>" + cond.app_display + "</strong><br /><br />";
   
-  if (DEBUG) str += "id: " + cond.resource.id + "<br />";
+  // ICD-10 if we have it
+  if (cond.app_icd10.length>0) {
+    str += "<span class=\"icd10\">ICD-10: " + cond.app_icd10 + "</span><br />";
+  } else {
+    str += "id: " + cond.resource.id + "<br />";
+  }
   // add in some details
   str += "Condition began: " + cond.app_onset_display + "<br />";
   str += "Interval to death: " + cond.app_interval_display;
@@ -380,8 +385,8 @@ function condition_tooltop_formatter(cond) {
   return str;
 }
 
-function proposed_tooltop_formatter(prop) {
-  // real easy, just lay our the progression
+function proposed_tooltip_formatter(prop) {
+  // really simple, just lay out the progression
   str = condition_lookup(prop[prop.length-1]).app_display;
   str += " (" + condition_lookup(prop[prop.length-1]).app_interval_display + ")"
   for (var i=prop.length-2; i>=0; i--) {
@@ -514,6 +519,13 @@ function process_condition_metadata() {
       fhirdata.conditions[i].app_interval_display = Math.floor(sec/(60*60*24*365))+" years";
     }
     
+    // SET BLANK FOR ICD10 CODING (AS FOR UMLS)
+    
+    fhirdata.conditions[i].app_icd10 = "";
+    if (fhirdata.conditions[i].resource.code.coding[0].system.indexOf("ICD10")>-1) {
+      fhirdata.conditions[i].app_icd10 = fhirdata.conditions[i].resource.code.coding[0].code;
+    }
+    
   }
   
 }
@@ -615,7 +627,7 @@ function debug_code() {
 
 function unimplemented() {
   console.warn("feature not yet implemented");
-  window.alert("this button not yet implemented");
+  window.alert("this feature not yet implemented");
 }
 
 
