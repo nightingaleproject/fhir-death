@@ -241,7 +241,7 @@ function init(err, pat, cond, notes) {
   // analytics controls
   b1 = timeline.canvas.append("g")
              .classed("analytics-button", true)
-             .attr("transform","translate(200," + (arrow_pad_top+proposed_padding) + ")");
+             .attr("transform","translate(50," + (arrow_pad_top+proposed_padding) + ")");
   b1.append("rect")
     .attr("height",50)
     .attr("width",200)
@@ -256,7 +256,7 @@ function init(err, pat, cond, notes) {
 
   b2 = timeline.canvas.append("g")
                .classed("analytics-button", true)
-               .attr("transform","translate(550," + (arrow_pad_top+proposed_padding) + ")");
+               .attr("transform","translate(350," + (arrow_pad_top+proposed_padding) + ")");
   b2.append("rect")
     .attr("height",50)
     .attr("width",300)
