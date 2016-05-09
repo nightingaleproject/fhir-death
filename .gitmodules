@@ -1,15 +1,15 @@
-[submodule "Resources/GIT-FHIR"]
-	path = Resources/GIT-FHIR
+[submodule "resources/GIT-FHIR"]
+	path = resources/GIT-FHIR
 	url = https://github.com/i3l/GT-FHIR
-[submodule "Resources/SMART-on-FHIR"]
-	path = Resources/SMART-client-py
+[submodule "resources/SMART-on-FHIR"]
+	path = resources/SMART-client-py
 	url = https://github.com/smart-on-fhir/client-py
-[submodule "Resources/SMART-client-js"]
-	path = Resources/SMART-client-js
+[submodule "resources/SMART-client-js"]
+	path = resources/SMART-client-js
 	url = https://github.com/smart-on-fhir/client-js.git
-[submodule "Resources/d3-tip"]
-	path = Resources/d3-tip
+[submodule "resources/d3-tip"]
+	path = resources/d3-tip
 	url = https://github.com/Caged/d3-tip.git
-[submodule "Resources/queue-js"]
-	path = Resources/queue-js
+[submodule "resources/queue-js"]
+	path = resources/queue-js
 	url = https://github.com/d3/d3-queue.git
