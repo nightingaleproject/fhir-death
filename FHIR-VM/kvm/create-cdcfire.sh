@@ -13,7 +13,7 @@
 
 DISK=/data/kvm/miblab-fhir.img
 
-fallocate -l 20G $DISK
+fallocate -l 100G $DISK
 chown qemu:qemu $DISK
 chmod 0744 $DISK
 virt-install                                  \
@@ -23,8 +23,10 @@ virt-install                                  \
   --ram=2048                                  \
   --network bridge:br0,mac=52:54:00:1f:23:8b  \
   --disk path=$DISK                           \
-  --cdrom=ubuntu-14.04.4-server-amd64.iso         
-
+  --cdrom=ISOs/ubuntu-14.04.4-server-amd64.iso         
+# # http://serverfault.com/questions/226429/how-do-i-headless-install-ubuntu-10-10-server
+# # at the "boot" prompt, enter:
+# /install/vmlinuz console=ttyS0,115200n8 file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz
 
 # # #
 #
@@ -33,7 +35,7 @@ virt-install                                  \
 # # #
 
 
-# After installation, log in using the virsh console and start the netowork
+# After installation, log in using the virsh console and start the network
 #
 #   ifup eth0
 #

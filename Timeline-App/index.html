@@ -23,7 +23,7 @@
     
     <div class="layout-row" id="header-row">
       <!-- first row, contains patient ID and some controls -->
-      <button class="nav right" id="back-button" onclick="unimplemented()">&#8617; Return to EHR</button>
+      <button class="nav right" id="back-button" onclick="window.close()">&#8617; Return to EHR</button>
       <h2 id="fhir-pt-banner"></h2>
     </div>
     
@@ -69,7 +69,8 @@
     <div class="layout-row" id="bottom-nav-row">
       <!-- navigation buttons -->
       <button class="nav" id="nav1" onclick="unimplemented()">Demographic Information</button>
-      <button class="nav" id="nav2" onclick="umls_popup()">Validate and Submit</button>
+      <button class="nav" id="nav2" onclick="umls_popup()">ICD-10 Conversion</button>
+      <button class="nav" id="nav3" onclick="unimplemented()">Submit</button>
       <p class="small right">Logged in as: <span id="fhir-user"></span></p>
     </div>
     
@@ -90,12 +91,12 @@
     <script type="text/javascript" charset="utf-8" 
             src="./lib/queue.min.js"></script>
     
-    <!--  FINALLY, LOAD MAIN JS FILE TO RUN THE APP  -->
+    <!--  FINALLY, LOAD MAIN JS FILES TO RUN THE APP  -->
     
     <script type="text/javascript" charset="utf-8" 
-            src="umls.js"></script>
-    <script type="text/javascript" charset="utf-8" 
             src="app.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="umls.js"></script>
     
   </body>
 </html>

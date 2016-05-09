@@ -63,6 +63,7 @@ timeline.zoomlevel = 86400*10; // seconds
 timeline.zoommax = Infinity;
 timeline.zoommin = 60*60;
 var zoomfactor = 1.1; // sensitivity
+timeline.stop_animate = false;
 
 timeline.scale = d3.scale.log()
                    .domain([10, timeline.zoomlevel])
@@ -71,7 +72,7 @@ timeline.scale = d3.scale.log()
 
 // // MAIN CODE // //
 
-debug_code();
+loading_text();
 
 FHIR.oauth2.ready(function(s) {
   if (DEBUG) console.log("got smart");
@@ -79,6 +80,7 @@ FHIR.oauth2.ready(function(s) {
   queue()
     .defer(fhir_load_patient)
     .defer(fhir_load_conditions)
+    .defer(fhir_load_notes)
     .await(init);
 });
 
@@ -86,7 +88,7 @@ FHIR.oauth2.ready(function(s) {
 // // HELPER FUNCTIONS // //
 
 // initialize elements and draw empty timeline
-function init(err, pat, cond) {
+function init(err, pat, cond, notes) {
   if (err) {
     console.error(err);
     return;
@@ -104,10 +106,10 @@ function init(err, pat, cond) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   process_condition_metadata();
-  analytics_engine();
+  // analytics_engine();
   fhirdata.active = [];
   
-  // write in the parient info as appropriate
+  // write in the patient info as appropriate
   
   document.getElementById("fhir-user").innerHTML = smart.userId ? smart.userId : "unknown";
   
@@ -128,6 +130,17 @@ function init(err, pat, cond) {
               fhirdata.patient.address[0].city + ", " +
               fhirdata.patient.address[0].state + " " + 
               fhirdata.patient.address[0].postalCode + '</p>';
+  
+  // notes
+  
+  if (notes.total>0) {
+    document.getElementById("fhir-pt-history").innerHTML = 
+      notes.entry[0].resource.summary; // ##FIXME
+  } else {
+    document.getElementById("fhir-pt-history").innerHTML = 
+    '<p class="head">Patient History</p> \
+     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit, enim vel dictum dapibus, tellus massa dapibus nibh, in auctor felis felis ut mauris. Nam sit amet lorem diam. Sed ullamcorper magna eget enim semper, eu maximus nisi porta. Proin congue ex quam, ac rhoncus ipsum hendrerit quis. Proin sollicitudin diam vel diam semper, ac porta felis convallis. Nulla faucibus, risus eget gravida aliquet, mi ante pharetra dolor, eu luctus ante sapien et dolor. Cras feugiat, eros a ornare faucibus, odio elit vehicula felis, eu vehicula nibh sem nec magna. Integer faucibus vitae diam eget suscipit. Pellentesque dictum tincidunt neque eget molestie. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras odio purus, pretium non sagittis et, hendrerit ut neque. Nulla facilisi. Pellentesque mattis augue felis, ac tempor sapien euismod eu. Pellentesque venenatis scelerisque felis.</p>'
+  }
   
   
   // draw groups added to the SVG in draw order
@@ -155,14 +168,14 @@ function init(err, pat, cond) {
           .attr("class", "tooltip conditions")
           .direction("n")
           .offset([-10,0])
-          .html(condition_tooltop_formatter);
+          .html(condition_tooltip_formatter);
   timeline.canvas.call(timeline.cond_tip);
   
   timeline.prop_tip = d3.tip()
           .attr("class", "tooltip proposed")
           .direction("s")
           .offset([3,0])
-          .html(proposed_tooltop_formatter);
+          .html(proposed_tooltip_formatter);
   timeline.canvas.call(timeline.prop_tip);
   
   // initialize time markers, manually for now, rough x3 steps
@@ -224,6 +237,37 @@ function init(err, pat, cond) {
                                      : timeline.zoomlevel/zoomfactor;
       zoom_redraw();
     }, false)
+  
+  // analytics controls
+  b1 = timeline.canvas.append("g")
+             .classed("analytics-button", true)
+             .attr("transform","translate(50," + (arrow_pad_top+proposed_padding) + ")");
+  b1.append("rect")
+    .attr("height",50)
+    .attr("width",200)
+    .style("fill","#ECECEC")
+    .style("stroke","black");
+  b1.append("text")
+    .text("Load sample analytics")
+    .attr("text-anchor", "middle")
+    .attr("x", 100)
+    .attr("y",30)
+  b1.on("click",hardcoded_predictions);
+
+  b2 = timeline.canvas.append("g")
+               .classed("analytics-button", true)
+               .attr("transform","translate(350," + (arrow_pad_top+proposed_padding) + ")");
+  b2.append("rect")
+    .attr("height",50)
+    .attr("width",300)
+    .style("fill","#ECECEC")
+    .style("stroke","black");
+  b2.append("text")
+    .text("Load data mining (requires ICD-10)")
+    .attr("text-anchor", "middle")
+    .attr("x", 150)
+    .attr("y",30)
+  b2.on("click",analytics_engine);
     
   // get things right
   zoom_redraw();
@@ -279,6 +323,14 @@ function redraw_condition_markers() {
 }
 
 function redraw_proposed_causes() {
+  
+  if (!fhirdata.hasOwnProperty("predictions")) {
+    
+    return;
+    
+  } else {
+    d3.selectAll(".analytics-button").style("display","none");
+  }
   
   var psel = timeline.proposed.selectAll("g.proposed-timeline")
                      .data(fhirdata.predictions);
@@ -367,12 +419,17 @@ function redraw_time_markers() {
   
 }
 
-function condition_tooltop_formatter(cond) {
+function condition_tooltip_formatter(cond) {
   
   // start with bold disease name
   str = "<strong>" + cond.app_display + "</strong><br /><br />";
   
-  if (DEBUG) str += "id: " + cond.resource.id + "<br />";
+  // ICD-10 if we have it
+  if (cond.app_icd10.length>0) {
+    str += "<span class=\"icd10\">ICD-10: " + cond.app_icd10 + "</span><br />";
+  } else {
+    str += "id: " + cond.resource.id + "<br />";
+  }
   // add in some details
   str += "Condition began: " + cond.app_onset_display + "<br />";
   str += "Interval to death: " + cond.app_interval_display;
@@ -380,8 +437,8 @@ function condition_tooltop_formatter(cond) {
   return str;
 }
 
-function proposed_tooltop_formatter(prop) {
-  // real easy, just lay our the progression
+function proposed_tooltip_formatter(prop) {
+  // really simple, just lay out the progression
   str = condition_lookup(prop[prop.length-1]).app_display;
   str += " (" + condition_lookup(prop[prop.length-1]).app_interval_display + ")"
   for (var i=prop.length-2; i>=0; i--) {
@@ -514,6 +571,13 @@ function process_condition_metadata() {
       fhirdata.conditions[i].app_interval_display = Math.floor(sec/(60*60*24*365))+" years";
     }
     
+    // SET BLANK FOR ICD10 CODING (AS FOR UMLS)
+    
+    fhirdata.conditions[i].app_icd10 = "";
+    if (fhirdata.conditions[i].resource.code.coding[0].system.indexOf("ICD10")>-1) {
+      fhirdata.conditions[i].app_icd10 = fhirdata.conditions[i].resource.code.coding[0].code;
+    }
+    
   }
   
 }
@@ -584,6 +648,17 @@ function fhir_load_conditions(callback) {
   }
 }
 
+function fhir_load_notes(callback) {
+  try {
+    var pt_id = smart.patient.id;
+    smart.api.search({type: "ClinicalImpression", query: {patient: pt_id}}).then(function(r) {
+      callback(null, r.data);  // no notes is NOT an error, happens sometimes
+    })
+  } catch (err) {
+    callback("problem getting notes from the FHIR server")
+  }
+}
+
 function condition_lookup(id) {
   var f = fhirdata.conditions.filter(function(e) {
     return id == e.resource.id;
@@ -592,30 +667,100 @@ function condition_lookup(id) {
 }
 
 function analytics_engine() {
-  // hashtag lol
-  // hard-coded as hell, just for mr johnston
-  fhirdata.predictions = [['200001', '200005', '200003', '200002'],
-                          ['200003', '200002'],
-                          ['200005', '200004', '200003', '200002']];
+  // hang'sl v1
+  
+  animate_load_label();
+  
+  var conditions = [];
+  var lookup = {};
+  for (var i=0; i<fhirdata.conditions.length; i++) {
+    for (var k=0; k<fhirdata.conditions[i].resource.code.coding.length; k++) {
+      try {
+        if (fhirdata.conditions[i].resource.code.coding[k].system.indexOf("ICD10")>-1) {
+          code = fhirdata.conditions[i].resource.code.coding[k].code;
+          code = code.split(".")[0]; // strip the end
+          conditions.push(code);
+          lookup[code] = fhirdata.conditions[i].resource.id;
+        }
+      } catch(e) {}
+    }
+  }
+  
+  fhirdata.lookup = lookup;
+  
+  d3.xhr("http://apollo.bme.gatech.edu/cgi-bin/fsm_match.py")
+    .header("Content-Type", "application/x-www-form-urlencoded")
+    .post("conditions=['"+conditions.join("','")+"']", function(err,data) {
+        
+        if (err) {
+          console.error(err);
+          return;
+        }
+    
+        // fhirdata.debug = data.response;
+        seqs = JSON.parse(data.response);
+    
+        fhirdata.predictions = [];
+        for (var i=0; i<seqs.res.length; i++) {
+          fhirdata.predictions[i] = [];
+          seq = seqs.res[i][0].split("->");
+          for (j=0; j<seq.length; j++) {
+            fhirdata.predictions[i].push(fhirdata.lookup[seq[j]])
+          }
+        }
+    
+        console.log("got predictions from analytical engine server");
+        loading_done();
+        redraw_proposed_causes();
+    
+    });
+  
+  
+  //// #lol
+  //// hard-coded as hell, just for mr johnston
+  //fhirdata.predictions = [['200001', '200005', '200003', '200002'],
+  //                        ['200003', '200002'],
+  //                        ['200005', '200004', '200003', '200002']];
 }
 
+function hardcoded_predictions() {
+  fhirdata.predictions = [['210001', '210005', '210003', '210002'],
+                          ['210003', '210002'],
+                          ['210005', '210004', '210003', '210002']];
+  redraw_proposed_causes();
+}
 
-// cheating
-function debug_code() {
+// inspired by the transitions coolness from alignedleft
+function animate_load_label() {
+    d3.select("#load-label")
+        .style("display","block")
+        .transition()
+        .attr("fill", "hsl("+(Math.random()*360)+",100,50)")
+        .each("end",function() {
+            if (timeline.stop_animate) {
+                d3.select(this).style("display","none")
+                timeline.stop_animate = false; // reset the trigger
+            } else {
+                animate_load_label();
+            }
+        });
+}
+function loading_done() {
+    // map1.selectAll(".overlay")
+    //     .remove();
+    timeline.stop_animate = true;
+}
+
+function loading_text() {
   document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
   document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
   document.getElementById("fhir-user").innerHTML = 'Loading...';
-  document.getElementById("fhir-pt-history").innerHTML = 
-    '<p class="head">Patient History</p> \
-     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit, enim vel dictum dapibus, tellus massa dapibus nibh, in auctor felis felis ut mauris. Nam sit amet lorem diam. Sed ullamcorper magna eget enim semper, eu maximus nisi porta. Proin congue ex quam, ac rhoncus ipsum hendrerit quis. Proin sollicitudin diam vel diam semper, ac porta felis convallis. Nulla faucibus, risus eget gravida aliquet, mi ante pharetra dolor, eu luctus ante sapien et dolor. Cras feugiat, eros a ornare faucibus, odio elit vehicula felis, eu vehicula nibh sem nec magna. Integer faucibus vitae diam eget suscipit. Pellentesque dictum tincidunt neque eget molestie. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras odio purus, pretium non sagittis et, hendrerit ut neque. Nulla facilisi. Pellentesque mattis augue felis, ac tempor sapien euismod eu. Pellentesque venenatis scelerisque felis.</p> \
-     <p>Duis convallis tempus tellus quis consectetur. Ut nec nisl quam. Cras mollis luctus libero, nec eleifend augue molestie et. Cras mi sapien, semper sed eros at, viverra vehicula elit. Ut vulputate imperdiet accumsan. Pellentesque placerat non dolor in tristique. In hac habitasse platea dictumst. Maecenas id eros tincidunt, ullamcorper orci eget, aliquet tortor. Nullam scelerisque ut odio in volutpat.</p> \
-     <p>Aliquam erat nisi, consequat eu erat eu, vestibulum cursus purus. Vivamus ornare odio odio. Nam facilisis odio mattis, congue enim id, euismod orci. Morbi eleifend porta congue. Sed sed urna urna. Integer malesuada blandit nisi, eget tincidunt tellus posuere aliquet. Sed efficitur laoreet libero vulputate tincidunt. In faucibus, arcu vitae scelerisque posuere, nisl arcu mattis mauris, id consequat justo urna vel justo.</p> \
-     ';
+  document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
 }
 
 function unimplemented() {
   console.warn("feature not yet implemented");
-  window.alert("this button not yet implemented");
+  window.alert("this feature not yet implemented");
 }
 
 
