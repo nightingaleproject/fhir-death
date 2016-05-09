@@ -7,6 +7,7 @@ Branches
 
 - `master`: SMART-on-FHIR app development
 - `no-auth`: app connecting to FHIR server with no autentication (non-SMART)
+- `deploy`: minimal repository, for SMART-on-FHIR app deployment only
 
 
 Downloading Submodules for Reference
