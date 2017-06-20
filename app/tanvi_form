@@ -1,0 +1,203 @@
+<html>
+  <head>
+    
+    <title>CDC Death Certificate Input Form</title>
+    <link rel="stylesheet" type="text/css" href="app.css">
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    
+  </head>
+  <body>
+    <h1><header>U.S. Standard Certificate of Death Form</header></h1>
+    <h3>Decedent Information</h3>
+    <h4>To be Completed/Verified by Funeral Director</h4>
+    <div class="Basic Information">
+    <form>
+  		Decedent's First name:<br>
+  		<input type="text" name="patient_firstname"><br>
+ 		Decdent's Middle name:<br>
+  		<input type="text" name="patient_middlename"><br>
+  		Decdent's Last name:<br>
+  		<input type="text" name="patient_lastname"><br>
+ 		
+ 		Sex:<br>
+  		<input type="text" name="sex"><br>
+  		Social Security Number:<br>
+  		<input type="text" name="SSN"><br>
+ 		Age - Last Birthday (Years):<br>
+  		<input type="text" name="age"><br>
+ 		If under 1 yr, Months/Days or Hours/Minutes:<br>
+  		<input type="text" name="age_infant"><br>
+ 		Birthplace (City and State or Foreign Country):<br>
+  		<input type="text" name="birthplace"><br>
+
+ 		Residence (State):<br>
+  		<input type="text" name="residence_state"><br>
+  		Residence (County):<br>
+  		<input type="text" name="residence_county"><br>
+  		Residence (City/Town):<br>
+  		<input type="text" name="residence_city"><br>
+  		Residence (Street and Number):<br>
+  		<input type="text" name="residence_street"><br>
+  		Residence (Apartment Number):<br>
+  		<input type="text" name="residence_apt"><br>
+  		Residence (Zip Code):<br>
+  		<input type="text" name="residence_zip"><br>
+  		Residence (Country): <br>
+  		<input type="text" name="residence_country"><br>
+  		Inside City Limits?: <br>
+  		<input type="radio" name="insidecity" value="yes" /> Yes<br />
+  		<input type="radio" name="insidecity" value="no" /> No<br />
+
+  		Every in US Armed Forces?: <br>
+  		<input type="radio" name="military" value="yes" /> Yes<br />
+  		<input type="radio" name="military" value="no" /> No<br />
+
+
+  		Marital Status at Time of Death: <br>
+  		<input type="radio" name="marital" value="married" /> Married<br />
+  		<input type="radio" name="marital" value="married, but separated" /> Married, but separated<br />
+  		<input type="radio" name="marital" value="widowed" /> Widowed<br />
+  		<input type="radio" name="marital" value="divorced" /> Divorced<br />
+  		<input type="radio" name="marital" value="never married" /> Never Married<br />
+  		<input type="radio" name="marital" value="unknown" /> Unknown<br />
+
+
+  		Surviving Spouse's Name (If wife, give name prior to first marriage):<br>
+  		<input type="text" name="spouse_firstname"><br>
+ 		Spouse's Middle name:<br>
+  		<input type="text" name="spouse_middlename"><br>
+  		Spouse's Last name:<br>
+  		<input type="text" name="spouse_lastname"><br>
+  		Father's Name:<br>
+  		<input type="text" name="father_firstname"><br>
+ 		Father's Middle name:<br>
+  		<input type="text" name="father_middlename"><br>
+  		Father's Last name:<br>
+  		<input type="text" name="father_lastname"><br>
+   		Mother's Name Prior to Marriage:<br>
+  		<input type="text" name="mother_firstname"><br>
+ 		Mother's Middle name:<br>
+  		<input type="text" name="mother_middlename"><br>
+  		Mother's Last name:<br>
+  		<input type="text" name="mother_lastname"><br>
+
+  		Informant's Name:<br>
+  		<input type="text" name="informant_firstname"><br>
+ 		Informant's Middle name:<br>
+  		<input type="text" name="informant_middlename"><br>
+  		Informant's Last name:<br>
+  		<input type="text" name="informant_lastname"><br>
+
+  		Informant's Relationship to Decedent: <br>
+  		<input type="text" name="informant_relationship"><br>
+
+
+  		Informant's Mailing Address: <br>
+	 		Residence (State):<br>
+	  		<input type="text" name="informant_state"><br>
+	  		Residence (County):<br>
+	  		<input type="text" name="informant_county"><br>
+	  		Residence (City/Town):<br>
+	  		<input type="text" name="informant_city"><br>
+	  		Residence (Street and Number):<br>
+	  		<input type="text" name="informant_street"><br>
+	  		Residence (Apartment Number):<br>
+	  		<input type="text" name="informant_apt"><br>
+	  		Residence (Zip Code):<br>
+	  		<input type="text" name="informant_zip"><br>
+	  		Residence (Country): <br>
+	  		<input type="text" name="informant_country"><br>
+
+	  	Place of Death: <br>
+	  	If Death Occurred in a Hospital: <br>
+	  	<select name="place_of_death">
+	  		<option></option>
+	  		<option>Hospital</option>
+			<option>Emergency Room/ Outpatient</option>
+			<option>Dead on Arrival</option>
+		</select>
+		<select name="place_of_death">
+			<option> </option>
+	  		<option>Hospice Facility</option>
+			<option>Nursing home/Long term care facility</option>
+			<option>Decdent's home</option>
+		</select>
+		If Other (specify):
+	  	<input type="text" name="place_of_death">
+
+	</form>
+
+    </div>
+    
+    <!--  LOAD IN EXTERNAL JS RESOURCES  -->
+    
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/d3.min.js"></script> <!-- should really just use jquery -->
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/fhir-client.min.js"></script> <!-- should really just use jquery -->
+    
+
+    <script type="text/javascript">
+      
+      // adapted from smart-on-fhir demo app
+      
+      var connected = false;
+      var clientId = "gt-cdc-fhir-death"
+      var secret = null;
+      
+      var urlparams = {}
+      location.search.substr(1).split("&").forEach(function(element) {
+        urlparams[element.split("=")[0]] = decodeURIComponent(element.split("=")[1]);
+      }); // stackoverflow 5448545
+      
+      var serviceUrl = urlparams.iss;
+      var launchUrl = window.location.href;
+      var redirectUrl = launchUrl.replace("launch.html","");
+      
+      var launchContextId = urlparams.launch;
+      
+      var scope = [
+        "patient/*.read",
+        "launch"
+      ].join(" ");
+      
+      var state = Math.round(Math.random()*100000000).toString();
+      
+      var conformanceUrl = serviceUrl + "/metadata"
+      
+      d3.json(conformanceUrl, function(d) {
+        
+        var authUrl, tokenUrl;
+        
+        var smart = d.rest[0].security.extension.filter(function (e) {
+           return (e.url === "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris");
+        });
+        smart[0].extension.forEach(function(arg, index, array){
+          if (arg.url === "authorize") {
+            authUrl = arg.valueUri;
+          } else if (arg.url === "token") {
+            tokenUrl = arg.valueUri;
+          }
+        });
+        
+        sessionStorage[state] = JSON.stringify({
+            clientId: clientId,
+            secret: secret,
+            serviceUrl: serviceUrl,
+            redirectUrl: redirectUrl,
+            tokenUrl: tokenUrl
+        });
+        
+        FHIR.oauth2.authorize({
+          client_id: clientId,
+          scope: scope,
+          state: state
+        });
+        
+      });
+      
+    </script>
+    
+  </body>
+</html>
