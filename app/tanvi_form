@@ -9,16 +9,16 @@
   </head>
   <body>
     <h1><header>U.S. Standard Certificate of Death Form</header></h1>
+    <section>
     <h3>Decedent Information</h3>
-    <h4>To be Completed/Verified by Funeral Director</h4>
+    <h5>To be Completed/Verified by Funeral Director</h5>
     <div class="Basic Information">
     <form>
-  		Decedent's First name:<br>
-  		<input type="text" name="patient_firstname"><br>
- 		Decdent's Middle name:<br>
-  		<input type="text" name="patient_middlename"><br>
-  		Decdent's Last name:<br>
-  		<input type="text" name="patient_lastname"><br>
+      	<h4>Basic Information</h4><span id ="formatbod">
+    	Name (First/ Middle/ Last):<br>
+  		<input type="text" name="patient_firstname">
+  		<input type="text" name="patient_middlename">
+  		<input type="text" name="patient_lastname"><br><br>
  		
  		Sex:<br>
   		<input type="text" name="sex"><br>
@@ -29,121 +29,124 @@
  		If under 1 yr, Months/Days or Hours/Minutes:<br>
   		<input type="text" name="age_infant"><br>
  		Birthplace (City and State or Foreign Country):<br>
-  		<input type="text" name="birthplace"><br>
+  		<input type="text" name="birthplace"><br></span>
 
- 		Residence (State):<br>
+  		<h5>Decedent's Residence</h5>  		<span id ="formatbod">
+ 		State:<br>
   		<input type="text" name="residence_state"><br>
-  		Residence (County):<br>
+  		County:<br>
   		<input type="text" name="residence_county"><br>
-  		Residence (City/Town):<br>
+  		City/Town:<br>
   		<input type="text" name="residence_city"><br>
-  		Residence (Street and Number):<br>
+  		Street and Number:<br>
   		<input type="text" name="residence_street"><br>
-  		Residence (Apartment Number):<br>
+  		Apartment Number:<br>
   		<input type="text" name="residence_apt"><br>
-  		Residence (Zip Code):<br>
+  		Zip Code:<br>
   		<input type="text" name="residence_zip"><br>
-  		Residence (Country): <br>
+  		Country: <br>
   		<input type="text" name="residence_country"><br>
   		Inside City Limits?: <br>
   		<input type="radio" name="insidecity" value="yes" /> Yes<br />
-  		<input type="radio" name="insidecity" value="no" /> No<br />
+  		<input type="radio" name="insidecity" value="no" /> No<br /><br></span>
 
-  		Ever in US Armed Forces?: <br>
+  		<span id ="formatbod">Ever in US Armed Forces?: <br>
   		<input type="radio" name="military" value="yes" /> Yes<br />
-  		<input type="radio" name="military" value="no" /> No<br />
+  		<input type="radio" name="military" value="no" /> No<br /></span>
 
-
+  		<h5>Decedent's Family Information</h5>
+  		<span id ="formatbod">
   		Marital Status at Time of Death: <br>
   		<input type="radio" name="marital" value="married" /> Married<br />
   		<input type="radio" name="marital" value="married, but separated" /> Married, but separated<br />
   		<input type="radio" name="marital" value="widowed" /> Widowed<br />
   		<input type="radio" name="marital" value="divorced" /> Divorced<br />
   		<input type="radio" name="marital" value="never married" /> Never Married<br />
-  		<input type="radio" name="marital" value="unknown" /> Unknown<br />
+  		<input type="radio" name="marital" value="unknown" /> Unknown<br /><br></span>
 
 
-  		Surviving Spouse's Name (If wife, give name prior to first marriage):<br>
-  		<input type="text" name="spouse_firstname"><br>
- 		Spouse's Middle name:<br>
-  		<input type="text" name="spouse_middlename"><br>
-  		Spouse's Last name:<br>
-  		<input type="text" name="spouse_lastname"><br>
-  		Father's Name:<br>
-  		<input type="text" name="father_firstname"><br>
- 		Father's Middle name:<br>
-  		<input type="text" name="father_middlename"><br>
-  		Father's Last name:<br>
-  		<input type="text" name="father_lastname"><br>
-   		Mother's Name Prior to Marriage:<br>
-  		<input type="text" name="mother_firstname"><br>
- 		Mother's Middle name:<br>
-  		<input type="text" name="mother_middlename"><br>
-  		Mother's Last name:<br>
-  		<input type="text" name="mother_lastname"><br>
+  		<span id ="formatbod">Surviving Spouse's Name (If wife, give name prior to first marriage) (First/Middle/Last):<br>
+  		<input type="text" name="spouse_firstname">
+  		<input type="text" name="spouse_middlename">
+  		<input type="text" name="spouse_lastname"><br><br>
+  		Father's Name (First/Middle/Last):<br>
+  		<input type="text" name="father_firstname">
+  		<input type="text" name="father_middlename">
+  		<input type="text" name="father_lastname"><br><br>
+   		Mother's Name Prior to Marriage (First/Middle/Last):<br>
+  		<input type="text" name="mother_firstname">
+  		<input type="text" name="mother_middlename">
+  		<input type="text" name="mother_lastname"><br><br></span>
 
-  		Informant's Name:<br>
-  		<input type="text" name="informant_firstname"><br>
- 		Informant's Middle name:<br>
-  		<input type="text" name="informant_middlename"><br>
-  		Informant's Last name:<br>
+  		<h5>Informant Information</h5>
+<span id ="formatbod">
+  		Informant's Name (First/Middle/Last):<br>
+  		<input type="text" name="informant_firstname">
+  		<input type="text" name="informant_middlename">
   		<input type="text" name="informant_lastname"><br>
 
   		Informant's Relationship to Decedent: <br>
   		<input type="text" name="informant_relationship"><br><br>
+</>
 
-
-  		Informant's Mailing Address: <br>
-	 		Residence (State):<br>
+  		<h5>Informant's Mailing Address:</h5><span id ="formatbod">
+	 		State:<br>
 	  		<input type="text" name="informant_state"><br>
-	  		Residence (County):<br>
+	  		County:<br>
 	  		<input type="text" name="informant_county"><br>
-	  		Residence (City/Town):<br>
+	  		City/Town:<br>
 	  		<input type="text" name="informant_city"><br>
-	  		Residence (Street and Number):<br>
+	  		Street and Number:<br>
 	  		<input type="text" name="informant_street"><br>
-	  		Residence (Apartment Number):<br>
+	  		Apartment Number:<br>
 	  		<input type="text" name="informant_apt"><br>
-	  		Residence (Zip Code):<br>
+	  		Zip Code:<br>
 	  		<input type="text" name="informant_zip"><br>
-	  		Residence (Country): <br>
-	  		<input type="text" name="informant_country"><br><br>
+	  		Country: <br>
+	  		<input type="text" name="informant_country"><br><br></span
+>
 
-	  	Place of Death: <br>
+	  		<h5>Place of Death</h5>
+
+	  	<span id ="formatbod">
 	  	If Death Occurred in a Hospital: <br>
 	  	<select name="place_of_death">
 	  		<option></option>
 	  		<option>Hospital</option>
 			<option>Emergency Room/ Outpatient</option>
 			<option>Dead on Arrival</option>
-		</select>
+		</select><br>
+		If Death Occurred Somewhere other than a Hospital:<br>
 		<select name="place_of_death">
 			<option> </option>
 	  		<option>Hospice Facility</option>
 			<option>Nursing home/Long term care facility</option>
 			<option>Decedent's home</option>
-		</select>
+		</select><br>
 		If Other (specify):
-	  	<input type="text" name="place_of_death"><br><br>
+	  	<input type="text" name="place_of_death"><br><br><br>
 
 	  	Facility Name: <br>
 	  	<input type="text" name="POD_name"><br>
 
-	  	Facility location
+	  	State:<br>
 	  	<input type="text" name="POD_state"><br>
-	  		Funeral Facility (County):<br>
+	  		County:<br>
 	  		<input type="text" name="POD_county"><br>
-	  		Funeral Facility  (City/Town):<br>
+	  		City/Town:<br>
 	  		<input type="text" name="POD_city"><br>
-	  		Funeral Facility  (Street and Number):<br>
+	  		Street and Number:<br>
 	  		<input type="text" name="POD_street"><br>
-	  		Funeral Facility  (Apartment Number):<br>
+	  		Apartment Number:<br>
 	  		<input type="text" name="POD_apt"><br>
-	  		Funeral Facility  (Zip Code):<br>
+	  		Zip Code:<br>
 	  		<input type="text" name="POD_zip"><br>
-	  		Funeral Facility  (Country): <br>
-	  		<input type="text" name="POD_country"><br><br>
+	  		Country: <br>
+	  		<input type="text" name="POD_country"><br><br><br>
 	  	
+	  	</span>
+	  	<h5> Disposition</h5>
+	  	<span id ="formatbod">
 	  	Method of Disposition: <br>
 	  	<select name="funeral_method">
 	  		<option></option>
@@ -154,30 +157,32 @@
 			<option>Removal from State</option>
 		</select>
 		If Other (specify):
-	  	<input type="text" name="funeral_method"><br>
+	  	<input type="text" name="funeral_method"><br><br>
 	  	Place of Disposition (name): <br>
 	  	<input type="text" name="funeral_name"><br>
 
 	  	<input type="text" name="funeral_state"><br>
-	  		Funeral Facility (County):<br>
+	  		County:<br>
 	  		<input type="text" name="funeral_county"><br>
-	  		Funeral Facility  (City/Town):<br>
+	  		City/Town:<br>
 	  		<input type="text" name="funeral_city"><br>
-	  		Funeral Facility  (Street and Number):<br>
+	  		Street and Number:<br>
 	  		<input type="text" name="funeral_street"><br>
-	  		Funeral Facility  (Apartment Number):<br>
+	  		Apartment Number:<br>
 	  		<input type="text" name="funeral_apt"><br>
-	  		Funeral Facility  (Zip Code):<br>
+	  		Zip Code:<br>
 	  		<input type="text" name="funeral_zip"><br>
-	  		Funeral Facility  (Country): <br>
+	  		Country: <br>
 	  		<input type="text" name="funeral_country"><br><br>
 
 	  	License Number (of Licensee): <br>
 	  	<input type="text" name="licensee_number"><br>
+	  	</section></span>
 
+<section>
 	<h3>Conditions of Death</h3>
-    <h4>To be Completed by Medical Examiner</h4>
-   	 	Date Pronounced Dead: <br>
+    <h5>To be Completed by Medical Examiner</h5>
+   	 	<span id ="formatbod">Date Pronounced Dead: <br>
 	  	<input type="text" name="death_date"><br>
 	  	Time Pronounced Dead: <br>
 	  	<input type="text" name="death_time"><br>
@@ -188,9 +193,9 @@
 	  	Actual or Presumed Date of Death (Mo/Day/Yr): <br>
 	  	<input type="text" name="actual_death_date"><br>
 	  	Actual or Presumed Time of Death: <br>
-	  	<input type="text" name="actual_death_time"><br>
+	  	<input type="text" name="actual_death_time"><br></span>
 
-	  	Was Medical Examiner or Coroner Contacted?: <br>
+	  	<span id ="formatbod">Was Medical Examiner or Coroner Contacted?: <br>
   		<input type="radio" name="examiner_contacted" value="yes" /> Yes<br />
   		<input type="radio" name="examiner_contacted" value="no" /> No<br />
 
@@ -200,9 +205,9 @@
 
   		Were Autopsy Findings Available to Complete the Case of Death?: <br>
   		<input type="radio" name="autopsy_available" value="yes" /> Yes<br />
-  		<input type="radio" name="autopsy_available" value="no" /> No<br /> <br>
+  		<input type="radio" name="autopsy_available" value="no" /> No<br /> <br></span>
 
-  		Did tobacco use contribute to death?: <br>
+  		<span id ="formatbod">Did tobacco use contribute to death?: <br>
   		<input type="radio" name="tobacco" value="yes" /> Yes<br />
   		<input type="radio" name="tobacco" value="no" /> No<br />
   		<input type="radio" name="tobacco" value="Probably" /> Probably<br />
@@ -221,9 +226,9 @@
   		<input type="radio" name="death_manner" value="accident" /> Accident<br />
   		<input type="radio" name="death_manner" value="suicide" /> Suicide<br />
   		<input type="radio" name="death_manner" value="pending investigation" /> Pending Investigation<br />
-  		<input type="radio" name="death_manner" value="could not be determined" /> Could not be Determined<br />
+  		<input type="radio" name="death_manner" value="could not be determined" /> Could not be Determined<br /></span>
 
-  		Date of Injury (Mo/Day/Yr): <br>
+  		<span>Date of Injury (Mo/Day/Yr): <br>
 	  	<input type="text" name="injury_date"><br>
 	  	Time of Injury: <br>
 	  	<input type="text" name="injury_time"><br>
@@ -231,25 +236,25 @@
 	  	<input type="text" name="injury_location"><br>
 	  	Injury at Work?: <br>
   		<input type="radio" name="injury_workrelated" value="yes" /> Yes<br />
-  		<input type="radio" name="injury_workrelated" value="no" /> No<br /> <br>
+  		<input type="radio" name="injury_workrelated" value="no" /> No<br /> <br></span>
 
-  		Location of Injury:<br>
+  		<span id ="formatbod">Location of Injury:<br>
   		<input type="text" name="injury_state"><br>
-  		Residence (County):<br>
+  		County:<br>
   		<input type="text" name="injury_county"><br>
-  		Residence (City/Town):<br>
+  		City/Town:<br>
   		<input type="text" name="injury_city"><br>
-  		Residence (Street and Number):<br>
+  		Street and Number:<br>
   		<input type="text" name="injury_street"><br>
-  		Residence (Apartment Number):<br>
+  		Apartment Number:<br>
   		<input type="text" name="injury_apt"><br>
-  		Residence (Zip Code):<br>
+  		Zip Code:<br>
   		<input type="text" name="injury_zip"><br>
-  		Residence (Country): <br>
+  		Country: <br>
   		<input type="text" name="injury_country"><br>
 
   		Injury Description:<br>
-  		<textarea rows="3" cols="20"> Describe how injury occurred...</textarea><br>
+  		<textarea rows="3" cols="20"> Describe how injury occurred...</textarea><br><br>
 
 		If Transportation Injury, Specify <br>
 	  	<select name="injury_transportation">
@@ -264,33 +269,37 @@
 
 	  	Certifier: <br>
 	  	<input type="text" name="certifier"><br>
+	  	</section></span>
 
-	  	Injury at Work?: <br>
+<section>
+	  	<span id ="formatbod">Injury at Work?: <br>
   		<input type="radio" name="certifier" value="Certifying physician - To the best of my knowledge, death occurred due to the cause(s) and manner stated" /> Certifying physician - To the best of my knowledge, death occurred due to the cause(s) and manner stated<br />
   		<input type="radio" name="certifier" value="Pronouncing & Certifying physician - To the best of my knowledge, death occurred at the time, date, and place and due to the cause(s) and manner stated." /> Pronouncing & Certifying physician - To the best of my knowledge, death occurred at the time, date, and place and due to the cause(s) and manner stated.<br /> 
-  		<input type="radio" name="certifier" value="Medical Examiner/Coroner - On the basis of examination, and/or investigation, in my opinion, death occurred at the time, date, and place, and due to the cause(s) and manner stated" /> Medical Examiner/Coroner - On the basis of examination, and/or investigation, in my opinion, death occurred at the time, date, and place, and due to the cause(s) and manner stated<br /><br>
+  		<input type="radio" name="certifier" value="Medical Examiner/Coroner - On the basis of examination, and/or investigation, in my opinion, death occurred at the time, date, and place, and due to the cause(s) and manner stated" /> Medical Examiner/Coroner - On the basis of examination, and/or investigation, in my opinion, death occurred at the time, date, and place, and due to the cause(s) and manner stated<br /><br></span>
 
-  		Name, Address, and Zip Code of Person Completing Cause of Death:
+  		<h5>Name, Address, and Zip Code of Person Completing Cause of Death:</h5><span id ="formatbod">
   		First name:<br>
   		<input type="text" name="certifier_firstname"><br>
  		Middle name:<br>
   		<input type="text" name="certifier_middlename"><br>
   		Last name:<br>
-  		<input type="text" name="certifier_lastname"><br>
+  		<input type="text" name="certifier_lastname"><br></span>
 
- 		Residence (State):<br>
+  		<h5> Address Information </h5>
+<span id ="formatbod">
+ 		State:<br>
   		<input type="text" name="certifier_state"><br>
-  		Residence (County):<br>
+  		County:<br>
   		<input type="text" name="certifier_county"><br>
-  		Residence (City/Town):<br>
+  		City/Town:<br>
   		<input type="text" name="certifier_city"><br>
-  		Residence (Street and Number):<br>
+  		Street and Number:<br>
   		<input type="text" name="certifier_street"><br>
-  		Residence (Apartment Number):<br>
+  		Apartment Number:<br>
   		<input type="text" name="certifier_apt"><br>
-  		Residence (Zip Code):<br>
+  		Zip Code:<br>
   		<input type="text" name="certifier_zip"><br>
-  		Residence (Country): <br>
+  		Country: <br>
   		<input type="text" name="certifier_country"><br><br>
 
   		Title of Certifier: <br>
@@ -312,13 +321,13 @@
   		<input type="radio" name="education" value="Master's degree (e.g. MA, MS, MEng, MEd, MSW, MBA)" /> Master's degree (e.g. MA, MS, MEng, MEd, MSW, MBA)<br />
   		<input type="radio" name="education" value="Doctorate (e.g. PhD, EdD) or Professional degree (e.g., MD, DDS, DVM, LLB, JD)" /> Doctorate (e.g. PhD, EdD) or Professional degree (e.g., MD, DDS, DVM, LLB, JD)<br /><br>
 
-		Decedent of Hispanic Origin? Check the box that best describes whether teh decdent is Spanish/Hispanic/Latino.  Check the "No" box if decdent is not Spanish/Hispanic/ Latino <br>
+		Decedent of Hispanic Origin? Check the box that best describes whether the decedent is Spanish/Hispanic/Latino.  Check the "No" box if decedent is not Spanish/Hispanic/ Latino <br>
   		<input type="radio" name="hispanic" value="No, not Spanish/Hispanic/Latino" /> No, not Spanish/Hispanic/Latino<br />
   		<input type="radio" name="hispanic" value="Yes, Mexican, Mexican American, Chicano" /> Yes, Mexican, Mexican American, Chicano/Hispanic/Latino<br />
   		<input type="radio" name="hispanic" value="Yes, Puerto Rican" /> Yes, Puerto Rican<br />
   		<input type="radio" name="hispanic" value="Yes, Cuban" /> Yes, Cuban<br />
   		Other
-  		<input type="text" name="hispanic"><br>
+  		<input type="text" name="hispanic"><br><br>
 
   		Decedent's Race (Check one or more races to indicate what the decedent considered himself or herself to be):
   		<input type="checkbox" name="race" value="White"> White<br>
@@ -335,7 +344,7 @@
   		<input type="checkbox" name="race" value="Guamanian or Chamorro"> Guamanian or Chamorro<br>
   		<input type="checkbox" name="race" value="Samoan"> Samoan<br>
   		<input type="checkbox" name="race" value="Other Pacific Islander (Specify)"> Other Pacific Islander <input type="text" name="race"><br>
-  		<input type="checkbox" name="race" value="Other"> Other <input type="text" name="race"><br>
+  		<input type="checkbox" name="race" value="Other"> Other <input type="text" name="race"><br><br>
 
 
 
@@ -344,81 +353,10 @@
   		Decedent's Usual Occupation (Indicate type of work done during most of working life): <br>
   		<input type="text" name="patient_job"><br>
   		Kind of Business/Industry: <br>
-  		<input type="text" name="patient_industry"><br>
+  		<input type="text" name="patient_industry"><br></span>
 
-
+</section>
 	</form>
-
-    </div>
-    
-    <!--  LOAD IN EXTERNAL JS RESOURCES  -->
-    
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/d3.min.js"></script> <!-- should really just use jquery -->
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/fhir-client.min.js"></script> <!-- should really just use jquery -->
-    
-
-    <script type="text/javascript">
-      
-      // adapted from smart-on-fhir demo app
-      
-      var connected = false;
-      var clientId = "gt-cdc-fhir-death"
-      var secret = null;
-      
-      var urlparams = {}
-      location.search.substr(1).split("&").forEach(function(element) {
-        urlparams[element.split("=")[0]] = decodeURIComponent(element.split("=")[1]);
-      }); // stackoverflow 5448545
-      
-      var serviceUrl = urlparams.iss;
-      var launchUrl = window.location.href;
-      var redirectUrl = launchUrl.replace("launch.html","");
-      
-      var launchContextId = urlparams.launch;
-      
-      var scope = [
-        "patient/*.read",
-        "launch"
-      ].join(" ");
-      
-      var state = Math.round(Math.random()*100000000).toString();
-      
-      var conformanceUrl = serviceUrl + "/metadata"
-      
-      d3.json(conformanceUrl, function(d) {
-        
-        var authUrl, tokenUrl;
-        
-        var smart = d.rest[0].security.extension.filter(function (e) {
-           return (e.url === "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris");
-        });
-        smart[0].extension.forEach(function(arg, index, array){
-          if (arg.url === "authorize") {
-            authUrl = arg.valueUri;
-          } else if (arg.url === "token") {
-            tokenUrl = arg.valueUri;
-          }
-        });
-        
-        sessionStorage[state] = JSON.stringify({
-            clientId: clientId,
-            secret: secret,
-            serviceUrl: serviceUrl,
-            redirectUrl: redirectUrl,
-            tokenUrl: tokenUrl
-        });
-        
-        FHIR.oauth2.authorize({
-          client_id: clientId,
-          scope: scope,
-          state: state
-        });
-        
-      });
-      
-    </script>
     
   </body>
 </html>
