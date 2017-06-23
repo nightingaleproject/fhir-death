@@ -23,14 +23,21 @@
     
     <div class="layout-row" id="header-row">
       <!-- first row, contains patient ID and some controls -->
-      <button class="nav right" id="back-button" onclick="window.close()">&#8617; Return to EHR</button>
+      <button class="nav right" id="back-button" onclick="app_exit()">&#8617; Return to EHR</button>
       <h2 id="fhir-pt-banner"></h2>
     </div>
     
     <div class="layout-row" id="patient-row">
       <!-- second row, contains patient info and history -->
-      <div class="textbox" id="fhir-pt-detail"></div>
+      <div class="textbox" id="fhir-pt-detail">
+        <button class="nav" id="nav-expand" onclick="toggle_dc_expand()">Expand</button>
+      </div>
       <div class="textbox right" id="fhir-pt-history"></div>
+    </div>
+    
+    <div class="layout-row" id="dc-row">
+      <!-- patient detail section, collabsible -->
+      <!-- loaded from <form> tag in dc-form.html -->
     </div>
     
     <div class="layout-row" id="timeline-row">
@@ -68,9 +75,8 @@
     
     <div class="layout-row" id="bottom-nav-row">
       <!-- navigation buttons -->
-      <button class="nav" id="nav1" onclick="unimplemented()">Demographic Information</button>
-      <button class="nav" id="nav2" onclick="umls_popup()">ICD-10 Conversion</button>
-      <button class="nav" id="nav3" onclick="unimplemented()">Submit</button>
+      <button class="nav" id="nav-umls" onclick="umls_popup()">ICD-10 Conversion</button>
+      <button class="nav" id="nav-submit" onclick="unimplemented()">Submit</button>
       <p class="small right">Logged in as: <span id="fhir-user"></span></p>
     </div>
     

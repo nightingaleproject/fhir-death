@@ -308,6 +308,17 @@ div.popover {
   color: blue;
 }
 
+#nav-expand {
+  float: right;
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 12px;
+  padding: 5px 10px 5px 10px;
+}
+
 /*** dev-only (AKA "ugly") styling ***/
 div {
   /*border: 2px solid gray;*/

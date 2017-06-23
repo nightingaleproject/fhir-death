@@ -73,6 +73,7 @@ timeline.scale = d3.scale.log()
 // // MAIN CODE // //
 
 loading_text();
+$("#dc-row").fadeOut(0); // expanded fields not initially visible
 
 FHIR.oauth2.ready(function(s) {
   if (DEBUG) console.log("got smart");
@@ -81,6 +82,7 @@ FHIR.oauth2.ready(function(s) {
     .defer(fhir_load_patient)
     .defer(fhir_load_conditions)
     .defer(fhir_load_notes)
+    .defer(import_dc)
     .await(init);
 });
 
@@ -107,7 +109,7 @@ function init(err, pat, cond, notes) {
   });
   process_condition_metadata();
   // analytics_engine();
-  fhirdata.active = [];
+  fhirdata.active = [];  
   
   // write in the patient info as appropriate
   
@@ -120,7 +122,7 @@ function init(err, pat, cond, notes) {
     namestr + " -- ID " + fhirdata.patient.id;
   
   
-  document.getElementById("fhir-pt-detail").innerHTML = 
+  document.getElementById("fhir-pt-detail").insertAdjacentHTML("beforeend", 
     '<p class="head">Patient Details</p> \
      <p>Name: ' + fhirdata.patient.name[0].given.join(" ") + " " + 
                   fhirdata.patient.name[0].family.join(" ") + '</p> \
@@ -129,7 +131,8 @@ function init(err, pat, cond, notes) {
      <p>Residence: ' + 
               fhirdata.patient.address[0].city + ", " +
               fhirdata.patient.address[0].state + " " + 
-              fhirdata.patient.address[0].postalCode + '</p>';
+              fhirdata.patient.address[0].postalCode + '</p>'
+  );
   
   // notes
   
@@ -248,7 +251,7 @@ function init(err, pat, cond, notes) {
     .style("fill","#ECECEC")
     .style("stroke","black");
   b1.append("text")
-    .text("Load sample analytics")
+    .text("Load demo analytics")
     .attr("text-anchor", "middle")
     .attr("x", 100)
     .attr("y",30)
@@ -263,7 +266,7 @@ function init(err, pat, cond, notes) {
     .style("fill","#ECECEC")
     .style("stroke","black");
   b2.append("text")
-    .text("Load data mining (requires ICD-10)")
+    .text("Run v1 analytics (requires ICD-10 login)")
     .attr("text-anchor", "middle")
     .attr("x", 150)
     .attr("y",30)
@@ -730,6 +733,16 @@ function hardcoded_predictions() {
   redraw_proposed_causes();
 }
 
+function import_dc(callback) {
+  $("#dc-row").load("dc-form.html form", function() {
+    callback(null);
+  });
+}
+
+function toggle_dc_expand() {
+  $("#dc-row").fadeToggle(300);
+}
+
 // inspired by the transitions coolness from alignedleft
 function animate_load_label() {
     d3.select("#load-label")
@@ -753,7 +766,7 @@ function loading_done() {
 
 function loading_text() {
   document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
-  document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
+  // document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
   document.getElementById("fhir-user").innerHTML = 'Loading...';
   document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
 }
@@ -763,6 +776,9 @@ function unimplemented() {
   window.alert("this feature not yet implemented");
 }
 
+function app_exit() {
+  window.close();
+}
 
 
 
