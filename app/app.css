@@ -308,6 +308,14 @@ div.popover {
   color: blue;
 }
 
+#dc-row {
+  border: 1px solid gray;
+}
+
+form#death-certificate-expanded {
+  margin: 1em;
+}
+
 #nav-expand {
   float: right;
   -webkit-border-radius: 28;
