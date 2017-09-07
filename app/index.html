@@ -1,38 +1,8 @@
 
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="style2.css">
+  <link rel="stylesheet" type="text/css" href="style2.css">
   <link rel="stylesheet" type="text/css" href="app.css">
-    <script type="text/javascript">
-
-/***********************************************
-* Drop Down Date select script- by JavaScriptKit.com
-* This notice MUST stay intact for use
-* Visit JavaScript Kit at http://www.javascriptkit.com/ for this script and more
-***********************************************/
-
-var monthtext=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
-
-function populatedropdown(dayfield, monthfield, yearfield){
-var today=new Date()
-var dayfield=document.getElementById(dayfield)
-var monthfield=document.getElementById(monthfield)
-var yearfield=document.getElementById(yearfield)
-for (var i=0; i<31; i++)
-dayfield.options[i]=new Option(i, i+1)
-dayfield.options[today.getDate()]=new Option(today.getDate(), today.getDate(), true, true) //select today's day
-for (var m=0; m<12; m++)
-monthfield.options[m]=new Option(monthtext[m], monthtext[m])
-monthfield.options[today.getMonth()]=new Option(monthtext[today.getMonth()], monthtext[today.getMonth()], true, true) //select today's month
-var thisyear=today.getFullYear()
-for (var y=0; y<20; y++){
-yearfield.options[y]=new Option(thisyear, thisyear)
-thisyear+=1
-}
-yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, true) //select today's year
-}
-
-</script>
 </head>
 <body>
 <!-- multistep form -->
@@ -40,25 +10,22 @@ yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, 
     <title>CDC Death Certificate Input Form</title>
         <h1><header>U.S. Standard Certificate of Death Form</header></h1><br>
     <div class="infohead">
-	Patient Name <br>
-	Patient ID # <br>
-	Patient DOB  <br>
+	Patient Name: <span class="data" id="patient_name"></span> <br>
+	Patient ID: <span class="data" id="patient_id"></span><br>
+	Patient Age: <span class="data" id="patient_age"></span> <br>
 	</div>
 	<!-- progressbar -->
 	<ul id="progressbar">
-		<li class = "active">Personal Information</li>
+		<li class = "active">Welcome</li>
 		<li>Death Certification</li>
 		<li>Cause of Death</li>
 		<li>Manner of Death</li>
-		<li>Demographics</li>
+		<li>Submission</li>
 	</ul>
 	<!-- fieldsets -->
 	<fieldset>
-		<h2 class="fs-title">Personal Information</h2>
-		<h3 class="fs-subtitle">[Items 1-23] - Completed by Funeral Director</h3>
-		<input type="text" name="twitter" placeholder="Twitter" />
-		<input type="text" name="facebook" placeholder="Facebook" />
-		<input type="text" name="gplus" placeholder="Google Plus" />
+		<h2 class="fs-title">Welcome</h2>
+                <p id="setup_status" style="margin-bottom: 3em">Loading...</p>
 		<input type="button" name="next" class="next action-button" value="Next" />
 	</fieldset>
 	<fieldset>
@@ -67,12 +34,8 @@ yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, 
      	Date Pronounced Dead:
 	     	<select id="actual_death_date_day"></select> 
 	     	<select id="actual_death_date_month"></select> 
-			<select id="actual_death_date_year"></select> 
-			<script type="text/javascript"> //populatedropdown(id_of_day_select, id_of_month_select, id_of_year_select)
-			window.onload=function(){
-				populatedropdown("actual_death_date_day", "actual_death_date_month", "actual_death_date_year")
-			}
-			</script>
+		<select id="actual_death_date_year"></select>
+          
 	  	Time Pronounced Dead: <br>
 	  	<input type="text" name="death_time"><br>
 	  	License Number: <br>
@@ -104,7 +67,6 @@ yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, 
 		
           <div class="layout-row" id="timeline-row">
             <!-- left totally empty, D3 will draw the SVG canvas here -->
-            <img src="timline_mockup.png" style="width: 100%;" />
           </div>
 
           <div class="layout-row" id="cause-of-death-row">
@@ -150,8 +112,7 @@ yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, 
 		<input type="button" name="next" class="next action-button" value="Next" />
 	</fieldset>
 	<fieldset>
-		<h2 class="fs-title">Demographics</h2>
-		<h3 class="fs-subtitle">[Items 51-55] - Completed by Funeral Director</h3>
+		<h2 class="fs-title">Submission</h2>
 		<input type="text" name="fname" placeholder="First Name" />
 		<input type="text" name="lname" placeholder="Last Name" />
 		<input type="text" name="phone" placeholder="Phone" />
@@ -204,7 +165,8 @@ $(".next").click(function(){
 	$("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
 	
 	//show the next fieldset
-	next_fs.show(); 
+	next_fs.show();
+        zoom_redraw();
 	//hide the current fieldset with style
 	current_fs.animate({opacity: 0}, {
 		step: function(now, mx) {

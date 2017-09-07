@@ -30,7 +30,7 @@ timeline.canvas = d3.select("#timeline-row").append("svg")
                .classed("timeline", true)
                .attr("id","timeline-canvas")
                .attr("height",svg_ht);
-var svg_wd = timeline.canvas[0][0].getBoundingClientRect().width;
+var svg_wd = document.getElementById("setup_status").getBoundingClientRect().width - 2;
 
 
 var arrow_pad_top = 70; // px
@@ -73,7 +73,6 @@ timeline.scale = d3.scale.log()
 // // MAIN CODE // //
 
 loading_text();
-$("#dc-row").fadeOut(0); // expanded fields not initially visible
 
 FHIR.oauth2.ready(function(s) {
   if (DEBUG) console.log("got smart");
@@ -82,7 +81,6 @@ FHIR.oauth2.ready(function(s) {
     .defer(fhir_load_patient)
     .defer(fhir_load_conditions)
     .defer(fhir_load_notes)
-    .defer(import_dc)
     .await(init);
 });
 
@@ -113,38 +111,18 @@ function init(err, pat, cond, notes) {
   
   // write in the patient info as appropriate
   
-  document.getElementById("fhir-user").innerHTML = smart.userId ? smart.userId : "unknown";
-  
   var namestr = fhirdata.patient.name[0].family + ", " +
                 fhirdata.patient.name[0].given[0];
   
-  document.getElementById("fhir-pt-banner").innerHTML = 
-    namestr + " -- ID " + fhirdata.patient.id;
+  document.getElementById("patient_name").innerHTML = namestr;
+  document.getElementById("patient_id").innerHTML = fhirdata.patient.id;
+  document.getElementById("patient_age").innerHTML = 
+    d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
   
-  
-  document.getElementById("fhir-pt-detail").insertAdjacentHTML("beforeend", 
-    '<p class="head">Patient Details</p> \
-     <p>Name: ' + fhirdata.patient.name[0].given.join(" ") + " " + 
-                  fhirdata.patient.name[0].family.join(" ") + '</p> \
-     <p>Age at death: ' + 
-        d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + ' years</p> \
-     <p>Residence: ' + 
-              fhirdata.patient.address[0].city + ", " +
-              fhirdata.patient.address[0].state + " " + 
-              fhirdata.patient.address[0].postalCode + '</p>'
-  );
-  
-  // notes
-  
-  if (notes.total>0) {
-    document.getElementById("fhir-pt-history").innerHTML = 
-      notes.entry[0].resource.summary; // ##FIXME
-  } else {
-    document.getElementById("fhir-pt-history").innerHTML = 
-    '<p class="head">Patient History</p> \
-     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit, enim vel dictum dapibus, tellus massa dapibus nibh, in auctor felis felis ut mauris. Nam sit amet lorem diam. Sed ullamcorper magna eget enim semper, eu maximus nisi porta. Proin congue ex quam, ac rhoncus ipsum hendrerit quis. Proin sollicitudin diam vel diam semper, ac porta felis convallis. Nulla faucibus, risus eget gravida aliquet, mi ante pharetra dolor, eu luctus ante sapien et dolor. Cras feugiat, eros a ornare faucibus, odio elit vehicula felis, eu vehicula nibh sem nec magna. Integer faucibus vitae diam eget suscipit. Pellentesque dictum tincidunt neque eget molestie. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras odio purus, pretium non sagittis et, hendrerit ut neque. Nulla facilisi. Pellentesque mattis augue felis, ac tempor sapien euismod eu. Pellentesque venenatis scelerisque felis.</p>'
-  }
-  
+  populatedropdown("actual_death_date_day", 
+                   "actual_death_date_month", 
+                   "actual_death_date_year",
+                   new Date(fhirdata.patient.deceasedDateTime));
   
   // draw groups added to the SVG in draw order
   
@@ -273,11 +251,13 @@ function init(err, pat, cond, notes) {
   b2.on("click",analytics_engine);
     
   // get things right
+  document.getElementById("setup_status").innerHTML = "SMART-on-FHIR connection complete! This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue."
   zoom_redraw();
   
 }
 
 function zoom_redraw() {
+  // TODO: check for changed canvas width?
   timeline.zoomlevel = Math.min(Math.max(timeline.zoomlevel, timeline.zoommin), timeline.zoommax);
   timeline.scale.domain([10, timeline.zoomlevel]);
   redraw_condition_markers();
@@ -733,13 +713,41 @@ function hardcoded_predictions() {
   redraw_proposed_causes();
 }
 
+function populatedropdown(dayfield, monthfield, yearfield, then){
+  /***********************************************
+  * Drop Down Date select script- by JavaScriptKit.com
+  * This notice MUST stay intact for use
+  * Visit JavaScript Kit at http://www.javascriptkit.com/ for this script and more
+  ***********************************************/
+  // modified by Ryan Hoffman, 2017
+  // TODO: rename something less bad
+  var monthtext=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
+  var dayfield=document.getElementById(dayfield)
+  var monthfield=document.getElementById(monthfield)
+  var yearfield=document.getElementById(yearfield)
+  for (var i=0; i<31; i++)
+  dayfield.options[i]=new Option(i, i+1)
+  dayfield.options[then.getDate()]=new Option(then.getDate(), then.getDate(), true, true) //select then's day
+  for (var m=0; m<12; m++)
+  monthfield.options[m]=new Option(monthtext[m], monthtext[m])
+  monthfield.options[then.getMonth()]=new Option(monthtext[then.getMonth()], monthtext[then.getMonth()], true, true) //select then's month
+  var thisyear=then.getFullYear()
+  for (var y=0; y<20; y++){
+  yearfield.options[y]=new Option(thisyear, thisyear)
+  thisyear-=1
+  }
+  yearfield.options[0]=new Option(then.getFullYear(), then.getFullYear(), true, true) //select then's year
+}
+
 function import_dc(callback) {
+  // TODO: deprecated, remove
   $("#dc-row").load("dc-form.html form", function() {
     callback(null);
   });
 }
 
 function toggle_dc_expand() {
+  // TODO: deprecated, remove
   $("#dc-row").fadeToggle(300);
 }
 
@@ -765,10 +773,11 @@ function loading_done() {
 }
 
 function loading_text() {
-  document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
+  // TODO: deprecated, remove
+  // document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
   // document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
-  document.getElementById("fhir-user").innerHTML = 'Loading...';
-  document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
+  // document.getElementById("fhir-user").innerHTML = 'Loading...';
+  // document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
 }
 
 function unimplemented() {

@@ -202,6 +202,7 @@ svg .time-marker {
   color: #000;
   border: 1px solid black;
   border-radius: 2px;
+  max-width: 300px;
 }
 
 .tooltip.conditions {

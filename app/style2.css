@@ -13,8 +13,8 @@ header {
 body {
 	background-color: #e6f9ff !important;
 	font-family: montserrat;
-	font-size = 12px;
-	color: #007399
+	font-size: 12px;
+	color: #007399;
 	position: left;
 	}
 /*form styles*/
@@ -152,4 +152,7 @@ body {
 #progressbar li.active:before,  #progressbar li.active:after{
 	background: #007399;
 	color:  white;
+}
+.data {
+  color: black;
 }
