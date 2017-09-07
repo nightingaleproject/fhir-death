@@ -1,108 +1,258 @@
-<!--
-  -- Timeline-App/app.html
-  --   Ryan Hoffman, 2016
-  -- 
-  -- Main file for death app.
-  -- 
-  -->
+
 <html>
-  <head>
-    
-    <title>GT / CDC Death Reporting FHIR Application</title>
-    <link rel="stylesheet" type="text/css" href="app.css">
-    <!--<link rel="stylesheet" type="text/css" href="../Resources/d3-tip/d3-tip.min.css">-->
-    
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    
-  </head>
-  <body>
-    
-    <!-- MOST FIELDS LEFT EMPTY, TO BE FILLED BY JS -->
-    
-    <!-- GRID LAYOUT OF MAIN CONTENT -->
-    
-    <div class="layout-row" id="header-row">
-      <!-- first row, contains patient ID and some controls -->
-      <button class="nav right" id="back-button" onclick="app_exit()">&#8617; Return to EHR</button>
-      <h2 id="fhir-pt-banner"></h2>
-    </div>
-    
-    <div class="layout-row" id="patient-row">
-      <!-- second row, contains patient info and history -->
-      <div class="textbox" id="fhir-pt-detail">
-        <button class="nav" id="nav-expand" onclick="toggle_dc_expand()">Expand</button>
-      </div>
-      <div class="textbox right" id="fhir-pt-history"></div>
-    </div>
-    
-    <div class="layout-row" id="dc-row">
-      <!-- patient detail section, collabsible -->
-      <!-- loaded from <form> tag in dc-form.html -->
-    </div>
-    
-    <div class="layout-row" id="timeline-row">
-      <!-- left totally empty, D3 will draw the SVG canvas here -->
-    </div>
-    
-    <div class="layout-row" id="cause-of-death-row">
-      <!-- cause of death grid section -->
-      <div class="right" id="cod-comments-contain">
-        <p class="small label">Other Significant Conditions</p>
-        <textarea id="cod-comments">Enter text here.</textarea>
-      </div>
-      <div class="cod-row" id="cod-header">
-        <span class="cod-field label">Cause of Death:</span>
-        <span class="cod-time label right">Onset to Death:</span>
-        
-      </div>
-      <div class="cod-row" id="cod-row1">
-        <input id="cod1-text" class="cod-field" type="text">
-        <input id="cod1-time" class="cod-time right" type="text">
-      </div>
-      <div class="cod-row" id="cod-row2">
-        <input id="cod2-text" class="cod-field" type="text">
-        <input id="cod2-time" class="cod-time right" type="text">
-      </div>
-      <div class="cod-row" id="cod-row3">
-        <input id="cod3-text" class="cod-field" type="text">
-        <input id="cod3-time" class="cod-time right" type="text">
-      </div>
-      <div class="cod-row" id="cod-row4">
-        <input id="cod4-text" class="cod-field" type="text">
-        <input id="cod4-time" class="cod-time right" type="text">
-      </div>
-    </div>
-    
-    <div class="layout-row" id="bottom-nav-row">
-      <!-- navigation buttons -->
-      <button class="nav" id="nav-umls" onclick="umls_popup()">ICD-10 Conversion</button>
-      <button class="nav" id="nav-submit" onclick="unimplemented()">Submit</button>
-      <p class="small right">Logged in as: <span id="fhir-user"></span></p>
-    </div>
-    
-    <div id="fade"></div>
-    <div id="login-container"></div>
-    
-    
-    <!--  LOAD IN EXTERNAL JS RESOURCES  -->
-    
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/jquery.min.js"></script>
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/d3.min.js"></script>
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/d3-tip.min.js"></script>
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/fhir-client.min.js"></script>
-    <script type="text/javascript" charset="utf-8" 
-            src="./lib/queue.min.js"></script>
-    
-    <!--  FINALLY, LOAD MAIN JS FILES TO RUN THE APP  -->
+<head>
+    <link rel="stylesheet" type="text/css" href="style2.css">
+  <link rel="stylesheet" type="text/css" href="app.css">
+    <script type="text/javascript">
+
+/***********************************************
+* Drop Down Date select script- by JavaScriptKit.com
+* This notice MUST stay intact for use
+* Visit JavaScript Kit at http://www.javascriptkit.com/ for this script and more
+***********************************************/
+
+var monthtext=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
+
+function populatedropdown(dayfield, monthfield, yearfield){
+var today=new Date()
+var dayfield=document.getElementById(dayfield)
+var monthfield=document.getElementById(monthfield)
+var yearfield=document.getElementById(yearfield)
+for (var i=0; i<31; i++)
+dayfield.options[i]=new Option(i, i+1)
+dayfield.options[today.getDate()]=new Option(today.getDate(), today.getDate(), true, true) //select today's day
+for (var m=0; m<12; m++)
+monthfield.options[m]=new Option(monthtext[m], monthtext[m])
+monthfield.options[today.getMonth()]=new Option(monthtext[today.getMonth()], monthtext[today.getMonth()], true, true) //select today's month
+var thisyear=today.getFullYear()
+for (var y=0; y<20; y++){
+yearfield.options[y]=new Option(thisyear, thisyear)
+thisyear+=1
+}
+yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, true) //select today's year
+}
+
+</script>
+</head>
+<body>
+<!-- multistep form -->
+<form id="msform">
+    <title>CDC Death Certificate Input Form</title>
+        <h1><header>U.S. Standard Certificate of Death Form</header></h1><br>
+    <div class="infohead">
+	Patient Name <br>
+	Patient ID # <br>
+	Patient DOB  <br>
+	</div>
+	<!-- progressbar -->
+	<ul id="progressbar">
+		<li class = "active">Personal Information</li>
+		<li>Death Certification</li>
+		<li>Cause of Death</li>
+		<li>Manner of Death</li>
+		<li>Demographics</li>
+	</ul>
+	<!-- fieldsets -->
+	<fieldset>
+		<h2 class="fs-title">Personal Information</h2>
+		<h3 class="fs-subtitle">[Items 1-23] - Completed by Funeral Director</h3>
+		<input type="text" name="twitter" placeholder="Twitter" />
+		<input type="text" name="facebook" placeholder="Facebook" />
+		<input type="text" name="gplus" placeholder="Google Plus" />
+		<input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<h2 class="fs-title">Death Certification</h2>
+		<h3 class="fs-subtitle">[Items 24-28] - Must be completed by person who pronounced or certifies death</h3>
+     	Date Pronounced Dead:
+	     	<select id="actual_death_date_day"></select> 
+	     	<select id="actual_death_date_month"></select> 
+			<select id="actual_death_date_year"></select> 
+			<script type="text/javascript"> //populatedropdown(id_of_day_select, id_of_month_select, id_of_year_select)
+			window.onload=function(){
+				populatedropdown("actual_death_date_day", "actual_death_date_month", "actual_death_date_year")
+			}
+			</script>
+	  	Time Pronounced Dead: <br>
+	  	<input type="text" name="death_time"><br>
+	  	License Number: <br>
+	  	<input type="text" name="examiner_number"><br>
+	  	Date Signed (Mo/Day/Yr): <br>
+	  	<input type="text" name="examiner_sign_date"><br>
+	  	Actual or Presumed Date of Death (Mo/Day/Yr): <br>
+	  	<input type="text" name="actual_death_date"><br>
+	  	Actual or Presumed Time of Death: <br>
+	  	<input type="text" name="actual_death_time"><br>
+
+	  	Was Medical Examiner or Coroner Contacted?: <br>
+  		<input type="radio" name="examiner_contacted" value="yes" /> Yes<br />
+  		<input type="radio" name="examiner_contacted" value="no" /> No<br />
+
+  		Was an Autopsy Performed?: <br>
+  		<input type="radio" name="autopsy" value="yes" /> Yes<br />
+  		<input type="radio" name="autopsy" value="no" /> No<br />
+
+  		Were Autopsy Findings Available to Complete the Case of Death?: <br>
+  		<input type="radio" name="autopsy_available" value="yes" /> Yes<br />
+  		<input type="radio" name="autopsy_available" value="no" /> No<br /> <br>
+  		<input type="button" name="previous" class="previous action-button" value="Previous" />
+		<input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<h2 class="fs-title">Cause of Death</h2>
+		<h3 class="fs-subtitle">[Item 32] - Must be completed by person who pronounced or certifies death</h3>
+		
+          <div class="layout-row" id="timeline-row">
+            <!-- left totally empty, D3 will draw the SVG canvas here -->
+            <img src="timline_mockup.png" style="width: 100%;" />
+          </div>
+
+          <div class="layout-row" id="cause-of-death-row">
+            <!-- cause of death grid section -->
+            <div class="right" id="cod-comments-contain">
+              <p class="small label">Other Significant Conditions</p>
+              <textarea id="cod-comments">Enter text here.</textarea>
+            </div>
+            <div class="cod-row" id="cod-header">
+              <span class="cod-field label">Cause of Death:</span>
+              <span class="cod-time label right">Onset to Death:</span>
+
+            </div>
+            <div class="cod-row" id="cod-row1">
+              <input id="cod1-text" class="cod-field" type="text">
+              <input id="cod1-time" class="cod-time right" type="text">
+            </div>
+            <div class="cod-row" id="cod-row2">
+              <input id="cod2-text" class="cod-field" type="text">
+              <input id="cod2-time" class="cod-time right" type="text">
+            </div>
+            <div class="cod-row" id="cod-row3">
+              <input id="cod3-text" class="cod-field" type="text">
+              <input id="cod3-time" class="cod-time right" type="text">
+            </div>
+            <div class="cod-row" id="cod-row4">
+              <input id="cod4-text" class="cod-field" type="text">
+              <input id="cod4-time" class="cod-time right" type="text">
+            </div>
+          </div>
+          
+          
+		<input type="button" name="previous" class="previous action-button" value="Previous" />
+		<input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<h2 class="fs-title">Manner of Death</h2>
+		<h3 class="fs-subtitle">[Items 33-50] - Completed by Medical Certifier</h3>
+		<input type="text" name="twitter" placeholder="Twitter" />
+		<input type="text" name="facebook" placeholder="Facebook" />
+		<input type="text" name="gplus" placeholder="Google Plus" />
+		<input type="button" name="previous" class="previous action-button" value="Previous" />
+		<input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<h2 class="fs-title">Demographics</h2>
+		<h3 class="fs-subtitle">[Items 51-55] - Completed by Funeral Director</h3>
+		<input type="text" name="fname" placeholder="First Name" />
+		<input type="text" name="lname" placeholder="Last Name" />
+		<input type="text" name="phone" placeholder="Phone" />
+		<textarea name="address" placeholder="Address"></textarea>
+		<input type="button" name="previous" class="previous action-button" value="Previous" />
+		<input type="submit" name="submit" class="submit action-button" value="Submit" />
+	</fieldset>
+</form>
+
+<!-- jQuery -->
+<script src="http://www.htmlbestcodes.com/javascripts//jquery.js" type="text/javascript"></script>
+<!-- jQuery easing plugin -->
+<script src="http://www.htmlbestcodes.com/javascripts/jquery.easing.js" type="text/javascript"></script>
+<script type="text/javascript">
+//jQuery time
+var current_fs, next_fs, previous_fs; //fieldsets
+var left, opacity, scale; //fieldset properties which we will animate
+var animating; //flag to prevent quick multi-click glitches
+
+$(".next").click(function(){
+	if(animating) return false;
+	animating = true;
+	
+	current_fs = $(this).parent();
+	next_fs = $(this).parent().next();
+	
+	//activate next step on progressbar using the index of next_fs
+	$("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+	
+	//show the next fieldset
+	next_fs.show(); 
+	//hide the current fieldset with style
+	current_fs.animate({opacity: 0}, {
+		step: function(now, mx) {
+			//as the opacity of current_fs reduces to 0 - stored in "now"
+			//1. scale current_fs down to 80%
+			scale = 1 - (1 - now) * 0.2;
+			//2. bring next_fs from the right(50%)
+			left = (now * 50)+"%";
+			//3. increase opacity of next_fs to 1 as it moves in
+			opacity = 1 - now;
+			current_fs.css({'transform': 'scale('+scale+')'});
+			next_fs.css({'left': left, 'opacity': opacity});
+		}, 
+		duration: 800, 
+		complete: function(){
+			current_fs.hide();
+			animating = false;
+		}, 
+		//this comes from the custom easing plugin
+		easing: 'easeInOutBack'
+	});
+});
+
+$(".previous").click(function(){
+	if(animating) return false;
+	animating = true;
+	
+	current_fs = $(this).parent();
+	previous_fs = $(this).parent().prev();
+	
+	//de-activate current step on progressbar
+	$("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+	
+	//show the previous fieldset
+	previous_fs.show(); 
+	//hide the current fieldset with style
+	current_fs.animate({opacity: 0}, {
+		step: function(now, mx) {
+			//as the opacity of current_fs reduces to 0 - stored in "now"
+			//1. scale previous_fs from 80% to 100%
+			scale = 0.8 + (1 - now) * 0.2;
+			//2. take current_fs to the right(50%) - from 0%
+			left = ((1-now) * 50)+"%";
+			//3. increase opacity of previous_fs to 1 as it moves in
+			opacity = 1 - now;
+			current_fs.css({'left': left});
+			previous_fs.css({'transform': 'scale('+scale+')', 'opacity': opacity});
+		}, 
+		duration: 800, 
+		complete: function(){
+			current_fs.hide();
+			animating = false;
+		}, 
+		//this comes from the custom easing plugin
+		easing: 'easeInOutBack'
+	});
+});
+
+$(".submit").click(function(){
+	return false;
+})
+</script>
+
+
+  <!--  FINALLY, LOAD MAIN JS FILES TO RUN THE APP  -->
     
     <script type="text/javascript" charset="utf-8" 
             src="app.js"></script>
     <script type="text/javascript" charset="utf-8" 
             src="umls.js"></script>
-    
-  </body>
+  
+</body>
 </html>

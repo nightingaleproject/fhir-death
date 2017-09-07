@@ -52,12 +52,12 @@ h2 {
   text-align: center;
 }
 
-.cod-field {
-  width: 75%;
+input.cod-field {
+  width: 75% !important;
 }
 
-.cod-time {
-  width: 20%;
+input.cod-time {
+  width: 20% !important;
 }
 
 #cod-comments {
