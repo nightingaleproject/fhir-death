@@ -876,6 +876,9 @@ function bundle_export() {
                    "resource": c.resource});
   });
   
+  // gather up the rogue observations from various fields
+  generate_response_observations();
+  
   fhirdata.observations.forEach(function(o){
     dc.entry.push(o);
   });
@@ -891,13 +894,37 @@ function bundle_export() {
   
 }
 
-function generate_observation(code,system,text,type,value) {
-  console.warn("unimplemented!");
-  var obs = {}
-  
-  return obs;
+function generate_observation_entry(osystem,ocode,otext,otype,ovalue) {
+  var obs = {
+    "resourceType" : "Observation",
+    "id" : random_id(),
+    "status" : "preliminary",
+    "code" : {
+      "coding" : [{
+        "system": osystem,
+        "code": ocode
+      }],
+      "text" : otext
+    },
+    "subject": {"reference": "Patient/"+fhirdata.patient.id}
+  }
+  obs["value"+otype] = ovalue;
+  return {"fullUrl": "Observation/"+obs.id, "resource": obs};
 }
 
+function generate_response_observations() {
+  
+  ;
+  
+  
+}
+
+function random_id(len) {
+  len = len ? len : 12;
+  var str = "", pool = "0123456789abcdef";
+  while (str.length<len) str += pool[Math.floor(pool.length*Math.random())];
+  return str;
+}
 
 function unimplemented() {
   console.warn("feature not yet implemented");
