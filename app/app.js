@@ -868,10 +868,16 @@ function bundle_export() {
   dc.entry.push(comp);
   
   // conditions and observations
-  dc.entry.concat(fhirdata.conditions.filter(function(c){
-    return fhirdata.active.indexOf(c.id)>-1;
-  }));
-  dc.entry.concat(fhirdata.observations);
+  
+  fhirdata.conditions.filter(function(c){
+    return fhirdata.active.indexOf(c.resource.id)>-1;
+  }).forEach(function(c){
+    dc.entry.push(c.resource);
+  });
+  
+  fhirdata.observations.forEach(function(o){
+    dc.entry.push(o.resource);
+  });
   
   if (DEBUG) console.log(JSON.stringify(dc));
   
@@ -880,7 +886,7 @@ function bundle_export() {
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
   dlAnchorElem.setAttribute("href", dataStr);
   dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
-  dlAnchorElem.click();
+  if (!DEBUG) dlAnchorElem.click();
   
 }
 
