@@ -764,15 +764,17 @@ function hardcoded_demo_predictions() {
 }
 
 function date_time_init() {
-  $("#pronounced_death_date").datepicker();
-  $("#pronounced_death_date").datepicker("setDate", (new Date(Date.now())).toDateString());
-  $("#actual_death_date").datepicker();
-  $("#actual_death_date").datepicker("setDate", 
-    (new Date(fhirdata.patient.deceasedDateTime)).toDateString());
   
-  $("#pronounced_death_time").val((new Date(Date.now())).toTimeString());
-  $("#actual_death_time").val( 
-    (new Date(fhirdata.patient.deceasedDateTime)).toTimeString());
+  var pronounced = new Date(Date.now());
+  var actual = new Date(fhirdata.patient.deceasedDateTime);
+  
+  $("#pronounced_death_date").datepicker();
+  $("#pronounced_death_date").datepicker("setDate", pronounced);
+  $("#actual_death_date").datepicker();
+  $("#actual_death_date").datepicker("setDate", actual);
+  
+  $("#pronounced_death_time").val(pronounced.toTimeString());
+  $("#actual_death_time").val(actual.toTimeString());
   
   var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
                            Date.parse(fhirdata.patient.birthDate))/1000;
@@ -790,24 +792,22 @@ function date_time_init() {
 }
 
 function date_time_update() {
+  
+  var newtod = new Date($("#actual_death_date").val() + $("#actual_death_time").val())
+  if (DEBUG) console.log("recorded new time of death: "+newtod.toISOString());
+  
+  fhirdata.patient.deceasedDateTime = newtod.toISOString();
+  
   var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
                            Date.parse(fhirdata.patient.birthDate))/1000;
   timeline.zoommax = pt_age_in_sec;
   document.getElementById("patient_age").innerHTML = 
     d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
+  
   process_condition_metadata(true); // override flag turned on!
-}
-
-function import_dc(callback) {
-  // TODO: deprecated, remove
-  $("#dc-row").load("dc-form.html form", function() {
-    callback(null);
-  });
-}
-
-function toggle_dc_expand() {
-  // TODO: deprecated, remove
-  $("#dc-row").fadeToggle(300);
+  redraw_time_markers();
+  redraw_condition_markers();
+  redraw_proposed_causes();
 }
 
 // inspired by the transitions coolness from alignedleft
