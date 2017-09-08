@@ -873,6 +873,8 @@ function bundle_export() {
   }));
   dc.entry.concat(fhirdata.observations);
   
+  if (DEBUG) console.log(JSON.stringify(dc));
+  
   // now attach it to the phantom link and download
   var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dc));
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
