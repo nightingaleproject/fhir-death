@@ -104,15 +104,14 @@ function init(err, pat, cond, obs) {
     fhirdata.patient.deceasedDateTime = tod.toISOString();
   }
   
-  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
-                           Date.parse(fhirdata.patient.birthDate))/1000;
-  timeline.zoommax = pt_age_in_sec;
   
   if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
-  process_condition_metadata();
+  
+  date_time_init();
+  process_condition_metadata()
   fhirdata.active = []; 
   
   // save the observations
@@ -125,13 +124,6 @@ function init(err, pat, cond, obs) {
   
   document.getElementById("patient_name").innerHTML = namestr;
   document.getElementById("patient_id").innerHTML = fhirdata.patient.id;
-  document.getElementById("patient_age").innerHTML = 
-    d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
-  
-  populatedropdown("actual_death_date_day", 
-                   "actual_death_date_month", 
-                   "actual_death_date_year",
-                   new Date(fhirdata.patient.deceasedDateTime));
   
   // draw groups added to the SVG in draw order
   
@@ -496,12 +488,12 @@ function rewrite_cod_fields() {
   
 }
 
-function process_condition_metadata() {
+function process_condition_metadata(override) {
   
   for (var i=fhirdata.conditions.length-1; i>=0; i--) {
     
     // don't duplicate efforts
-    if (fhirdata.conditions[i].hasOwnProperty("app_onset")) continue;
+    if (!override && fhirdata.conditions[i].hasOwnProperty("app_onset")) continue;
     
     // ONSET
     
@@ -771,31 +763,39 @@ function hardcoded_demo_predictions() {
   redraw_proposed_causes();
 }
 
-function populatedropdown(dayfield, monthfield, yearfield, then){
-  // Tanvi Rao's code, moved from index.html
-  /***********************************************
-  * Drop Down Date select script- by JavaScriptKit.com
-  * This notice MUST stay intact for use
-  * Visit JavaScript Kit at http://www.javascriptkit.com/ for this script and more
-  ***********************************************/
-  // modified by Ryan Hoffman, 2017
-  // TODO: rename something less bad, reorganize
-  var monthtext=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
-  var dayfield=document.getElementById(dayfield)
-  var monthfield=document.getElementById(monthfield)
-  var yearfield=document.getElementById(yearfield)
-  for (var i=0; i<31; i++)
-  dayfield.options[i]=new Option(i, i+1)
-  dayfield.options[then.getDate()]=new Option(then.getDate(), then.getDate(), true, true) //select then's day
-  for (var m=0; m<12; m++)
-  monthfield.options[m]=new Option(monthtext[m], monthtext[m])
-  monthfield.options[then.getMonth()]=new Option(monthtext[then.getMonth()], monthtext[then.getMonth()], true, true) //select then's month
-  var thisyear=then.getFullYear()
-  for (var y=0; y<20; y++){
-  yearfield.options[y]=new Option(thisyear, thisyear)
-  thisyear-=1
-  }
-  yearfield.options[0]=new Option(then.getFullYear(), then.getFullYear(), true, true) //select then's year
+function date_time_init() {
+  $("#pronounced_death_date").datepicker();
+  $("#pronounced_death_date").datepicker("setDate", (new Date(Date.now())).toDateString());
+  $("#actual_death_date").datepicker();
+  $("#actual_death_date").datepicker("setDate", 
+    (new Date(fhirdata.patient.deceasedDateTime)).toDateString());
+  
+  $("#pronounced_death_time").val((new Date(Date.now())).toTimeString());
+  $("#actual_death_time").val( 
+    (new Date(fhirdata.patient.deceasedDateTime)).toTimeString());
+  
+  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
+                           Date.parse(fhirdata.patient.birthDate))/1000;
+  timeline.zoommax = pt_age_in_sec;
+  document.getElementById("patient_age").innerHTML = 
+    d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
+  
+  var temp = (new Date(Date.now())).toTimeString();
+  var timezone = " (local time: " + temp.substr(temp.indexOf(" ")+1) + ")";
+  $("span.tod-timezone").text(timezone);
+  
+  $("#actual_death_date").change(date_time_update);
+  $("#actual_death_time").change(date_time_update);
+  
+}
+
+function date_time_update() {
+  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
+                           Date.parse(fhirdata.patient.birthDate))/1000;
+  timeline.zoommax = pt_age_in_sec;
+  document.getElementById("patient_age").innerHTML = 
+    d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
+  process_condition_metadata(true); // override flag turned on!
 }
 
 function import_dc(callback) {

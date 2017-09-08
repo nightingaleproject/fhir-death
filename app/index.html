@@ -39,25 +39,17 @@
     <h2 class="fs-title">Death Certification</h2>
     <h3 class="fs-subtitle">[Items 24-28] - Must be completed by person who pronounced or certifies death</h3>
     Date Pronounced Dead:
-    <select id="actual_death_date_day"></select> 
-    <select id="actual_death_date_month"></select> 
-    <select id="actual_death_date_year"></select>
-          
-    <br>Time Pronounced Dead:
-    <select id="actual_death_date_day"></select> 
-    <select id="actual_death_date_month"></select> 
-    <select id="actual_death_date_year"></select>
-    
-    <br>
-    <input type="text" name="death_time"><br>
+    <input type="text" id="pronounced_death_date"><br>
+    Time Pronounced Dead<span class="tod-timezone"></span>:<br>
+    <input type="text" id="pronounced_death_time"><br>
     License Number: <br>
     <input class="centered" type="text" name="examiner_number"><br>
     Date Signed (Mo/Day/Yr): <br>
     <input class="centered" type="text" name="examiner_sign_date"><br>
-    Actual or Presumed Date of Death (Mo/Day/Yr): <br>
-    <input class="centered" type="text" name="actual_death_date"><br>
-    Actual or Presumed Time of Death: <br>
-    <input class="centered" type="text" name="actual_death_time"><br>
+    Actual or Presumed Date of Death: <br>
+    <input class="centered" type="text" id="actual_death_date"><br>
+    Actual or Presumed Time of Death<span class="tod-timezone"></span>: <br>
+    <input class="centered" type="text" id="actual_death_time"><br>
 
     Was Medical Examiner or Coroner Contacted?: <br>
     <input type="radio" name="examiner_contacted" value="yes" /> Yes<br />
