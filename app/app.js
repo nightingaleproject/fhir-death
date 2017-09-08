@@ -837,6 +837,51 @@ function loading_text() {
   // document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
 }
 
+function bundle_export() {
+  // stackoverflow 19721439
+  
+  // construct the DC bundle of fun
+  dc = {};
+  dc.resourceType = "Bundle";
+  dc.type = "document"
+  dc.entry = [];
+  
+  // composition at heart of resource
+  comp = {}
+  comp.resourceType = "Composition"
+  comp.date = (new Date(Date.now())).toISOString();
+  comp.type = {
+    "coding" : [{
+      "system": "htftp://loinc.org",
+      "code": "64297-5",
+      "display": "Death certificate"
+    }],
+    "text" : "Death certificate"
+  };
+  comp.title = "Death certificate for " + fhirdata.patient.name[0].family + ", " +
+                fhirdata.patient.name[0].given[0];
+  comp.status = "preliminary";
+  comp.subject = {"reference": "Patient/"+fhirdata.patient.id};
+  dc.entry.push(comp);
+  
+  
+  // now attach it to the phantom link and download
+  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storageObj));
+  var dlAnchorElem = document.getElementById('downloadAnchorElem');
+  dlAnchorElem.setAttribute("href",     dataStr     );
+  dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
+  dlAnchorElem.click();
+  
+}
+
+function generate_observation(code,system,text,type,value) {
+  console.warn("unimplemented!");
+  var obs = {}
+  
+  return obs;
+}
+
+
 function unimplemented() {
   console.warn("feature not yet implemented");
   window.alert("this feature not yet implemented");

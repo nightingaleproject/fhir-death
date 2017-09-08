@@ -133,34 +133,34 @@
   		<input type="radio" name="death_manner" value="could not be determined" /> Could not be Determined<br /></span>
 
   		<span>Date of Injury (Mo/Day/Yr): <br>
-	  	<input type="text" name="injury_date"><br>
+	  	<input class="centered" type="text" name="injury_date"><br>
 	  	Time of Injury: <br>
-	  	<input type="text" name="injury_time"><br>
+	  	<input class="centered" type="text" name="injury_time"><br>
 	  	Place of Injury: <br>
-	  	<input type="text" name="injury_location"><br>
+	  	<input class="centered" type="text" name="injury_location"><br>
 	  	Injury at Work?: <br>
   		<input type="radio" name="injury_workrelated" value="yes" /> Yes<br />
   		<input type="radio" name="injury_workrelated" value="no" /> No<br /> <br></span>
 
-  		<span id ="formatbod">Location of Injury:<br>
-  		<input type="text" name="injury_state"><br>
+  		Location of Injury:<br>
+  		<input class="centered" type="text" name="injury_state"><br>
   		County:<br>
-  		<input type="text" name="injury_county"><br>
+  		<input class="centered" type="text" name="injury_county"><br>
   		City/Town:<br>
-  		<input type="text" name="injury_city"><br>
+  		<input class="centered" type="text" name="injury_city"><br>
   		Street and Number:<br>
-  		<input type="text" name="injury_street"><br>
+  		<input class="centered" type="text" name="injury_street"><br>
   		Apartment Number:<br>
-  		<input type="text" name="injury_apt"><br>
+  		<input class="centered" type="text" name="injury_apt"><br>
   		Zip Code:<br>
-  		<input type="text" name="injury_zip"><br>
+  		<input class="centered" type="text" name="injury_zip"><br>
   		Country: <br>
-  		<input type="text" name="injury_country"><br>
+  		<input class="centered" type="text" name="injury_country"><br>
 
   		Injury Description:<br>
-  		<textarea rows="3" cols="20"> Describe how injury occurred...</textarea><br><br>
+  		<textarea rows="3" cols="20" placeholder="Describe how injury occurred..."></textarea><br><br>
 
-		If Transportation Injury, Specify <br>
+		If Transportation Injury, Specify: <br>
 	  	<select name="injury_transportation">
 	  		<option></option>
 	  		<option>Driver/Operator</option>
@@ -169,7 +169,7 @@
 			<option>Entombment</option>
 		</select>
 		If Other (specify):
-	  	<input type="text" name="injury_transportation"><br>
+	  	<input type="text" name="injury_transportation" /><br>
 
     
     <input type="button" name="previous" class="previous action-button" value="Previous" />
@@ -179,14 +179,15 @@
     <h2 class="fs-title">Submission</h2>
     <p>Thank you for using our system!</p>
     <input type="button" name="previous" class="previous action-button" value="Previous" />
-    <input type="submit" name="save" class="submit action-button" value="Save" onclick="unimplemented()"/>
-                <input type="submit" name="submit" class="submit action-button" value="Submit" onclick="unimplemented()"/>
+    <input type="submit" name="export" class="submit action-button" value="Export" onclick="bundle_export()"/>
+    <input type="submit" name="submit" class="submit action-button" value="Submit" onclick="unimplemented()"/>
   </fieldset>
 </form>
 
 
 
-
+    <!-- stackoverflow 19721439 -->
+    <a id="downloadAnchorElem" style="display:none"></a>
 
     <script type="text/javascript" charset="utf-8" 
             src="./lib/jquery.min.js"></script>
