@@ -758,10 +758,9 @@ function hardcoded_demo_predictions() {
         var andx, bndx;
         for (var i=0; i<fhirdata.conditions.length; i++) {
           if (fhirdata.conditions[i].resource.id==a) andx = i;
-          if (fhirdata.conditions[i].resource.id==a) bndx = b;
+          if (fhirdata.conditions[i].resource.id==b) bndx = i;
         }
-        return fhirdata.conditions[andx].app_onset -
-               fhirdata.conditions[bndx].app_onset;
+        return fhirdata.conditions[andx].app_onset - fhirdata.conditions[bndx].app_onset;
       })
       fhirdata.predictions[x] = temp;
     }

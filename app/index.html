@@ -109,7 +109,68 @@
   </fieldset>
   <fieldset>
     <h2 class="fs-title">Manner of Death</h2>
-    <h3 class="fs-subtitle">TODO: insert form from Tanvi</h3>
+    
+    
+    <span id ="formatbod">Did tobacco use contribute to death?: <br>
+  		<input type="radio" name="tobacco" value="yes" /> Yes<br />
+  		<input type="radio" name="tobacco" value="no" /> No<br />
+  		<input type="radio" name="tobacco" value="Probably" /> Probably<br />
+  		<input type="radio" name="tobacco" value="Unknown" /> Unknown<br /> <br>
+
+  		If female: <br>
+  		<input type="radio" name="pregnancy" value="Not pregnant within past year" /> Not pregnant within past year<br />
+  		<input type="radio" name="pregnancy" value="Pregnant at time of death" /> regnant at time of death<br />
+  		<input type="radio" name="pregnancy" value="Not pregnant, but pregnant within 42 days of death" /> Not pregnant, but pregnant within 42 days of death<br />
+  		<input type="radio" name="pregnancy" value="Not pregnant, but pregnant 43 days to 1 year before death" /> Not pregnant, but pregnant 43 days to 1 year before death<br />
+  		<input type="radio" name="pregnancy" value="Unknown if pregnant within the past year" /> Unknown if pregnant within the past year<br /> <br>
+
+  		Manner of Death: <br>
+  		<input type="radio" name="death_manner" value="natural" /> Natural<br />
+  		<input type="radio" name="death_manner" value="homicide" /> Homicide<br />
+  		<input type="radio" name="death_manner" value="accident" /> Accident<br />
+  		<input type="radio" name="death_manner" value="suicide" /> Suicide<br />
+  		<input type="radio" name="death_manner" value="pending investigation" /> Pending Investigation<br />
+  		<input type="radio" name="death_manner" value="could not be determined" /> Could not be Determined<br /></span>
+
+  		<span>Date of Injury (Mo/Day/Yr): <br>
+	  	<input type="text" name="injury_date"><br>
+	  	Time of Injury: <br>
+	  	<input type="text" name="injury_time"><br>
+	  	Place of Injury: <br>
+	  	<input type="text" name="injury_location"><br>
+	  	Injury at Work?: <br>
+  		<input type="radio" name="injury_workrelated" value="yes" /> Yes<br />
+  		<input type="radio" name="injury_workrelated" value="no" /> No<br /> <br></span>
+
+  		<span id ="formatbod">Location of Injury:<br>
+  		<input type="text" name="injury_state"><br>
+  		County:<br>
+  		<input type="text" name="injury_county"><br>
+  		City/Town:<br>
+  		<input type="text" name="injury_city"><br>
+  		Street and Number:<br>
+  		<input type="text" name="injury_street"><br>
+  		Apartment Number:<br>
+  		<input type="text" name="injury_apt"><br>
+  		Zip Code:<br>
+  		<input type="text" name="injury_zip"><br>
+  		Country: <br>
+  		<input type="text" name="injury_country"><br>
+
+  		Injury Description:<br>
+  		<textarea rows="3" cols="20"> Describe how injury occurred...</textarea><br><br>
+
+		If Transportation Injury, Specify <br>
+	  	<select name="injury_transportation">
+	  		<option></option>
+	  		<option>Driver/Operator</option>
+	  		<option>Passenger</option>
+	  		<option>Pedestrial</option>
+			<option>Entombment</option>
+		</select>
+		If Other (specify):
+	  	<input type="text" name="injury_transportation"><br>
+
     
     <input type="button" name="previous" class="previous action-button" value="Previous" />
     <input type="button" name="next" class="next action-button" value="Next" />
