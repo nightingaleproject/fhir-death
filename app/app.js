@@ -772,6 +772,7 @@ function date_time_init() {
   $("#pronounced_death_date").datepicker("setDate", pronounced);
   $("#actual_death_date").datepicker();
   $("#actual_death_date").datepicker("setDate", actual);
+  $("#examiner_sign_date").datepicker();
   
   $("#pronounced_death_time").val(pronounced.toTimeString());
   $("#actual_death_time").val(actual.toTimeString());
@@ -793,7 +794,8 @@ function date_time_init() {
 
 function date_time_update() {
   
-  var newtod = new Date($("#actual_death_date").val() + $("#actual_death_time").val())
+  var newtod = new Date($("#actual_death_date").val() + " " + 
+                        $("#actual_death_time").val());
   if (DEBUG) console.log("recorded new time of death: "+newtod.toISOString());
   
   fhirdata.patient.deceasedDateTime = newtod.toISOString();
