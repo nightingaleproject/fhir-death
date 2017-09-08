@@ -16,6 +16,10 @@ h2 {
   /*padding-left: 0.5em;*/
 }
 
+p.instructions {
+  margin-bottom: 2em;
+}
+
 .right {
   float: right;
   /* clear: both; */
