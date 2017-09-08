@@ -754,6 +754,15 @@ function hardcoded_demo_predictions() {
           y++;
         }
       }
+      temp.sort(function(a,b){
+        var andx, bndx;
+        for (var i=0; i<fhirdata.conditions.length; i++) {
+          if (fhirdata.conditions[i].resource.id==a) andx = i;
+          if (fhirdata.conditions[i].resource.id==a) bndx = b;
+        }
+        return fhirdata.conditions[andx].app_onset -
+               fhirdata.conditions[bndx].app_onset;
+      })
       fhirdata.predictions[x] = temp;
     }
   }
