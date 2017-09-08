@@ -865,18 +865,19 @@ function bundle_export() {
                 fhirdata.patient.name[0].given[0];
   comp.status = "preliminary";
   comp.subject = {"reference": "Patient/"+fhirdata.patient.id};
-  dc.entry.push(comp);
+  dc.entry.push({"resource": comp});
   
   // conditions and observations
   
   fhirdata.conditions.filter(function(c){
     return fhirdata.active.indexOf(c.resource.id)>-1;
   }).forEach(function(c){
-    dc.entry.push(c.resource);
+    dc.entry.push({"fullUrl":  c.fullUrl, 
+                   "resource": c.resource});
   });
   
   fhirdata.observations.forEach(function(o){
-    dc.entry.push(o.resource);
+    dc.entry.push(o);
   });
   
   if (DEBUG) console.log(JSON.stringify(dc));
@@ -886,7 +887,7 @@ function bundle_export() {
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
   dlAnchorElem.setAttribute("href", dataStr);
   dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
-  if (!DEBUG) dlAnchorElem.click();
+  dlAnchorElem.click();
   
 }
 
