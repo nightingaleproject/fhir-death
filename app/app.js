@@ -250,7 +250,7 @@ function init(err, pat, cond, notes) {
   b2.on("click",analytics_engine);
     
   // get things right
-  document.getElementById("setup_status").innerHTML = "SMART-on-FHIR connection complete! This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue.";
+  document.getElementById("setup_status").innerHTML = "<b>SMART-on-FHIR connection complete!</b> This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue.";
   document.getElementById("first_button").disabled = false;
   document.getElementById("first_button").value = "Next";
   

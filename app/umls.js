@@ -10,15 +10,15 @@
 
 umls = {};
 
-d3.select("#login-container")
-  .append("div")
-  .attr("id","umls-login")
-  .classed("popover",true)
-  .html("<p class=\"head\">UMLS Login</p> \
-         <p>Username: <input type=\"text\" id=\"umls-username\" name=\"umls-username\"></p> \
-         <p>Password: <input type=\"password\" id=\"umls-password\" name=\"umls-password\"></p> \
-         <p><button onclick=\"umls_convert()\">Log In and Convert to ICD10</button></p>"
-  );
+//d3.select("#login-container")
+//  .append("div")
+//  .attr("id","umls-login")
+//  .classed("popover",true)
+//  .html("<p class=\"head\">UMLS Login</p> \
+//         <p>Username: <input type=\"text\" id=\"umls-username\" name=\"umls-username\"></p> \
+//         <p>Password: <input type=\"password\" id=\"umls-password\" name=\"umls-password\"></p> \
+//         <p><button onclick=\"umls_convert()\">Log In and Convert to ICD10</button></p>"
+//  );
 d3.select("#timeline-canvas").append("text")
     .attr("id", "load-label")
     .attr("x",25)
@@ -26,17 +26,17 @@ d3.select("#timeline-canvas").append("text")
     .text("Loading...")
     .style("display","none");
 
-function umls_popup() {
-  
-  // draw the interface
-  d3.select("#fade").style("visibility","visible");
-  d3.select("#umls-login").style("visibility","visible");
-  
-}
+//function umls_popup() {
+//  
+//  // draw the interface
+//  d3.select("#fade").style("visibility","visible");
+//  d3.select("#umls-login").style("visibility","visible");
+//  
+//}
 
 function umls_convert() {
   
-  console.log("kicked off login");
+  console.log("kicked off UMLS login");
   
   umls.user = document.getElementById("umls-username").value;
   var pass = document.getElementById("umls-password").value;
@@ -61,10 +61,10 @@ function umls_convert() {
         console.log("UMLS resources all loaded in");
     })
   
-  // un-draw the interface
-  d3.select("#fade").style("visibility","hidden");
-  d3.select("#umls-login").style("visibility","hidden");
-  animate_load_label();
+//  // un-draw the interface // TODO: remove
+//  d3.select("#fade").style("visibility","hidden");
+//  d3.select("#umls-login").style("visibility","hidden");
+//  animate_load_label();
   
 }
 
@@ -93,4 +93,8 @@ function bundle_conditions() {
   
 }
 
-
+$("#first_button").click(function(){
+  if (document.getElementById("umls-username").value) {
+    umls_convert();
+  }
+})

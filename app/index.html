@@ -27,6 +27,9 @@
     <h2 class="fs-title">Welcome</h2>
     <p class="instructions">This prototype application was developed as a collaboration between the <a href="http://miblab.bme.gatech.edu">Wang Lab</a> at Georgia Tech's Wallace H. Coulter Department of Biomedical Engineering and the Centers for Disease Control.</p>
     <p class="instructions">The purpose of this application is to provide visualization, context, and decision support at the point of a patient's death, with the aim of improving the timeliness, accuracy, and completeness of mortality reporting.</p>
+    <p class="instructions">Some advanced features of this application require a free <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a> account to function. Please enter your UMLS login credentials here before continuing:</p>
+    <p>Username: <input class="centered" type="text" id="umls-username" name="umls-username"></p> 
+    <p>Password: <input class="centered" type="password" id="umls-password" name="umls-password"></p> 
     <p id="setup_status"  class="instructions">Loading...</p>
     <input type="button" name="next" class="next action-button" value="Loading" id="first_button" disabled/>
   </fieldset>
@@ -41,13 +44,13 @@
     Time Pronounced Dead: <br>
     <input type="text" name="death_time"><br>
     License Number: <br>
-    <input type="text" name="examiner_number"><br>
+    <input class="centered" type="text" name="examiner_number"><br>
     Date Signed (Mo/Day/Yr): <br>
-    <input type="text" name="examiner_sign_date"><br>
+    <input class="centered" type="text" name="examiner_sign_date"><br>
     Actual or Presumed Date of Death (Mo/Day/Yr): <br>
-    <input type="text" name="actual_death_date"><br>
+    <input class="centered" type="text" name="actual_death_date"><br>
     Actual or Presumed Time of Death: <br>
-    <input type="text" name="actual_death_time"><br>
+    <input class="centered" type="text" name="actual_death_time"><br>
 
     Was Medical Examiner or Coroner Contacted?: <br>
     <input type="radio" name="examiner_contacted" value="yes" /> Yes<br />

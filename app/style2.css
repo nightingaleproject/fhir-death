@@ -71,6 +71,10 @@ body {
 	color: #2C3E50;
 	font-size: 13px;
 }
+#msform input.centered {
+  width: 40%;
+  min-width: 12em;
+}
 /*buttons*/
 #msform .action-button {
 	width: 100px;
