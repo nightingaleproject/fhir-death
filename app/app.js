@@ -230,7 +230,7 @@ function init(err, pat, cond, obs) {
     .style("fill","#ECECEC")
     .style("stroke","black");
   b1.append("text")
-    .text("Load demo analytics")
+    .text("Random demo analytics")
     .attr("text-anchor", "middle")
     .attr("x", 100)
     .attr("y",30)
@@ -773,6 +773,7 @@ function date_time_init() {
   $("#actual_death_date").datepicker();
   $("#actual_death_date").datepicker("setDate", actual);
   $("#examiner_sign_date").datepicker();
+  $("#injury_date").datepicker();
   
   $("#pronounced_death_time").val(pronounced.toTimeString());
   $("#actual_death_time").val(actual.toTimeString());
