@@ -44,7 +44,8 @@ function umls_convert() {
   d3.xhr('http://apollo.bme.gatech.edu/cgi-bin/umls-icd10.py')
     .header("Content-Type", "application/x-www-form-urlencoded")
     .post("username="+umls.user+"&password="+pass+"&data="+JSON.stringify(bundle_conditions()), 
-      function(err,data) { 
+      function(err,data) {
+        console.log("got a UMLS response");
         umls.raw = data.response;
         umls.response = JSON.parse(umls.raw);
         // reintegrate with main data scrtucture
