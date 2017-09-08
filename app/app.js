@@ -80,7 +80,6 @@ FHIR.oauth2.ready(function(s) {
   queue()
     .defer(fhir_load_patient)
     .defer(fhir_load_conditions)
-    .defer(fhir_load_notes)
     .await(init);
 });
 
@@ -521,12 +520,23 @@ function process_condition_metadata() {
       
     } else {
       // onset is either missing completely or a string
-      // can't do anything with onsetString data... gotta lose it
-      console.warn("Dropping un-parsed condition resource: " + fhirdata.conditions[i]);
+      // can't do anything with onsetString data right now... gotta lose it
+      console.warn("Dropping un-parsed condition resource, cannot detemine onset: " +
+                   fhirdata.conditions[i]);
       fhirdata.conditions.splice(i,1);
+      continue;
     }
     
     // DESCRIPTIONS
+    
+    // verify that the condition has at least one coe associated with it
+    if (!fhirdata.conditions[i].resource.hasOwnProperty("code") ||
+        !fhirdata.conditions[i].resource.code.hasOwnProperty("coding")) {
+      console.warn("Dropping un-coded condition resource: " +
+                   JSON.stringify(fhirdata.conditions[i]));
+      fhirdata.conditions.splice(i,1);
+      continue;
+    }
     
     var str = "";
     if (fhirdata.conditions[i].resource.code.coding[0].hasOwnProperty("display")) {
@@ -632,6 +642,7 @@ function fhir_load_conditions(callback) {
 }
 
 function fhir_load_notes(callback) {
+  // TODO: doesn't work on Cerner right now, remove
   try {
     var pt_id = smart.patient.id;
     smart.api.search({type: "ClinicalImpression", query: {patient: pt_id}}).then(function(r) {
