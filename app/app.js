@@ -80,6 +80,7 @@ FHIR.oauth2.ready(function(s) {
   queue()
     .defer(fhir_load_patient)
     .defer(fhir_load_conditions)
+    .defer(fhir_load_observations)
     .await(init);
 });
 
@@ -87,7 +88,7 @@ FHIR.oauth2.ready(function(s) {
 // // HELPER FUNCTIONS // //
 
 // initialize elements and draw empty timeline
-function init(err, pat, cond, notes) {
+function init(err, pat, cond, obs) {
   if (err) {
     console.error(err);
     return;
@@ -112,8 +113,10 @@ function init(err, pat, cond, notes) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   process_condition_metadata();
-  // analytics_engine();
-  fhirdata.active = [];  
+  fhirdata.active = []; 
+  
+  // save the observations
+  fhirdata.observations = obs.entry;
   
   // write in the patient info as appropriate
   
@@ -660,15 +663,15 @@ function fhir_load_conditions(callback) {
   }
 }
 
-function fhir_load_notes(callback) {
+function fhir_load_observations(callback) {
   // TODO: doesn't work on Cerner right now, remove
   try {
     var pt_id = smart.patient.id;
-    smart.api.search({type: "ClinicalImpression", query: {patient: pt_id}}).then(function(r) {
-      callback(null, r.data);  // no notes is NOT an error, happens sometimes
+    smart.api.search({type: "Observation", query: {patient: pt_id}}).then(function(r) {
+      callback(null, r.data); 
     })
   } catch (err) {
-    callback("problem getting notes from the FHIR server")
+    callback("problem getting observations from the FHIR server")
   }
 }
 
@@ -864,11 +867,16 @@ function bundle_export() {
   comp.subject = {"reference": "Patient/"+fhirdata.patient.id};
   dc.entry.push(comp);
   
+  // conditions and observations
+  dc.entry.concat(fhirdata.conditions.filter(function(c){
+    return fhirdata.active.indexOf(c.id)>-1;
+  }));
+  dc.entry.concat(fhirdata.observations);
   
   // now attach it to the phantom link and download
-  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storageObj));
+  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dc));
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
-  dlAnchorElem.setAttribute("href",     dataStr     );
+  dlAnchorElem.setAttribute("href", dataStr);
   dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
   dlAnchorElem.click();
   
