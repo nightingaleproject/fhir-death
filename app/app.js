@@ -232,7 +232,7 @@ function init(err, pat, cond, notes) {
     .attr("text-anchor", "middle")
     .attr("x", 100)
     .attr("y",30)
-  b1.on("click",hardcoded_predictions);
+  b1.on("click",hardcoded_demo_predictions);
 
   b2 = timeline.canvas.append("g")
                .classed("analytics-button", true)
@@ -250,7 +250,11 @@ function init(err, pat, cond, notes) {
   b2.on("click",analytics_engine);
     
   // get things right
-  document.getElementById("setup_status").innerHTML = "SMART-on-FHIR connection complete! This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue."
+  document.getElementById("setup_status").innerHTML = "SMART-on-FHIR connection complete! This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue.";
+  document.getElementById("first_button").disabled = false;
+  document.getElementById("first_button").value = "Next";
+  
+  
   zoom_redraw();
   
 }
@@ -717,7 +721,7 @@ function analytics_engine() {
   //                        ['200005', '200004', '200003', '200002']];
 }
 
-function hardcoded_predictions() {
+function hardcoded_demo_predictions() {
   fhirdata.predictions = [['210001', '210005', '210003', '210002'],
                           ['210003', '210002'],
                           ['210005', '210004', '210003', '210002']];
