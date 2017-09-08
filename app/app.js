@@ -680,9 +680,9 @@ function condition_lookup(id) {
 }
 
 function analytics_engine() {
-  // hang'sl v1
+  // Hang's v1
   
-  animate_load_label();
+  animate_load_label("Loading remote analytics...");
   
   var conditions = [];
   var lookup = {};
