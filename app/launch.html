@@ -55,7 +55,32 @@
       var launchContextId = urlparams.launch;
       
       var scope = [
-        "patient/*.read",
+        "patient/AllergyIntolerance.read",
+        "patient/Appointment.read",
+        "patient/Binary.read",
+        "patient/CarePlan.read",
+        "patient/Condition.read",
+        "patient/Contract.read",
+        "patient/Device.read",
+        "patient/DiagnosticReport.read",
+        "patient/DocumentReference.read",
+        "patient/Encounter.read",
+        "patient/Goal.read",
+        "patient/Immunization.read",
+        "patient/MedicationOrder.read",
+        "patient/MedicationStatement.read",
+        "patient/Observation.read",
+        "patient/OperationDefinition.read",
+        "patient/Patient.read",
+        "patient/Person.read",
+        "patient/Practitioner.read",
+        "patient/Procedure.read",
+        "patient/RelatedPerson.read",
+        "patient/StructureDefinition.read",
+        "patient/AllergyIntolerance.write",
+        "patient/Condition.write",
+        "patient/DocumentReference.write",
+        "patient/MedicationStatement.write",
         "launch"
       ].join(" ");
       

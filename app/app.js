@@ -714,13 +714,14 @@ function hardcoded_predictions() {
 }
 
 function populatedropdown(dayfield, monthfield, yearfield, then){
+  // Tanvi Rao's code, moved from index.html
   /***********************************************
   * Drop Down Date select script- by JavaScriptKit.com
   * This notice MUST stay intact for use
   * Visit JavaScript Kit at http://www.javascriptkit.com/ for this script and more
   ***********************************************/
   // modified by Ryan Hoffman, 2017
-  // TODO: rename something less bad
+  // TODO: rename something less bad, reorganize
   var monthtext=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
   var dayfield=document.getElementById(dayfield)
   var monthfield=document.getElementById(monthfield)
