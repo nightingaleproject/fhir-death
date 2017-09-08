@@ -39,17 +39,17 @@
     <h2 class="fs-title">Death Certification</h2>
     <h3 class="fs-subtitle">[Items 24-28] - Must be completed by person who pronounced or certifies death</h3>
     Date Pronounced Dead:<br>
-    <input class="centered" type="text" id="pronounced_death_date"><br>
+    <input class="centered" type="text" name="pronounced_death_date"><br>
     Time Pronounced Dead<span class="tod-timezone"></span>:<br>
-    <input class="centered" type="text" id="pronounced_death_time"><br>
+    <input class="centered" type="text" name="pronounced_death_time"><br>
     License Number: <br>
     <input class="centered" type="text" name="examiner_number"><br>
-    Date Signed (Mo/Day/Yr): <br>
+    Date Signed: <br>
     <input class="centered" type="text" name="examiner_sign_date"><br>
     Actual or Presumed Date of Death: <br>
-    <input class="centered" type="text" id="actual_death_date"><br>
+    <input class="centered" type="text" name="actual_death_date"><br>
     Actual or Presumed Time of Death<span class="tod-timezone"></span>: <br>
-    <input class="centered" type="text" id="actual_death_time"><br>
+    <input class="centered" type="text" name="actual_death_time"><br>
 
     Was Medical Examiner or Coroner Contacted?: <br>
     <input type="radio" name="examiner_contacted" value="yes" /> Yes<br />
@@ -176,10 +176,10 @@
   </fieldset>
   <fieldset>
     <h2 class="fs-title">Submission</h2>
-    <p>Thank you for using our system!</p>
+    <p>Thank you for using our system!</p><br><br>
     <input type="button" name="previous" class="previous action-button" value="Previous" />
     <input type="button" name="export" class="export action-button" value="Export" onclick="bundle_export()"/>
-    <input type="button" name="submit" class="submit action-button" value="Submit" onclick="unimplemented()"/>
+    <input type="button" name="submit" class="submit action-button" value="Submit" onclick="unimplemented()" disabled/>
   </fieldset>
 </form>
 

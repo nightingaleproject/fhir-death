@@ -768,15 +768,16 @@ function date_time_init() {
   var pronounced = new Date(Date.now());
   var actual = new Date(fhirdata.patient.deceasedDateTime);
   
-  $("#pronounced_death_date").datepicker();
-  $("#pronounced_death_date").datepicker("setDate", pronounced);
-  $("#actual_death_date").datepicker();
-  $("#actual_death_date").datepicker("setDate", actual);
-  $("#examiner_sign_date").datepicker();
-  $("#injury_date").datepicker();
+  $("[name='pronounced_death_date']").datepicker();
+  $("[name='pronounced_death_date']").datepicker("setDate", pronounced);
+  $("[name='actual_death_date']").datepicker();
+  $("[name='actual_death_date']").datepicker("setDate", actual);
   
-  $("#pronounced_death_time").val(pronounced.toTimeString());
-  $("#actual_death_time").val(actual.toTimeString());
+  $("[name='examiner_sign_date']").datepicker();
+  $("[name='injury_date']").datepicker();
+  
+  $("[name='pronounced_death_time']").val(pronounced.toTimeString());
+  $("[name='actual_death_time']").val(actual.toTimeString());
   
   var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
                            Date.parse(fhirdata.patient.birthDate))/1000;
@@ -788,15 +789,15 @@ function date_time_init() {
   var timezone = " (local time: " + temp.substr(temp.indexOf(" ")+1) + ")";
   $("span.tod-timezone").text(timezone);
   
-  $("#actual_death_date").change(date_time_update);
-  $("#actual_death_time").change(date_time_update);
+  $("[name='actual_death_date']").change(date_time_update);
+  $("[name='actual_death_time']").change(date_time_update);
   
 }
 
 function date_time_update() {
   
-  var newtod = new Date($("#actual_death_date").val() + " " + 
-                        $("#actual_death_time").val());
+  var newtod = new Date($("[name='actual_death_date']").val() + " " + 
+                        $("[name='actual_death_time']").val());
   if (DEBUG) console.log("recorded new time of death: "+newtod.toISOString());
   
   fhirdata.patient.deceasedDateTime = newtod.toISOString();
