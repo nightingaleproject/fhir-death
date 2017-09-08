@@ -255,6 +255,14 @@ function init(err, pat, cond, notes) {
     .attr("x", 150)
     .attr("y",30)
   b2.on("click",analytics_engine);
+  
+  
+  d3.select("#timeline-canvas").append("text")
+    .attr("id", "load-label")
+    .attr("x",25)
+    .attr("y",38)
+    .text("Loading...")
+    .style("display","none");
     
   // get things right
   document.getElementById("setup_status").innerHTML = "<b>SMART-on-FHIR connection complete!</b> This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue.";
@@ -729,9 +737,26 @@ function analytics_engine() {
 }
 
 function hardcoded_demo_predictions() {
-  fhirdata.predictions = [['210001', '210005', '210003', '210002'],
-                          ['210003', '210002'],
-                          ['210005', '210004', '210003', '210002']];
+  if (fhirdata.patient.id == 110001) {
+    fhirdata.predictions = [['210001', '210005', '210003', '210002'],
+                            ['210003', '210002'],
+                            ['210005', '210004', '210003', '210002']];
+  } else {
+    fhirdata.predictions = [];
+    for (var x=0; x<3; x++) {
+      var ncond = (Math.floor(3*Math.random())+2);
+      var temp = [];
+      var y = 0;
+      while (temp.length < ncond) {
+        var roll = Math.floor(fhirdata.conditions.length*Math.random());
+        if (-1 == temp.indexOf(fhirdata.conditions[roll].resource.id)) {
+          temp[y] = fhirdata.conditions[roll].resource.id;
+          y++;
+        }
+      }
+      fhirdata.predictions[x] = temp;
+    }
+  }
   redraw_proposed_causes();
 }
 
@@ -775,8 +800,9 @@ function toggle_dc_expand() {
 }
 
 // inspired by the transitions coolness from alignedleft
-function animate_load_label() {
+function animate_load_label(loadstr) {
     d3.select("#load-label")
+        .text(loadstr ? loadstr : "Loading...")
         .style("display","block")
         .transition()
         .attr("fill", "hsl("+(Math.random()*360)+",100,50)")

@@ -19,12 +19,7 @@ umls = {};
 //         <p>Password: <input type=\"password\" id=\"umls-password\" name=\"umls-password\"></p> \
 //         <p><button onclick=\"umls_convert()\">Log In and Convert to ICD10</button></p>"
 //  );
-d3.select("#timeline-canvas").append("text")
-    .attr("id", "load-label")
-    .attr("x",25)
-    .attr("y",38)
-    .text("Loading...")
-    .style("display","none");
+
 
 //function umls_popup() {
 //  
@@ -37,6 +32,7 @@ d3.select("#timeline-canvas").append("text")
 function umls_convert() {
   
   console.log("kicked off UMLS login");
+  animate_load_label();
   
   umls.user = document.getElementById("umls-username").value;
   var pass = document.getElementById("umls-password").value;
