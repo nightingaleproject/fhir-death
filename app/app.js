@@ -96,6 +96,13 @@ function init(err, pat, cond, notes) {
   // data management
   
   fhirdata.patient = pat;
+  
+  // check if TOD is already logged... if not, pre-populate with now
+  if (!fhirdata.patient.deceasedDateTime) {
+    var tod = new Date(Date.now());
+    fhirdata.patient.deceasedDateTime = tod.toISOString();
+  }
+  
   var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
                            Date.parse(fhirdata.patient.birthDate))/1000;
   timeline.zoommax = pt_age_in_sec;
