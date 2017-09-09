@@ -773,7 +773,7 @@ function date_time_init() {
   $("[name='actual_death_date']").datepicker();
   $("[name='actual_death_date']").datepicker("setDate", actual);
   
-  $("[name='examiner_sign_date']").datepicker();
+  // $("[name='examiner_sign_date']").datepicker();
   $("[name='injury_date']").datepicker();
   
   $("[name='pronounced_death_time']").val(pronounced.toTimeString());
@@ -830,6 +830,7 @@ function animate_load_label(loadstr) {
             }
         });
 }
+
 function loading_done() {
     // map1.selectAll(".overlay")
     //     .remove();
@@ -880,8 +881,8 @@ function bundle_export() {
                    "resource": c.resource});
   });
   
-  // gather up the rogue observations from various fields
-  generate_response_observations();
+  // gather up the rogue observations, etc. from various fields
+  render_questionnaire();
   
   fhirdata.observations.forEach(function(o){
     dc.entry.push(o);
@@ -898,7 +899,8 @@ function bundle_export() {
   
 }
 
-function generate_observation_entry(osystem,ocode,otext,otype,ovalue) {
+function record_observation(osystem,ocode,otext,otype,ovalue) {
+  if (ovalue==undefined) return; // if there's no answer given, skip it
   var obs = {
     "resourceType" : "Observation",
     "id" : random_id(),
@@ -913,12 +915,111 @@ function generate_observation_entry(osystem,ocode,otext,otype,ovalue) {
     "subject": {"reference": "Patient/"+fhirdata.patient.id}
   }
   obs["value"+otype] = ovalue;
-  return {"fullUrl": "Observation/"+obs.id, "resource": obs};
+  fhirdata.observations.push({"fullUrl": "Observation/"+obs.id, "resource": obs});
 }
 
-function generate_response_observations() {
+function render_questionnaire() {
   
-  ;
+  // $("[name='whatevs']:checked").val();
+  // date/time death pronounced
+  record_observation("http://ncimeta.nci.nih.gov","C4263722",
+                     "Date and time pronounced dead",
+                     "DateTime",(new Date($("[name='pronounced_death_date']").val() + " " + 
+                     $("[name='pronounced_death_time']").val())).toISOString());
+  
+  // medical examiner contacted
+  if ($("[name='examiner_contacted']:checked").val()) {
+    var radio = $("[name='examiner_contacted']:checked").val();
+    var response = (radio=="yes") ? "31874001" : "64100000";
+    record_observation("http://ncimeta.nci.nih.gov","C3840494",
+                       "Medical examiner or coroner was contacted",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // autopsy performed
+  if ($("[name='autopsy']:checked").val()) {
+    var radio = $("[name='autopsy']:checked").val();
+    var response = (radio=="yes") ? "31874001" : "64100000";
+    record_observation("http://snomed.info/sct","716347009",
+                       "Autopsy performed",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // autopsy results available
+  if ($("[name='autopsy_available']:checked").val()) {
+    var radio = $("[name='autopsy_available']:checked").val();
+    var response = (radio=="yes") ? "31874001" : "64100000";
+    record_observation("http://snomed.info/sct","9427006",
+                       "Autopsy review",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // tobacco contributed to death
+  if ($("[name='tobacco']:checked").val()) {
+    var response = $("[name='tobacco']:checked").val();
+    record_observation("http://ncimeta.nci.nih.gov","C3263269",
+                       "Did tobacco use contribute to death",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.6004",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // pregnancy status for female decedent
+  if ($("[name='pregnancy']:checked").val()) {
+    var response = $("[name='pregnancy']:checked").val();
+    record_observation("http://ncimeta.nci.nih.gov","C3263267",
+                       "Timing of recent pregnancy in relation to death",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.6003",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // manner of death
+  if ($("[name='death_manner']:checked").val()) {
+    var response = $("[name='death_manner']:checked").val();
+    record_observation("http://ncimeta.nci.nih.gov","C3263279",
+                       "Manner of death",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.6002",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // certifying clinician
+  if ($("[name='certifier_name']").val()) {
+    
+    // TODO: move to last tab, include options for certifier type
+    
+  }
   
   
 }

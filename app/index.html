@@ -42,10 +42,7 @@
     <input class="centered" type="text" name="pronounced_death_date"><br>
     Time Pronounced Dead<span class="tod-timezone"></span>:<br>
     <input class="centered" type="text" name="pronounced_death_time"><br>
-    License Number: <br>
-    <input class="centered" type="text" name="examiner_number"><br>
-    Date Signed: <br>
-    <input class="centered" type="text" name="examiner_sign_date"><br>
+    
     Actual or Presumed Date of Death: <br>
     <input class="centered" type="text" name="actual_death_date"><br>
     Actual or Presumed Time of Death<span class="tod-timezone"></span>: <br>
@@ -62,8 +59,17 @@
     Were Autopsy Findings Available to Complete the Case of Death?: <br>
     <input type="radio" name="autopsy_available" value="yes" /> Yes<br />
     <input type="radio" name="autopsy_available" value="no" /> No<br /> <br>
+    
+    <h2 class="fs-title">Person Pronouncing Death</h2>
+    Type your full name to electronically sign this document:<br>
+    <input class="centered" type="text" name="certifier_name"><br>
+    License Number: <br>
+    <input class="centered" type="text" name="certifier_number"><br>
+    
+    <br><br>
     <input type="button" name="previous" class="previous action-button" value="Previous" />
     <input type="button" name="next" class="next action-button" value="Next" />
+    
   </fieldset>
   <fieldset>
     <h2 class="fs-title">Causes of Death</h2>
@@ -111,29 +117,29 @@
     
     
     <span id ="formatbod">Did tobacco use contribute to death?: <br>
-  		<input type="radio" name="tobacco" value="yes" /> Yes<br />
-  		<input type="radio" name="tobacco" value="no" /> No<br />
-  		<input type="radio" name="tobacco" value="Probably" /> Probably<br />
-  		<input type="radio" name="tobacco" value="Unknown" /> Unknown<br /> <br>
+  		<input type="radio" name="tobacco" value="373066001" /> Yes<br />
+  		<input type="radio" name="tobacco" value="373067005" /> No<br />
+  		<input type="radio" name="tobacco" value="2931005" /> Probably<br />
+  		<input type="radio" name="tobacco" value="UNK" /> Unknown<br /> <br>
 
   		If female: <br>
-  		<input type="radio" name="pregnancy" value="Not pregnant within past year" /> Not pregnant within past year<br />
-  		<input type="radio" name="pregnancy" value="Pregnant at time of death" /> regnant at time of death<br />
-  		<input type="radio" name="pregnancy" value="Not pregnant, but pregnant within 42 days of death" /> Not pregnant, but pregnant within 42 days of death<br />
-  		<input type="radio" name="pregnancy" value="Not pregnant, but pregnant 43 days to 1 year before death" /> Not pregnant, but pregnant 43 days to 1 year before death<br />
-  		<input type="radio" name="pregnancy" value="Unknown if pregnant within the past year" /> Unknown if pregnant within the past year<br /> <br>
+  		<input type="radio" name="pregnancy" value="PHC1260" /> Not pregnant within past year<br />
+  		<input type="radio" name="pregnancy" value="PHC1261" /> Pregnant at time of death<br />
+  		<input type="radio" name="pregnancy" value="PHC1262" /> Not pregnant, but pregnant within 42 days of death<br />
+  		<input type="radio" name="pregnancy" value="PHC1263" /> Not pregnant, but pregnant 43 days to 1 year before death<br />
+  		<input type="radio" name="pregnancy" value="PHC1264" /> Unknown if pregnant within the past year<br /> <br>
 
   		Manner of Death: <br>
-  		<input type="radio" name="death_manner" value="natural" /> Natural<br />
-  		<input type="radio" name="death_manner" value="homicide" /> Homicide<br />
-  		<input type="radio" name="death_manner" value="accident" /> Accident<br />
-  		<input type="radio" name="death_manner" value="suicide" /> Suicide<br />
-  		<input type="radio" name="death_manner" value="pending investigation" /> Pending Investigation<br />
-  		<input type="radio" name="death_manner" value="could not be determined" /> Could not be Determined<br /></span>
+  		<input type="radio" name="death_manner" value="38605008" /> Natural<br />
+  		<input type="radio" name="death_manner" value="27935005" /> Homicide<br />
+  		<input type="radio" name="death_manner" value="7878000" /> Accident<br />
+  		<input type="radio" name="death_manner" value="44301001" /> Suicide<br />
+  		<input type="radio" name="death_manner" value="185973002" /> Pending Investigation<br />
+  		<input type="radio" name="death_manner" value="65037004" /> Could not be Determined<br /></span>
 
   		Date of Injury: <br>
 	  	<input class="centered" type="text" name="injury_date"><br>
-	  	Time of Injury: <br>
+	  	Time of Injury<span class="tod-timezone"></span>: <br>
 	  	<input class="centered" type="text" name="injury_time"><br>
 	  	Place of Injury: <br>
 	  	<input class="centered" type="text" name="injury_location"><br>
