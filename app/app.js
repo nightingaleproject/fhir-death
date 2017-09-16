@@ -872,6 +872,10 @@ function bundle_export() {
   comp.subject = {"reference": "Patient/"+fhirdata.patient.id};
   dc.entry.push({"resource": comp});
   
+  // include the patient themselves
+  
+  dc.entry.push({"resource": fhirdata.patient})
+  
   // conditions and observations
   
   fhirdata.conditions.filter(function(c){
@@ -1020,7 +1024,6 @@ function render_questionnaire() {
     // TODO: move to last tab, include options for certifier type
     
   }
-  
   
 }
 
