@@ -30,7 +30,7 @@ timeline.canvas = d3.select("#timeline-row").append("svg")
                .classed("timeline", true)
                .attr("id","timeline-canvas")
                .attr("height",svg_ht);
-var svg_wd = timeline.canvas[0][0].getBoundingClientRect().width;
+var svg_wd = document.getElementById("setup_status").getBoundingClientRect().width - 2;
 
 
 var arrow_pad_top = 70; // px
@@ -80,7 +80,7 @@ FHIR.oauth2.ready(function(s) {
   queue()
     .defer(fhir_load_patient)
     .defer(fhir_load_conditions)
-    .defer(fhir_load_notes)
+    .defer(fhir_load_observations)
     .await(init);
 });
 
@@ -88,7 +88,7 @@ FHIR.oauth2.ready(function(s) {
 // // HELPER FUNCTIONS // //
 
 // initialize elements and draw empty timeline
-function init(err, pat, cond, notes) {
+function init(err, pat, cond, obs) {
   if (err) {
     console.error(err);
     return;
@@ -97,51 +97,33 @@ function init(err, pat, cond, notes) {
   // data management
   
   fhirdata.patient = pat;
-  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
-                           Date.parse(fhirdata.patient.birthDate))/1000;
-  timeline.zoommax = pt_age_in_sec;
+  
+  // check if TOD is already logged... if not, pre-populate with now
+  if (!fhirdata.patient.deceasedDateTime) {
+    var tod = new Date(Date.now());
+    fhirdata.patient.deceasedDateTime = tod.toISOString();
+  }
+  
   
   if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
     return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
-  process_condition_metadata();
-  // analytics_engine();
-  fhirdata.active = [];
+  
+  date_time_init();
+  process_condition_metadata()
+  fhirdata.active = []; 
+  
+  // save the observations
+  fhirdata.observations = obs.entry;
   
   // write in the patient info as appropriate
-  
-  document.getElementById("fhir-user").innerHTML = smart.userId ? smart.userId : "unknown";
   
   var namestr = fhirdata.patient.name[0].family + ", " +
                 fhirdata.patient.name[0].given[0];
   
-  document.getElementById("fhir-pt-banner").innerHTML = 
-    namestr + " -- ID " + fhirdata.patient.id;
-  
-  
-  document.getElementById("fhir-pt-detail").innerHTML = 
-    '<p class="head">Patient Details</p> \
-     <p>Name: ' + fhirdata.patient.name[0].given.join(" ") + " " + 
-                  fhirdata.patient.name[0].family.join(" ") + '</p> \
-     <p>Age at death: ' + 
-        d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + ' years</p> \
-     <p>Residence: ' + 
-              fhirdata.patient.address[0].city + ", " +
-              fhirdata.patient.address[0].state + " " + 
-              fhirdata.patient.address[0].postalCode + '</p>';
-  
-  // notes
-  
-  if (notes.total>0) {
-    document.getElementById("fhir-pt-history").innerHTML = 
-      notes.entry[0].resource.summary; // ##FIXME
-  } else {
-    document.getElementById("fhir-pt-history").innerHTML = 
-    '<p class="head">Patient History</p> \
-     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit, enim vel dictum dapibus, tellus massa dapibus nibh, in auctor felis felis ut mauris. Nam sit amet lorem diam. Sed ullamcorper magna eget enim semper, eu maximus nisi porta. Proin congue ex quam, ac rhoncus ipsum hendrerit quis. Proin sollicitudin diam vel diam semper, ac porta felis convallis. Nulla faucibus, risus eget gravida aliquet, mi ante pharetra dolor, eu luctus ante sapien et dolor. Cras feugiat, eros a ornare faucibus, odio elit vehicula felis, eu vehicula nibh sem nec magna. Integer faucibus vitae diam eget suscipit. Pellentesque dictum tincidunt neque eget molestie. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras odio purus, pretium non sagittis et, hendrerit ut neque. Nulla facilisi. Pellentesque mattis augue felis, ac tempor sapien euismod eu. Pellentesque venenatis scelerisque felis.</p>'
-  }
-  
+  document.getElementById("patient_name").innerHTML = namestr;
+  document.getElementById("patient_id").innerHTML = fhirdata.patient.id;
   
   // draw groups added to the SVG in draw order
   
@@ -248,11 +230,11 @@ function init(err, pat, cond, notes) {
     .style("fill","#ECECEC")
     .style("stroke","black");
   b1.append("text")
-    .text("Load sample analytics")
+    .text("Random demo analytics")
     .attr("text-anchor", "middle")
     .attr("x", 100)
     .attr("y",30)
-  b1.on("click",hardcoded_predictions);
+  b1.on("click",hardcoded_demo_predictions);
 
   b2 = timeline.canvas.append("g")
                .classed("analytics-button", true)
@@ -263,18 +245,32 @@ function init(err, pat, cond, notes) {
     .style("fill","#ECECEC")
     .style("stroke","black");
   b2.append("text")
-    .text("Load data mining (requires ICD-10)")
+    .text("Run v1 analytics (requires ICD-10 login)")
     .attr("text-anchor", "middle")
     .attr("x", 150)
     .attr("y",30)
   b2.on("click",analytics_engine);
+  
+  
+  d3.select("#timeline-canvas").append("text")
+    .attr("id", "load-label")
+    .attr("x",25)
+    .attr("y",38)
+    .text("Loading...")
+    .style("display","none");
     
   // get things right
+  document.getElementById("setup_status").innerHTML = "<b>SMART-on-FHIR connection complete!</b> This application will assist in completing the sections of the death certificate reserved for the medical certifier. Click 'Next' to continue.";
+  document.getElementById("first_button").disabled = false;
+  document.getElementById("first_button").value = "Next";
+  
+  
   zoom_redraw();
   
 }
 
 function zoom_redraw() {
+  // TODO: check for changed canvas width?
   timeline.zoomlevel = Math.min(Math.max(timeline.zoomlevel, timeline.zoommin), timeline.zoommax);
   timeline.scale.domain([10, timeline.zoomlevel]);
   redraw_condition_markers();
@@ -492,12 +488,12 @@ function rewrite_cod_fields() {
   
 }
 
-function process_condition_metadata() {
+function process_condition_metadata(override) {
   
   for (var i=fhirdata.conditions.length-1; i>=0; i--) {
     
     // don't duplicate efforts
-    if (fhirdata.conditions[i].hasOwnProperty("app_onset")) continue;
+    if (!override && fhirdata.conditions[i].hasOwnProperty("app_onset")) continue;
     
     // ONSET
     
@@ -538,12 +534,23 @@ function process_condition_metadata() {
       
     } else {
       // onset is either missing completely or a string
-      // can't do anything with onsetString data... gotta lose it
-      console.warn("Dropping un-parsed condition resource: " + fhirdata.conditions[i]);
+      // can't do anything with onsetString data right now... gotta lose it
+      console.warn("Dropping un-parsed condition resource, cannot detemine onset: " +
+                   fhirdata.conditions[i]);
       fhirdata.conditions.splice(i,1);
+      continue;
     }
     
     // DESCRIPTIONS
+    
+    // verify that the condition has at least one coe associated with it
+    if (!fhirdata.conditions[i].resource.hasOwnProperty("code") ||
+        !fhirdata.conditions[i].resource.code.hasOwnProperty("coding")) {
+      console.warn("Dropping un-coded condition resource: " +
+                   JSON.stringify(fhirdata.conditions[i]));
+      fhirdata.conditions.splice(i,1);
+      continue;
+    }
     
     var str = "";
     if (fhirdata.conditions[i].resource.code.coding[0].hasOwnProperty("display")) {
@@ -648,14 +655,15 @@ function fhir_load_conditions(callback) {
   }
 }
 
-function fhir_load_notes(callback) {
+function fhir_load_observations(callback) {
+  // TODO: doesn't work on Cerner right now, remove
   try {
     var pt_id = smart.patient.id;
-    smart.api.search({type: "ClinicalImpression", query: {patient: pt_id}}).then(function(r) {
-      callback(null, r.data);  // no notes is NOT an error, happens sometimes
+    smart.api.search({type: "Observation", query: {patient: pt_id}}).then(function(r) {
+      callback(null, r.data); 
     })
   } catch (err) {
-    callback("problem getting notes from the FHIR server")
+    callback("problem getting observations from the FHIR server")
   }
 }
 
@@ -667,9 +675,9 @@ function condition_lookup(id) {
 }
 
 function analytics_engine() {
-  // hang'sl v1
+  // Hang's v1
   
-  animate_load_label();
+  animate_load_label("Loading remote analytics...");
   
   var conditions = [];
   var lookup = {};
@@ -723,16 +731,93 @@ function analytics_engine() {
   //                        ['200005', '200004', '200003', '200002']];
 }
 
-function hardcoded_predictions() {
-  fhirdata.predictions = [['210001', '210005', '210003', '210002'],
-                          ['210003', '210002'],
-                          ['210005', '210004', '210003', '210002']];
+function hardcoded_demo_predictions() {
+  if (fhirdata.patient.id == 110001) {
+    fhirdata.predictions = [['210001', '210005', '210003', '210002'],
+                            ['210003', '210002'],
+                            ['210005', '210004', '210003', '210002']];
+  } else {
+    fhirdata.predictions = [];
+    for (var x=0; x<3; x++) {
+      var ncond = (Math.floor(3*Math.random())+2);
+      var temp = [];
+      var y = 0;
+      while (temp.length < ncond) {
+        var roll = Math.floor(fhirdata.conditions.length*Math.random());
+        if (-1 == temp.indexOf(fhirdata.conditions[roll].resource.id)) {
+          temp[y] = fhirdata.conditions[roll].resource.id;
+          y++;
+        }
+      }
+      temp.sort(function(a,b){
+        var andx, bndx;
+        for (var i=0; i<fhirdata.conditions.length; i++) {
+          if (fhirdata.conditions[i].resource.id==a) andx = i;
+          if (fhirdata.conditions[i].resource.id==b) bndx = i;
+        }
+        return fhirdata.conditions[andx].app_onset - fhirdata.conditions[bndx].app_onset;
+      })
+      fhirdata.predictions[x] = temp;
+    }
+  }
+  redraw_proposed_causes();
+}
+
+function date_time_init() {
+  
+  var pronounced = new Date(Date.now());
+  var actual = new Date(fhirdata.patient.deceasedDateTime);
+  
+  $("[name='pronounced_death_date']").datepicker();
+  $("[name='pronounced_death_date']").datepicker("setDate", pronounced);
+  $("[name='actual_death_date']").datepicker();
+  $("[name='actual_death_date']").datepicker("setDate", actual);
+  
+  // $("[name='examiner_sign_date']").datepicker();
+  $("[name='injury_date']").datepicker();
+  
+  $("[name='pronounced_death_time']").val(pronounced.toTimeString());
+  $("[name='actual_death_time']").val(actual.toTimeString());
+  
+  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
+                           Date.parse(fhirdata.patient.birthDate))/1000;
+  timeline.zoommax = pt_age_in_sec;
+  document.getElementById("patient_age").innerHTML = 
+    d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
+  
+  var temp = (new Date(Date.now())).toTimeString();
+  var timezone = " (local time: " + temp.substr(temp.indexOf(" ")+1) + ")";
+  $("span.tod-timezone").text(timezone);
+  
+  $("[name='actual_death_date']").change(date_time_update);
+  $("[name='actual_death_time']").change(date_time_update);
+  
+}
+
+function date_time_update() {
+  
+  var newtod = new Date($("[name='actual_death_date']").val() + " " + 
+                        $("[name='actual_death_time']").val());
+  if (DEBUG) console.log("recorded new time of death: "+newtod.toISOString());
+  
+  fhirdata.patient.deceasedDateTime = newtod.toISOString();
+  
+  var pt_age_in_sec = (Date.parse(fhirdata.patient.deceasedDateTime) -
+                           Date.parse(fhirdata.patient.birthDate))/1000;
+  timeline.zoommax = pt_age_in_sec;
+  document.getElementById("patient_age").innerHTML = 
+    d3.format("0.1f")(pt_age_in_sec / (60*60*24*365)) + " years";
+  
+  process_condition_metadata(true); // override flag turned on!
+  redraw_time_markers();
+  redraw_condition_markers();
   redraw_proposed_causes();
 }
 
 // inspired by the transitions coolness from alignedleft
-function animate_load_label() {
+function animate_load_label(loadstr) {
     d3.select("#load-label")
+        .text(loadstr ? loadstr : "Loading...")
         .style("display","block")
         .transition()
         .attr("fill", "hsl("+(Math.random()*360)+",100,50)")
@@ -745,6 +830,7 @@ function animate_load_label() {
             }
         });
 }
+
 function loading_done() {
     // map1.selectAll(".overlay")
     //     .remove();
@@ -752,10 +838,200 @@ function loading_done() {
 }
 
 function loading_text() {
-  document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
-  document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
-  document.getElementById("fhir-user").innerHTML = 'Loading...';
-  document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
+  // TODO: deprecated, remove
+  // document.getElementById("fhir-pt-banner").innerHTML = "Loading...";
+  // document.getElementById("fhir-pt-detail").innerHTML = 'Loading...';
+  // document.getElementById("fhir-user").innerHTML = 'Loading...';
+  // document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
+}
+
+function bundle_export() {
+  // stackoverflow 19721439
+  
+  // construct the DC bundle of fun
+  dc = {};
+  dc.resourceType = "Bundle";
+  dc.type = "document"
+  dc.entry = [];
+  
+  // composition at heart of resource
+  comp = {}
+  comp.resourceType = "Composition"
+  comp.date = (new Date(Date.now())).toISOString();
+  comp.type = {
+    "coding" : [{
+      "system": "htftp://loinc.org",
+      "code": "64297-5",
+      "display": "Death certificate"
+    }],
+    "text" : "Death certificate"
+  };
+  comp.title = "Death certificate for " + fhirdata.patient.name[0].family + ", " +
+                fhirdata.patient.name[0].given[0];
+  comp.status = "preliminary";
+  comp.subject = {"reference": "Patient/"+fhirdata.patient.id};
+  dc.entry.push({"resource": comp});
+  
+  // include the patient themselves
+  
+  dc.entry.push({"resource": fhirdata.patient})
+  
+  // conditions and observations
+  
+  fhirdata.conditions.filter(function(c){
+    return fhirdata.active.indexOf(c.resource.id)>-1;
+  }).forEach(function(c){
+    dc.entry.push({"fullUrl":  c.fullUrl, 
+                   "resource": c.resource});
+  });
+  
+  // gather up the rogue observations, etc. from various fields
+  render_questionnaire();
+  
+  fhirdata.observations.forEach(function(o){
+    dc.entry.push(o);
+  });
+  
+  if (DEBUG) console.log(JSON.stringify(dc));
+  
+  // now attach it to the phantom link and download
+  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dc));
+  var dlAnchorElem = document.getElementById('downloadAnchorElem');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
+  dlAnchorElem.click();
+  
+}
+
+function record_observation(osystem,ocode,otext,otype,ovalue) {
+  if (ovalue==undefined) return; // if there's no answer given, skip it
+  var obs = {
+    "resourceType" : "Observation",
+    "id" : random_id(),
+    "status" : "preliminary",
+    "code" : {
+      "coding" : [{
+        "system": osystem,
+        "code": ocode
+      }],
+      "text" : otext
+    },
+    "subject": {"reference": "Patient/"+fhirdata.patient.id}
+  }
+  obs["value"+otype] = ovalue;
+  fhirdata.observations.push({"fullUrl": "Observation/"+obs.id, "resource": obs});
+}
+
+function render_questionnaire() {
+  
+  // $("[name='whatevs']:checked").val();
+  // date/time death pronounced
+  record_observation("http://ncimeta.nci.nih.gov","C4263722",
+                     "Date and time pronounced dead",
+                     "DateTime",(new Date($("[name='pronounced_death_date']").val() + " " + 
+                     $("[name='pronounced_death_time']").val())).toISOString());
+  
+  // medical examiner contacted
+  if ($("[name='examiner_contacted']:checked").val()) {
+    var radio = $("[name='examiner_contacted']:checked").val();
+    var response = (radio=="yes") ? "31874001" : "64100000";
+    record_observation("http://ncimeta.nci.nih.gov","C3840494",
+                       "Medical examiner or coroner was contacted",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // autopsy performed
+  if ($("[name='autopsy']:checked").val()) {
+    var radio = $("[name='autopsy']:checked").val();
+    var response = (radio=="yes") ? "31874001" : "64100000";
+    record_observation("http://snomed.info/sct","716347009",
+                       "Autopsy performed",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // autopsy results available
+  if ($("[name='autopsy_available']:checked").val()) {
+    var radio = $("[name='autopsy_available']:checked").val();
+    var response = (radio=="yes") ? "31874001" : "64100000";
+    record_observation("http://snomed.info/sct","9427006",
+                       "Autopsy review",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // tobacco contributed to death
+  if ($("[name='tobacco']:checked").val()) {
+    var response = $("[name='tobacco']:checked").val();
+    record_observation("http://ncimeta.nci.nih.gov","C3263269",
+                       "Did tobacco use contribute to death",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.6004",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // pregnancy status for female decedent
+  if ($("[name='pregnancy']:checked").val()) {
+    var response = $("[name='pregnancy']:checked").val();
+    record_observation("http://ncimeta.nci.nih.gov","C3263267",
+                       "Timing of recent pregnancy in relation to death",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.6003",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // manner of death
+  if ($("[name='death_manner']:checked").val()) {
+    var response = $("[name='death_manner']:checked").val();
+    record_observation("http://ncimeta.nci.nih.gov","C3263279",
+                       "Manner of death",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "urn:oid:2.16.840.1.114222.4.11.6002",
+                            "code": response
+                          }],
+                          "text": response
+                        });
+  };
+  
+  // certifying clinician
+  if ($("[name='certifier_name']").val()) {
+    
+    // TODO: move to last tab, include options for certifier type
+    
+  }
+  
+}
+
+function random_id(len) {
+  len = len ? len : 12;
+  var str = "", pool = "0123456789abcdef";
+  while (str.length<len) str += pool[Math.floor(pool.length*Math.random())];
+  return str;
 }
 
 function unimplemented() {
@@ -763,6 +1039,9 @@ function unimplemented() {
   window.alert("this feature not yet implemented");
 }
 
+function app_exit() {
+  window.close();
+}
 
 
 

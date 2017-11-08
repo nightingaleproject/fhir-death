@@ -10,33 +10,29 @@
 
 umls = {};
 
-d3.select("#login-container")
-  .append("div")
-  .attr("id","umls-login")
-  .classed("popover",true)
-  .html("<p class=\"head\">UMLS Login</p> \
-         <p>Username: <input type=\"text\" id=\"umls-username\" name=\"umls-username\"></p> \
-         <p>Password: <input type=\"password\" id=\"umls-password\" name=\"umls-password\"></p> \
-         <p><button onclick=\"umls_convert()\">Log In and Convert to ICD10</button></p>"
-  );
-d3.select("#timeline-canvas").append("text")
-    .attr("id", "load-label")
-    .attr("x",25)
-    .attr("y",38)
-    .text("Loading...")
-    .style("display","none");
+//d3.select("#login-container")
+//  .append("div")
+//  .attr("id","umls-login")
+//  .classed("popover",true)
+//  .html("<p class=\"head\">UMLS Login</p> \
+//         <p>Username: <input type=\"text\" id=\"umls-username\" name=\"umls-username\"></p> \
+//         <p>Password: <input type=\"password\" id=\"umls-password\" name=\"umls-password\"></p> \
+//         <p><button onclick=\"umls_convert()\">Log In and Convert to ICD10</button></p>"
+//  );
 
-function umls_popup() {
-  
-  // draw the interface
-  d3.select("#fade").style("visibility","visible");
-  d3.select("#umls-login").style("visibility","visible");
-  
-}
+
+//function umls_popup() {
+//  
+//  // draw the interface
+//  d3.select("#fade").style("visibility","visible");
+//  d3.select("#umls-login").style("visibility","visible");
+//  
+//}
 
 function umls_convert() {
   
-  console.log("kicked off login");
+  console.log("kicked off UMLS login");
+  animate_load_label();
   
   umls.user = document.getElementById("umls-username").value;
   var pass = document.getElementById("umls-password").value;
@@ -44,7 +40,8 @@ function umls_convert() {
   d3.xhr('http://apollo.bme.gatech.edu/cgi-bin/umls-icd10.py')
     .header("Content-Type", "application/x-www-form-urlencoded")
     .post("username="+umls.user+"&password="+pass+"&data="+JSON.stringify(bundle_conditions()), 
-      function(err,data) { 
+      function(err,data) {
+        console.log("got a UMLS response");
         umls.raw = data.response;
         umls.response = JSON.parse(umls.raw);
         // reintegrate with main data scrtucture
@@ -61,10 +58,10 @@ function umls_convert() {
         console.log("UMLS resources all loaded in");
     })
   
-  // un-draw the interface
-  d3.select("#fade").style("visibility","hidden");
-  d3.select("#umls-login").style("visibility","hidden");
-  animate_load_label();
+//  // un-draw the interface // TODO: remove
+//  d3.select("#fade").style("visibility","hidden");
+//  d3.select("#umls-login").style("visibility","hidden");
+//  animate_load_label();
   
 }
 
@@ -93,4 +90,8 @@ function bundle_conditions() {
   
 }
 
-
+$("#first_button").click(function(){
+  if (document.getElementById("umls-username").value) {
+    umls_convert();
+  }
+})

@@ -16,6 +16,11 @@ h2 {
   /*padding-left: 0.5em;*/
 }
 
+p.instructions {
+  margin-bottom: 2em;
+  margin-top: 2em;
+}
+
 .right {
   float: right;
   /* clear: both; */
@@ -52,12 +57,12 @@ h2 {
   text-align: center;
 }
 
-.cod-field {
-  width: 75%;
+input.cod-field {
+  width: 75% !important;
 }
 
-.cod-time {
-  width: 20%;
+input.cod-time {
+  width: 20% !important;
 }
 
 #cod-comments {
@@ -202,6 +207,7 @@ svg .time-marker {
   color: #000;
   border: 1px solid black;
   border-radius: 2px;
+  max-width: 300px;
 }
 
 .tooltip.conditions {
@@ -306,6 +312,25 @@ div.popover {
 
 .icd10 {
   color: blue;
+}
+
+#dc-row {
+  border: 1px solid gray;
+}
+
+form#death-certificate-expanded {
+  margin: 1em;
+}
+
+#nav-expand {
+  float: right;
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 12px;
+  padding: 5px 10px 5px 10px;
 }
 
 /*** dev-only (AKA "ugly") styling ***/
