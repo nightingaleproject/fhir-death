@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="ReferencedCodeableConcept" />
+  <meta>
+    <lastUpdated value="2017-11-16T04:46:16.726-05:00" />
+  </meta>
+  <url value="StructureDefinition/ReferencedCodeableConcept" />
+  <name value="ReferencedCodeableConcept" />
+  <status value="draft" />
+  <fhirVersion value="1.0.2" />
+  <kind value="datatype" />
+  <constrainedType value="CodeableConcept" />
+  <abstract value="false" />
+  <base value="http://hl7.org/fhir/StructureDefinition/CodeableConcept" />
+  <differential>
+    <element>
+      <path value="CodeableConcept" />
+    </element>
+    <element>
+      <path value="CodeableConcept.extension" />
+      <slicing>
+        <discriminator value="url" />
+        <rules value="open" />
+      </slicing>
+    </element>
+    <element>
+      <path value="CodeableConcept.extension" />
+      <name value="condition-dueTo" />
+      <min value="1" />
+      <max value="*" />
+      <type>
+        <code value="Extension" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/condition-dueTo" />
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>

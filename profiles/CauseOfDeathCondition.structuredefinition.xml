@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="CauseOfDeathCondition" />
+  <meta>
+    <lastUpdated value="2017-11-16T04:43:36.655-05:00" />
+  </meta>
+  <url value="StructureDefinition/CauseOfDeathCondition" />
+  <name value="CauseOfDeathCondition" />
+  <status value="draft" />
+  <experimental value="true" />
+  <fhirVersion value="1.0.2" />
+  <kind value="resource" />
+  <constrainedType value="Condition" />
+  <abstract value="false" />
+  <base value="http://hl7.org/fhir/StructureDefinition/Condition" />
+  <differential>
+    <element>
+      <path value="Condition" />
+    </element>
+    <element>
+      <path value="Condition.onset[x]" />
+      <min value="1" />
+    </element>
+  </differential>
+</StructureDefinition>

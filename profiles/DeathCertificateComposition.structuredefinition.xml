@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="DeathCertificateComposition" />
+  <meta>
+    <lastUpdated value="2017-11-16T04:43:38.014-05:00" />
+  </meta>
+  <url value="StructureDefinition/DeathCertificateComposition" />
+  <version value="0.1" />
+  <name value="DeathCertificateComposition" />
+  <status value="draft" />
+  <experimental value="true" />
+  <publisher value="BioMIBLab - Georgia Institue of Technology" />
+  <description value="Profile for representing a completed or partially completed death certificate document" />
+  <fhirVersion value="1.0.2" />
+  <kind value="resource" />
+  <constrainedType value="Composition" />
+  <abstract value="false" />
+  <base value="http://hl7.org/fhir/StructureDefinition/Composition" />
+  <differential>
+    <element>
+      <path value="Composition" />
+      <short value="A set of resources documenting a death composed into a single coherent clinical statement with clinical attestation" />
+    </element>
+    <element>
+      <path value="Composition.type.coding.system" />
+      <fixedUri value="http://loinc.org" />
+    </element>
+    <element>
+      <path value="Composition.type.coding.code" />
+      <fixedCode value="64297-5" />
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <slicing>
+        <description value="Slice by resource type TODO arrange slices and/or sections in a more semantically meaningful way" />
+        <rules value="open" />
+      </slicing>
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <name value="patientSlice" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://fhir.org/guides/argonaut/StructureDefinition/argo-patient" />
+        <aggregation value="bundled" />
+      </type>
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <name value="conditionSlice" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Condition" />
+        <aggregation value="bundled" />
+      </type>
+      <type>
+        <code value="Reference" />
+        <profile value="StructureDefinition/CauseOfDeathCondition" />
+        <aggregation value="bundled" />
+      </type>
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <name value="observationSlice" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Observation" />
+        <aggregation value="bundled" />
+      </type>
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <name value="practitionerSlice" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Practitioner" />
+        <aggregation value="bundled" />
+      </type>
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <name value="locationSlice" />
+      <max value="1" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Location" />
+        <aggregation value="bundled" />
+      </type>
+    </element>
+    <element>
+      <path value="Composition.section.entry" />
+      <name value="relatedPersonSlice" />
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/RelatedPerson" />
+        <aggregation value="bundled" />
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>
