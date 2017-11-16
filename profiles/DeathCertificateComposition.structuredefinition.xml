@@ -2,7 +2,7 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
   <id value="DeathCertificateComposition" />
   <meta>
-    <lastUpdated value="2017-11-16T04:43:38.014-05:00" />
+    <lastUpdated value="2017-11-16T17:58:46.293-05:00" />
   </meta>
   <url value="StructureDefinition/DeathCertificateComposition" />
   <version value="0.1" />
@@ -32,9 +32,13 @@
     <element>
       <path value="Composition.section.entry" />
       <slicing>
-        <description value="Slice by resource type TODO arrange slices and/or sections in a more semantically meaningful way" />
+        <description value="Slice by resource type TODO may want to arrange slices and/or sections in a more semantically meaningful way. Need to decide how much information should be here vs. in the related bundle profile, more likely in bundle due to accesisblity of code fields for making more meaningful slices?" />
         <rules value="open" />
       </slicing>
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Resource" />
+      </type>
     </element>
     <element>
       <path value="Composition.section.entry" />

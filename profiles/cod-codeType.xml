@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="cod-codeType" />
+  <meta>
+    <lastUpdated value="2017-11-16T11:31:58.14-05:00" />
+  </meta>
+  <url value="StructureDefinition/cod-codeType" />
+  <name value="cod-codeType" />
+  <status value="draft" />
+  <experimental value="true" />
+  <fhirVersion value="1.0.2" />
+  <kind value="datatype" />
+  <constrainedType value="Extension" />
+  <abstract value="false" />
+  <contextType value="resource" />
+  <context value="Coding" />
+  <base value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <differential>
+    <element>
+      <path value="Extension" />
+    </element>
+    <element>
+      <path value="Extension.url" />
+      <fixedUri value="StructureDefinition/cod-codeType" />
+    </element>
+    <element>
+      <path value="Extension.valueString" />
+      <requirements value="Indicates whether a code is &quot;clinican-supplied&quot;, or a derived code of &quot;entity-axis&quot; or &quot;record-axis&quot; classification" />
+      <min value="1" />
+      <type>
+        <code value="string" />
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>

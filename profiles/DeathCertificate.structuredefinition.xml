@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="DeathCertificate" />
+  <meta>
+    <lastUpdated value="2017-11-16T18:02:05.743-05:00" />
+  </meta>
+  <url value="StructureDefinition/DeathCertificate" />
+  <name value="DeathCertificate" />
+  <status value="draft" />
+  <experimental value="true" />
+  <fhirVersion value="1.0.2" />
+  <kind value="resource" />
+  <constrainedType value="Bundle" />
+  <abstract value="false" />
+  <base value="http://hl7.org/fhir/StructureDefinition/Bundle" />
+  <differential>
+    <element>
+      <path value="Bundle" />
+    </element>
+    <element>
+      <path value="Bundle.type" />
+      <fixedCode value="document" />
+    </element>
+    <element>
+      <path value="Bundle.entry" />
+      <slicing>
+        <description value="Sections of the death certificate" />
+        <rules value="open" />
+      </slicing>
+    </element>
+    <element>
+      <path value="Bundle.entry" />
+      <name value="compositionSlice" />
+      <min value="1" />
+      <max value="1" />
+    </element>
+    <element>
+      <path value="Bundle.entry.resource" />
+      <type>
+        <code value="Composition" />
+        <profile value="StructureDefinition/DeathCertificateComposition" />
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>

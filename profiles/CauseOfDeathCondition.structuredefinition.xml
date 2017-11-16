@@ -2,7 +2,7 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
   <id value="CauseOfDeathCondition" />
   <meta>
-    <lastUpdated value="2017-11-16T04:43:36.655-05:00" />
+    <lastUpdated value="2017-11-16T11:32:45.714-05:00" />
   </meta>
   <url value="StructureDefinition/CauseOfDeathCondition" />
   <name value="CauseOfDeathCondition" />
@@ -16,6 +16,24 @@
   <differential>
     <element>
       <path value="Condition" />
+    </element>
+    <element>
+      <path value="Condition.code.coding.extension" />
+      <slicing>
+        <discriminator value="url" />
+        <rules value="open" />
+      </slicing>
+    </element>
+    <element>
+      <path value="Condition.code.coding.extension" />
+      <name value="codeType" />
+      <short value="Origin of the code" />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="StructureDefinition/cod-codeType" />
+      </type>
     </element>
     <element>
       <path value="Condition.onset[x]" />
