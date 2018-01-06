@@ -74,14 +74,39 @@ timeline.scale = d3.scale.log()
 
 loading_text();
 
-FHIR.oauth2.ready(function(s) {
-  if (DEBUG) console.log("got smart");
-  smart = s;
-  queue()
-    .defer(fhir_load_patient)
-    .defer(fhir_load_conditions)
-    .defer(fhir_load_observations)
-    .await(init);
+// Stand alone version, not kicked off by SMART on FHIR
+
+// FHIR.oauth2.ready(function(s) {
+//   if (DEBUG) console.log("got smart");
+//   smart = s;
+//   queue()
+//     .defer(fhir_load_patient)
+//     .defer(fhir_load_conditions)
+//     .defer(fhir_load_observations)
+//     .await(init);
+// });
+
+// Allow user to specify a FHIR server and a patient search string
+// TODO: add error handling, and allow user to pick patient
+$("#zeroth_button").click(function() {
+  $(this).parent().hide();
+  var fhirServer = $('#fhir-server').val()
+  var searchString = $('#decedent-name').val()
+  smart = FHIR.client({
+    serviceUrl: fhirServer
+  });
+  smart.api.search({type: 'Patient', query: { name: searchString } }).done(function(result) {
+    var patientId = result.data.entry[0].resource.id
+    smart = FHIR.client({
+      serviceUrl: fhirServer,
+      patientId: patientId
+    });
+    queue()
+      .defer(fhir_load_patient)
+      .defer(fhir_load_conditions)
+      .defer(fhir_load_observations)
+      .await(init);
+  })
 });
 
 
@@ -107,7 +132,7 @@ function init(err, pat, cond, obs) {
   
   if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
-    return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
+    return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
   });
   
   date_time_init();
