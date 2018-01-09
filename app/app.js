@@ -887,60 +887,73 @@ function loading_text() {
 
 function bundle_export() {
   // stackoverflow 19721439
-  
+
   // construct the DC bundle of fun
   dc = {};
   dc.resourceType = "Bundle";
   dc.type = "document"
   dc.entry = [];
-  
+
   // composition at heart of resource
   comp = {}
-  comp.resourceType = "Composition"
   comp.date = (new Date(Date.now())).toISOString();
   comp.type = {
-    "coding" : [{
-      "system": "htftp://loinc.org",
+    "coding": [{
+      "system": "http://loinc.org",
       "code": "64297-5",
       "display": "Death certificate"
     }],
-    "text" : "Death certificate"
+    "text": "Death certificate"
   };
   comp.title = "Death certificate for " + fhirdata.patient.name[0].family + ", " +
                 fhirdata.patient.name[0].given[0];
   comp.status = "preliminary";
-  comp.subject = {"reference": "Patient/"+fhirdata.patient.id};
-  dc.entry.push({"resource": comp});
-  
+  comp.subject = "Patient/"+fhirdata.patient.id;
+  comp.section = {
+    "code": {
+      "coding": [{
+        "system": "http://loinc.org",
+        "code": "69453-9",
+        "display": "Cause of death"
+      }],
+    },
+    "entry": [] //need to add entries for cause of death
+  };
+  comp.resourceType = "Composition"
+  dc.entry.push(comp);
+
   // include the patient themselves
-  
+
   dc.entry.push({"resource": fhirdata.patient})
-  
+
+  //TODO: add certifier
+  dc.entry.push({"resource": {}})
+
   // conditions and observations
-  
+
   fhirdata.conditions.filter(function(c){
     return fhirdata.active.indexOf(c.resource.id)>-1;
   }).forEach(function(c){
-    dc.entry.push({"fullUrl":  c.fullUrl, 
+    dc.entry.push({"fullUrl":  c.fullUrl,
                    "resource": c.resource});
   });
-  
+
   // gather up the rogue observations, etc. from various fields
   render_questionnaire();
-  
+
   fhirdata.observations.forEach(function(o){
     dc.entry.push(o);
   });
-  
+
   if (DEBUG) console.log(JSON.stringify(dc));
-  
+
   // now attach it to the phantom link and download
   var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dc));
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
   dlAnchorElem.setAttribute("href", dataStr);
   dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
   dlAnchorElem.click();
-  
+
 }
 
 function record_observation(osystem,ocode,otext,otype,ovalue) {
@@ -963,108 +976,95 @@ function record_observation(osystem,ocode,otext,otype,ovalue) {
 }
 
 function render_questionnaire() {
-  
+
   // $("[name='whatevs']:checked").val();
+
+  /*TODO: add:
+    actual or presumed date of death
+    injury at work
+    injury from transportation
+  */
   // date/time death pronounced
-  record_observation("http://ncimeta.nci.nih.gov","C4263722",
+  record_observation("http://loinc.org","80616-6",
                      "Date and time pronounced dead",
-                     "DateTime",(new Date($("[name='pronounced_death_date']").val() + " " + 
+                     "DateTime",(new Date($("[name='pronounced_death_date']").val() + " " +
                      $("[name='pronounced_death_time']").val())).toISOString());
-  
+
   // medical examiner contacted
   if ($("[name='examiner_contacted']:checked").val()) {
     var radio = $("[name='examiner_contacted']:checked").val();
-    var response = (radio=="yes") ? "31874001" : "64100000";
-    record_observation("http://ncimeta.nci.nih.gov","C3840494",
+    var response = (radio=="yes");
+    record_observation("http://loinc.org","74497-9",
                        "Medical examiner or coroner was contacted",
-                       "CodeableConcept",{
-                          "coding": [{
-                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
-                            "code": response
-                          }],
-                          "text": response
-                        });
+                       "Boolean",response);
   };
-  
+
   // autopsy performed
   if ($("[name='autopsy']:checked").val()) {
     var radio = $("[name='autopsy']:checked").val();
-    var response = (radio=="yes") ? "31874001" : "64100000";
-    record_observation("http://snomed.info/sct","716347009",
-                       "Autopsy performed",
-                       "CodeableConcept",{
-                          "coding": [{
-                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
-                            "code": response
-                          }],
-                          "text": response
-                        });
+    var response = (radio=="yes");
+    record_observation("http://loinc.org","85699-7",
+                       "Autopsy was performed",
+                       "Boolean",response);
   };
-  
+
   // autopsy results available
   if ($("[name='autopsy_available']:checked").val()) {
     var radio = $("[name='autopsy_available']:checked").val();
-    var response = (radio=="yes") ? "31874001" : "64100000";
-    record_observation("http://snomed.info/sct","9427006",
-                       "Autopsy review",
-                       "CodeableConcept",{
-                          "coding": [{
-                            "system": "urn:oid:2.16.840.1.114222.4.11.928",
-                            "code": response
-                          }],
-                          "text": response
-                        });
+    var response = (radio=="yes")
+    record_observation("http://loinc.org","69436-4",
+                       "Autopsy results available",
+                       "Boolean",response);
   };
-  
+
   // tobacco contributed to death
   if ($("[name='tobacco']:checked").val()) {
     var response = $("[name='tobacco']:checked").val();
-    record_observation("http://ncimeta.nci.nih.gov","C3263269",
+    record_observation("http://loinc.org","69443-0",
                        "Did tobacco use contribute to death",
                        "CodeableConcept",{
                           "coding": [{
-                            "system": "urn:oid:2.16.840.1.114222.4.11.6004",
+                            "system": "http://snomed.info/sct",
                             "code": response
                           }],
                           "text": response
                         });
   };
-  
+
   // pregnancy status for female decedent
   if ($("[name='pregnancy']:checked").val()) {
     var response = $("[name='pregnancy']:checked").val();
-    record_observation("http://ncimeta.nci.nih.gov","C3263267",
+    record_observation("http://loinc.org","69442-2",
                        "Timing of recent pregnancy in relation to death",
                        "CodeableConcept",{
                           "coding": [{
-                            "system": "urn:oid:2.16.840.1.114222.4.11.6003",
+                            "system": "PHIN VS (CDC Local Coding System)",
                             "code": response
                           }],
                           "text": response
                         });
   };
-  
+
   // manner of death
   if ($("[name='death_manner']:checked").val()) {
     var response = $("[name='death_manner']:checked").val();
-    record_observation("http://ncimeta.nci.nih.gov","C3263279",
+    record_observation("http://loinc.org","69449-7",
                        "Manner of death",
                        "CodeableConcept",{
                           "coding": [{
-                            "system": "urn:oid:2.16.840.1.114222.4.11.6002",
+                            "system": "http://snomed.info/sct",
                             "code": response
                           }],
-                          "text": response
                         });
   };
-  
+
   // certifying clinician
   if ($("[name='certifier_name']").val()) {
-    
+
     // TODO: move to last tab, include options for certifier type
-    
+
   }
-  
+
 }
 
 function random_id(len) {
@@ -1082,24 +1082,3 @@ function unimplemented() {
 function app_exit() {
   window.close();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
