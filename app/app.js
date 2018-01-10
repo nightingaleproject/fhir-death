@@ -89,24 +89,39 @@ loading_text();
 // Allow user to specify a FHIR server and a patient search string
 // TODO: add error handling, and allow user to pick patient
 $("#zeroth_button").click(function() {
-  $(this).parent().hide();
+  $('#patient-search').hide();
   var fhirServer = $('#fhir-server').val()
   var searchString = $('#decedent-name').val()
   smart = FHIR.client({
     serviceUrl: fhirServer
   });
   smart.api.search({type: 'Patient', query: { name: searchString } }).done(function(result) {
-    var patientId = result.data.entry[0].resource.id
-    smart = FHIR.client({
-      serviceUrl: fhirServer,
-      patientId: patientId
-    });
-    queue()
-      .defer(fhir_load_patient)
-      .defer(fhir_load_conditions)
-      .defer(fhir_load_observations)
-      .await(init);
-  })
+    $('#patient-links').show();
+    for (var i = 0; i < result.data.entry.length; i++) {
+      var record = result.data.entry[i].resource;
+      var first = record.name[0].given.join(' ');
+      var last = record.name[0].family
+      var link = $('<a>', { class: 'patient-link',
+                            id: record.id,
+                            text: first + ' ' + last,
+                            href: '#' });
+      link.appendTo('#patient-links');
+      $('<br/>').appendTo('#patient-links');
+      link.click(function() {
+        var patientId = this.id;
+        smart = FHIR.client({
+          serviceUrl: fhirServer,
+          patientId: patientId
+        });
+        queue()
+          .defer(fhir_load_patient)
+          .defer(fhir_load_conditions)
+          .defer(fhir_load_observations)
+          .await(init);
+        $('#patient-links').hide();
+      });
+    }
+  });
 });
 
 

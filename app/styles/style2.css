@@ -35,6 +35,21 @@ body {
 }
 
 
+#patient-search, #patient-links {
+    background: white;
+    border: 0 none;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+    padding: 20px 30px;
+    box-sizing: border-box;
+    width: 80%;
+    margin: 10px 10%;
+}
+
+#patient-links {
+    display: none;
+}
+
 #msform {
 	width: 1000px;
 	margin: 10px auto;
