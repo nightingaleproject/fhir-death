@@ -27,7 +27,7 @@
   <div id="patient-search">
     <h2 class="fs-title">Search for Decedent Record</h2>
     <h3 class="fs-subtitle">Specify FHIR server and patient name to search for</h3>
-    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="http://localhost:3001"></p>
+    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://syntheticmass.mitre.org/fhir"></p>
     <p>Decedent name: <input class="centered" type="text" id="decedent-name" name="decedent-name"></p>
     <input type="button" name="next" class="action-button" value="Load" id="zeroth_button"/>
   </div>
@@ -178,10 +178,10 @@
 		If Transportation Injury, Specify: <br>
 	  	<select name="injury_transportation">
 	  		<option></option>
-	  		<option>Driver/Operator</option>
-	  		<option>Passenger</option>
-	  		<option>Pedestrial</option>
-			<option>Entombment</option>
+	  		<option value="236320001">Driver/Operator</option>
+	  		<option value="257500003">Passenger</option>
+	  		<option value="257518000">Pedestrial</option>
+			<option value="OTH">Entombment</option>
 		</select>
 		If Other (specify):
 	  	<input type="text" name="injury_transportation" /><br>
@@ -194,8 +194,14 @@
     <h2 class="fs-title">Submission</h2>
     <p>Thank you for using our system!</p><br><br>
     <input type="button" name="previous" class="previous action-button" value="Previous" />
-    <input type="button" name="export" class="export action-button" value="Export" onclick="bundle_export()"/>
-    <input type="button" name="submit" class="submit action-button" value="Submit" onclick="unimplemented()" disabled/>
+    <input type="button" name="export" class="export action-button" value="Export" onclick="bundle_download()"/>
+    <div>
+      <h2 class="fs-title">Submit Death Record</h2>
+      <h3 class="fs-subtitle">Specify Nightingale endpoint and user email to submit</h3>
+      <p>Nightingale endpoint: <input class="centered" type="text" id="ng-server" name="ng-server" value="http://localhost:3000//fhir/v1/death_records"></p>
+      <p>User email: <input class="centered" type="text" id="user-email" name="user-email"></p>
+      <input type="button" name="submit" class="submit action-button" value="Submit" onclick="bundle_submit()"/>
+    </div>
   </fieldset>
 </form>
 
