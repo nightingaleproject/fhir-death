@@ -90,13 +90,18 @@ loading_text();
 // TODO: add error handling, and allow user to pick patient
 $("#zeroth_button").click(function() {
   $('#patient-search').hide();
+  $('#patient-links').show();
   var fhirServer = $('#fhir-server').val()
   var searchString = $('#decedent-name').val()
   smart = FHIR.client({
     serviceUrl: fhirServer
   });
-  smart.api.search({type: 'Patient', query: { name: searchString } }).done(function(result) {
-    $('#patient-links').show();
+  var searchParams = { type: 'Patient' }
+  if (searchString.length > 0) {
+    searchParams.name = searchString;
+  }
+  smart.api.search(searchParams).done(function(result) {
+    $('#patient-links .loading').hide();
     for (var i = 0; i < result.data.entry.length; i++) {
       var record = result.data.entry[i].resource;
       var first = record.name[0].given.join(' ');
