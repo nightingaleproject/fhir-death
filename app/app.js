@@ -669,11 +669,7 @@ function fhir_load_patient(callback) {
   try {
     var pt_id = smart.patient.id;
     smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
-      if (r.data.total == 1) {
-        callback(null, r.data.entry[0].resource);
-      } else {
-        callback("could not find unique patient id="+pt_id);
-      }
+      callback(null, r.data.entry[0].resource);
     })
   } catch (err) {
     callback("problem fetching patient context from the FHIR server")
@@ -684,11 +680,7 @@ function fhir_load_conditions(callback) {
   try {
     var pt_id = smart.patient.id;
     smart.api.search({type: "Condition", query: {patient: pt_id}}).then(function(r) {
-      if (r.data.total > 0) {
-        callback(null, r.data);
-      } else {
-        callback("could not find any conditions for patient id="+pt_id);
-      }
+      callback(null, r.data);
     })
   } catch (err) {
     callback("problem getting conditions from the FHIR server")
@@ -926,16 +918,41 @@ function bundle_export() {
 
   dc.entry.push({"resource": fhirdata.patient})
 
-  //TODO: add certifier
-  dc.entry.push({"resource": {}})
+  // add certifier
+  certifier = {};
+  namearray = $("[name='certifier_name']").val().split(" ");
+  givenname = namearray.shift()
+  familyname = namearray.join()
+  certifier.name = {
+    "family": familyname,
+    "given": [givenname],
+  }
+  certifier.extension = {
+    "url": "https://github.com/nightingaleproject/fhir-death-record/StructureDefinition/certifier-type",
+    "valueCoding": {
+      "system": "http://snomed.info/sct",
+      "code": "434651000124107", //this can be modified when certifier type is choosable
+      "display": "Certifying physician-To the best of my knowledge, death occurred due to the cause(s) and manner stated."
+    }
+  }
+  certifier.resourceType = "Practitioner"
+  dc.entry.push({"resource": certifier})
 
   // conditions and observations
+
+  entrylist = [];
 
   fhirdata.conditions.filter(function(c){
     return fhirdata.active.indexOf(c.resource.id)>-1;
   }).forEach(function(c){
-    dc.entry.push({"fullUrl":  c.fullUrl,
+    c.resource.text = {
+      "status": "additional",
+      "div": c.resource.code.coding[0].display
+    }
+    c.resource.onsetString = c.app_interval_display
+    dc.entry.push({"fullUrl":  "Condition"+c.resource.id,
                    "resource": c.resource});
+    entrylist.push("Condition/"+c.resource.id);
   });
 
   // gather up the rogue observations, etc. from various fields
@@ -943,17 +960,41 @@ function bundle_export() {
 
   fhirdata.observations.forEach(function(o){
     dc.entry.push(o);
+    entrylist.push(o.fullUrl)
   });
+  
+  //add list of entries to Composition
+  dc.entry[0].section.entry = entrylist;
 
   if (DEBUG) console.log(JSON.stringify(dc));
+  
+  return dc;
+}
 
-  // now attach it to the phantom link and download
+function bundle_submit() {
+  dc = bundle_export()
+  
+  var ngserver = $('#ng-server').val()
+  var user = $('#user-email').val()
+  
+  $.post(
+    ngserver,
+    jQuery.param({ contents: JSON.stringify(dc), email: user }),
+    function(data) {
+      alert("Response: " + data);
+    }
+  );
+}
+
+function bundle_download() {
+  dc = bundle_export()
+  
+  // attach it to the phantom link and download
   var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dc));
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
   dlAnchorElem.setAttribute("href", dataStr);
   dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
   dlAnchorElem.click();
-
 }
 
 function record_observation(osystem,ocode,otext,otype,ovalue) {
@@ -980,15 +1021,29 @@ function render_questionnaire() {
   // $("[name='whatevs']:checked").val();
 
   /*TODO: add:
-    actual or presumed date of death
-    injury at work
-    injury from transportation
+    contributing causes
   */
+  
+  // date/time of actual death
+  record_observation("http://loinc.org","81956-5",
+                      "Date and time of death",
+                      "DateTime",(new Date($("[name='actual_death_date']").val() + " " +
+                      $("[name='actual_death_time']").val())).toISOString());
+  
   // date/time death pronounced
   record_observation("http://loinc.org","80616-6",
                      "Date and time pronounced dead",
                      "DateTime",(new Date($("[name='pronounced_death_date']").val() + " " +
                      $("[name='pronounced_death_time']").val())).toISOString());
+
+  // injury at work
+  if ($("[name='injury_workrelated']:checked").val()) {
+    var radio = $("[name='injury_workrelated']:checked").val();
+    var response = (radio=="yes");
+    record_observation("http://loinc.org","69444-8",
+                       "Did death result from injury at work",
+                       "Boolean",response);
+  };
 
   // medical examiner contacted
   if ($("[name='examiner_contacted']:checked").val()) {
