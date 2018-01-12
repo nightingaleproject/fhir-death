@@ -935,6 +935,12 @@ function bundle_export() {
       "display": "Certifying physician-To the best of my knowledge, death occurred due to the cause(s) and manner stated."
     }
   }
+  certifier.qualification = {
+    "identifier": {
+      "use": "official",
+      "value": $("[name='certifier_number']").val()
+    }
+  }
   certifier.resourceType = "Practitioner"
   dc.entry.push({"resource": certifier})
 
@@ -1112,6 +1118,19 @@ function render_questionnaire() {
                           }],
                         });
   };
+  
+  // injury from Transportation
+  if ($("[name=injury_transportation]").val()) {
+    var response = $("[name=injury_transportation]").val();
+    record_observation("http://loinc.org","69448-9",
+                       "Injury leading to death associated with transportation event",
+                       "CodeableConcept",{
+                          "coding": [{
+                            "system": "Transportation Relationships (NCHS)",
+                            "code": response
+                          }],
+                        });
+  }
 
   // certifying clinician
   if ($("[name='certifier_name']").val()) {
