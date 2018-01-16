@@ -900,6 +900,7 @@ function bundle_export() {
   // construct the DC bundle of fun
   dc = {};
   dc.resourceType = "Bundle";
+  dc.id = guid();
   dc.type = "document"
   dc.entry = [];
 
@@ -969,7 +970,6 @@ function bundle_export() {
   fhirdata.conditions.filter(function(c){
     return fhirdata.active.indexOf(c.resource.id)>-1;
   }).forEach(function(c){
-    debugger
     c.resource.text = {
       "status": "additional",
       "div": '<div xmlns="http://www.w3.org/1999/xhtml">' + c.resource.code.coding[0].display + '</div>'
