@@ -98,7 +98,8 @@ $("#zeroth_button").click(function() {
   });
   var searchParams = { type: 'Patient' }
   if (searchString.length > 0) {
-    searchParams.name = searchString;
+    //searchParams.name = searchString;
+    searchParams.query = { family: searchString }
   }
   smart.api.search(searchParams).done(function(result) {
     $('#patient-links .loading').hide();
@@ -123,7 +124,7 @@ $("#zeroth_button").click(function() {
           .defer(fhir_load_conditions)
           .defer(fhir_load_observations)
           .await(init);
-        $('#patient-links').hide();
+        //$('#patient-links').hide();
       });
     }
   });
@@ -152,7 +153,8 @@ function init(err, pat, cond, obs) {
   
   if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
-    return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
+    //return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
+    return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   
   date_time_init();
@@ -696,7 +698,7 @@ function fhir_load_observations(callback) {
   // TODO: doesn't work on Cerner right now, remove
   try {
     var pt_id = smart.patient.id;
-    smart.api.search({type: "Observation", query: {patient: pt_id}}).then(function(r) {
+    smart.api.search({type: "Observation", query: {patient: pt_id, category: 'social-history,laboratory,social-history'}}).then(function(r) {
       callback(null, r.data); 
     })
   } catch (err) {
@@ -990,7 +992,7 @@ function bundle_submit() {
   
   $.post(
     ngserver,
-    jQuery.param({ contents: JSON.stringify(dc), email: user }),
+    jQuery.param({ fhir: JSON.stringify(dc), email: user }),
     function(data) {
       alert("Response: " + data);
     }

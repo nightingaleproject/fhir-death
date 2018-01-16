@@ -27,7 +27,7 @@
   <div id="patient-search">
     <h2 class="fs-title">Search for Decedent Record</h2>
     <h3 class="fs-subtitle">Specify FHIR server and patient name to search for</h3>
-    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://syntheticmass.mitre.org/fhir"></p>
+    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://epic7/Interconnect-FHIR/api/FHIR/DSTU2"></p>
     <p>Decedent name: <input class="centered" type="text" id="decedent-name" name="decedent-name"></p>
     <input type="button" name="next" class="action-button" value="Search" id="zeroth_button"/>
   </div>
@@ -199,7 +199,7 @@
     <div>
       <h2 class="fs-title">Submit Death Record</h2>
       <h3 class="fs-subtitle">Specify EDRS endpoint and user email to submit</h3>
-      <p>EDRS endpoint: <input class="centered" type="text" id="ng-server" name="ng-server" value="http://localhost:3000//fhir/v1/death_records"></p>
+      <p>EDRS endpoint: <input class="centered" type="text" id="ng-server" name="ng-server" value="http://localhost:3000/fhir/v1/death_records"></p>
       <p>User email: <input class="centered" type="text" id="user-email" name="user-email"></p>
       <input type="button" name="submit" class="submit action-button" value="Submit" onclick="bundle_submit()"/>
     </div>
