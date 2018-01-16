@@ -87,48 +87,78 @@ loading_text();
 // });
 
 // Allow user to specify a FHIR server and a patient search string
-// TODO: add error handling, and allow user to pick patient
-$("#zeroth_button").click(function() {
-  $('#patient-search').hide();
-  $('#patient-links').show();
-  var fhirServer = $('#fhir-server').val()
-  var searchString = $('#decedent-name').val()
-  smart = FHIR.client({
-    serviceUrl: fhirServer
+// $("#zeroth_button").click(function() {
+//   $('#patient-search').hide();
+//   $('#patient-links').show();
+//   var fhirServer = $('#fhir-server').val()
+//   var searchString = $('#decedent-name').val()
+//   smart = FHIR.client({
+//     serviceUrl: fhirServer
+//   });
+//   var searchParams = { type: 'Patient' }
+//   if (searchString.length > 0) {
+//     //searchParams.name = searchString;
+//     searchParams.query = { family: searchString }
+//   }
+//   smart.api.search(searchParams).done(function(result) {
+//     $('#patient-links .loading').hide();
+//     for (var i = 0; i < result.data.entry.length; i++) {
+//       var record = result.data.entry[i].resource;
+//       var first = record.name[0].given.join(' ');
+//       var last = record.name[0].family
+//       var link = $('<a>', { class: 'patient-link',
+//                             id: record.id,
+//                             text: first + ' ' + last,
+//                             href: '#' });
+//       link.appendTo('#patient-links');
+//       $('<br/>').appendTo('#patient-links');
+//       link.click(function() {
+//         var patientId = this.id;
+//         smart = FHIR.client({
+//           serviceUrl: fhirServer,
+//           patientId: patientId
+//         });
+//         queue()
+//           .defer(fhir_load_patient)
+//           .defer(fhir_load_conditions)
+//           .defer(fhir_load_observations)
+//           .await(init);
+//         $('#patient-links').hide();
+//       });
+//     }
+//   });
+// });
+
+// For Connectathon use hard coded patient IDs (the Epic STU3 server
+// does not allow searching for patients)
+
+var fhirServer = 'https://epic7/Interconnect-FHIR/api/FHIR/STU3'
+var patientIDs = ['eQR9XyQpmLgA.oysXs-VWPg3', 'ePhQT7xguXcJl0Mp7.EB17g3'];
+var patientNames = ['Chip Moore', 'James Kirk'];
+$('#patient-search').hide();
+$('#patient-links').show();
+$('#patient-links .loading').hide();
+for (var i = 0; i < patientIDs.length; i++) {
+  var link = $('<a>', { class: 'patient-link',
+                        id: patientIDs[i],
+                        text: patientNames[i],
+                        href: '#' });
+  link.appendTo('#patient-links');
+  $('<br/>').appendTo('#patient-links');
+  link.click(function() {
+    var patientId = this.id;
+    smart = FHIR.client({
+      serviceUrl: fhirServer,
+      patientId: patientId
+    });
+    queue()
+      .defer(fhir_load_patient)
+      .defer(fhir_load_conditions)
+      .defer(fhir_load_observations)
+      .await(init);
+    $('#patient-links').hide();
   });
-  var searchParams = { type: 'Patient' }
-  if (searchString.length > 0) {
-    //searchParams.name = searchString;
-    searchParams.query = { family: searchString }
-  }
-  smart.api.search(searchParams).done(function(result) {
-    $('#patient-links .loading').hide();
-    for (var i = 0; i < result.data.entry.length; i++) {
-      var record = result.data.entry[i].resource;
-      var first = record.name[0].given.join(' ');
-      var last = record.name[0].family
-      var link = $('<a>', { class: 'patient-link',
-                            id: record.id,
-                            text: first + ' ' + last,
-                            href: '#' });
-      link.appendTo('#patient-links');
-      $('<br/>').appendTo('#patient-links');
-      link.click(function() {
-        var patientId = this.id;
-        smart = FHIR.client({
-          serviceUrl: fhirServer,
-          patientId: patientId
-        });
-        queue()
-          .defer(fhir_load_patient)
-          .defer(fhir_load_conditions)
-          .defer(fhir_load_observations)
-          .await(init);
-        $('#patient-links').hide();
-      });
-    }
-  });
-});
+}
 
 
 // // HELPER FUNCTIONS // //
@@ -153,8 +183,8 @@ function init(err, pat, cond, obs) {
   
   if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
+    //return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
     return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
-    //return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   
   date_time_init();
@@ -579,6 +609,13 @@ function process_condition_metadata(override) {
       fhirdata.conditions[i].app_onset_display = 
         "beginning " + fhirdata.conditions[i].resource.onsetRange.low.split("T")[0];
       
+    } else if (fhirdata.conditions[i].resource.hasOwnProperty("assertedDate")) {
+      // no onset provided in Epic STU3 for connectathon, using assertedDate
+      fhirdata.conditions[i].app_onset =
+        dod - Date.parse(fhirdata.conditions[i].resource.assertedDate);
+      fhirdata.conditions[i].app_onset_display =
+        fhirdata.conditions[i].resource.assertedDate.split("T")[0];
+
     } else {
       // onset is either missing completely or a string
       // can't do anything with onsetString data right now... gotta lose it
@@ -600,7 +637,9 @@ function process_condition_metadata(override) {
     }
     
     var str = "";
-    if (fhirdata.conditions[i].resource.code.coding[0].hasOwnProperty("display")) {
+    if (fhirdata.conditions[i].resource.code.hasOwnProperty("text")) {
+      str += fhirdata.conditions[i].resource.code.text;
+    } else if (fhirdata.conditions[i].resource.code.coding[0].hasOwnProperty("display")) {
       str += fhirdata.conditions[i].resource.code.coding[0].display;
     } else {
       str += fhirdata.conditions[i].resource.code.coding[0].system + " - " +
@@ -675,8 +714,9 @@ function draw_arrow() {
 function fhir_load_patient(callback) {
   try {
     var pt_id = smart.patient.id;
-    smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
-      callback(null, r.data.entry[0].resource);
+    //smart.api.search({type: "Patient", query: {_id: pt_id}}).then(function(r) {
+    smart.api.read({type: 'Patient', id: pt_id }).then(function(r) {
+      callback(null, r.data);
     })
   } catch (err) {
     callback("problem fetching patient context from the FHIR server")
@@ -698,7 +738,7 @@ function fhir_load_observations(callback) {
   // TODO: doesn't work on Cerner right now, remove
   try {
     var pt_id = smart.patient.id;
-    smart.api.search({type: "Observation", query: {patient: pt_id, category: 'social-history,laboratory,social-history'}}).then(function(r) {
+    smart.api.search({type: "Observation", query: {patient: pt_id, category: 'laboratory'}}).then(function(r) {
       callback(null, r.data); 
     })
   } catch (err) {
