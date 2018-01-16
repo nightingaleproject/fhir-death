@@ -153,8 +153,8 @@ function init(err, pat, cond, obs) {
   
   if (DEBUG) console.log(cond);
   fhirdata.conditions = cond.entry.filter(function(element) {
-    //return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
-    return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
+    return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
+    //return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
   });
   
   date_time_init();
@@ -162,7 +162,7 @@ function init(err, pat, cond, obs) {
   fhirdata.active = []; 
   
   // save the observations
-  fhirdata.observations = obs.entry;
+  fhirdata.observations = obs.entry || [];
   
   // write in the patient info as appropriate
   
@@ -884,6 +884,16 @@ function loading_text() {
   // document.getElementById("fhir-pt-history").innerHTML = 'Loading...';
 }
 
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
 function bundle_export() {
   // stackoverflow 19721439
 
@@ -908,6 +918,7 @@ function bundle_export() {
                 fhirdata.patient.name[0].given[0];
   comp.status = "preliminary";
   comp.subject = "Patient/"+fhirdata.patient.id;
+  comp.author = "Practitioner/"+guid();
   comp.section = {
     "code": {
       "coding": [{
@@ -923,16 +934,16 @@ function bundle_export() {
 
   // include the patient themselves
 
-  dc.entry.push({"resource": fhirdata.patient})
+  dc.entry.push({fullUrl: comp.subject, "resource": fhirdata.patient})
 
   // add certifier
   certifier = {};
   namearray = $("[name='certifier_name']").val().split(" ");
-  givenname = namearray.shift()
-  familyname = namearray.join()
+  givenname = namearray.slice(0, namearray.length-1)
+  familyname = namearray[namearray.length-1]
   certifier.name = {
     "family": familyname,
-    "given": [givenname],
+    "given": givenname,
   }
   certifier.extension = {
     "url": "https://github.com/nightingaleproject/fhir-death-record/StructureDefinition/certifier-type",
@@ -949,7 +960,7 @@ function bundle_export() {
     }
   }
   certifier.resourceType = "Practitioner"
-  dc.entry.push({"resource": certifier})
+  dc.entry.push({fullUrl: comp.author, "resource": certifier})
 
   // conditions and observations
 
@@ -958,12 +969,13 @@ function bundle_export() {
   fhirdata.conditions.filter(function(c){
     return fhirdata.active.indexOf(c.resource.id)>-1;
   }).forEach(function(c){
+    debugger
     c.resource.text = {
       "status": "additional",
-      "div": c.resource.code.coding[0].display
-    }
-    c.resource.onsetString = c.app_interval_display
-    dc.entry.push({"fullUrl":  "Condition"+c.resource.id,
+      "div": '<div xmlns="http://www.w3.org/1999/xhtml">' + c.resource.code.coding[0].display + '</div>'
+    };
+    c.resource.onsetString = c.app_interval_display;
+    dc.entry.push({"fullUrl":  "Condition/"+c.resource.id,
                    "resource": c.resource});
     entrylist.push("Condition/"+c.resource.id);
   });
@@ -984,6 +996,16 @@ function bundle_export() {
   return dc;
 }
 
+function runLuaSafe(code) {
+  var results = L.execute("return xpcall(function() return "+code+" end, function(e) return e..[[\n]]..debug.traceback() end)");
+  if (results[0] === false) {
+    console.log(code + '\n' + results.slice(1).join());
+  } else {
+    // ignore the first status code, return the rest of result
+    return results.slice(1);
+  }
+}
+
 function bundle_submit() {
   var dc = bundle_export()
   
@@ -991,13 +1013,14 @@ function bundle_submit() {
   var doXml = $('#doXml').is(":checked")
   
   var contentType = "application/json; charset=utf-8"
+  dc = JSON.stringify(dc)
   if (doXml) {
-    var FHIR_JSONtoXML = new FHIRConverter(2)
-    dc = FHIR_JSONtoXML.toXML(dc)
+    // var FHIR_JSONtoXML = new FHIRConverter(2)
+    // dc = FHIR_JSONtoXML.toXML(dc)
+    // The JSON->XML converter doesn't get the Composition right... try a Lua one...
+    dc = runLuaSafe('in_fhir_xml' + "([[" + dc + "]], {pretty = true})")[0];
     contentType = "application/xml; charset=utf-8"
-  } else {
-    dc = JSON.stringify(dc)
-    }
+  }
 
   $.ajax({
     type: "POST",

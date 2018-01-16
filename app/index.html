@@ -231,6 +231,15 @@
     <script type="text/javascript" charset="utf-8"
             src="./lib/fhir-convert.js"></script>
     
+    <script src="https://fhir-formats.github.io/lua.vm.js/dist/lua.vm.js"></script>
+    <script type="text/lua">
+        -- has to be a global
+        in_fhir_json = require("https://fhir-formats.github.io/fhir-formats/src/fhirformats.web.lua").to_json
+        in_fhir_xml = require("https://fhir-formats.github.io/fhir-formats/src/fhirformats.web.lua").to_xml
+        -- warm up FHIR resources cache
+        in_fhir_xml'{}'
+    </script>
+ 
     <!--  FINALLY, LOAD MAIN JS FILES TO RUN THE APP  -->
     
     <script type="text/javascript" charset="utf-8" 
@@ -239,8 +248,9 @@
             src="umls.js"></script>
     <script type="text/javascript" charset="utf-8" 
             src="animations.js"></script>
-  
-  
+
+
+
     <div id="fade"></div>
     <div id="login-container"></div>
   
