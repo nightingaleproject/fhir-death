@@ -1,9 +1,9 @@
 /*
  * app.css
  *   Ryan Hoffman, 2016
- * 
+ *
  * Main stylesheet for death app.
- * 
+ *
  */
 
 /*** HTML styling ***/
@@ -212,7 +212,7 @@ svg .time-marker {
 
 .tooltip.conditions {
   border-color: red;
-  
+
 }
 
 .tooltip.proposed {
@@ -280,12 +280,12 @@ span#fhir-server {
 div#fade {
   opacity:0.8;
   filter: alpha(opacity=80); /* IE <9 tweak */
-  background-color: #ECECEC; 
-  width: 100%; 
-  height: 100%; 
+  background-color: #ECECEC;
+  width: 100%;
+  height: 100%;
   z-index: 98;
-  top: 0; 
-  left: 0; 
+  top: 0;
+  left: 0;
   position: fixed;
   visibility: hidden;
 }
@@ -337,25 +337,3 @@ form#death-certificate-expanded {
 div {
   /*border: 2px solid gray;*/
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

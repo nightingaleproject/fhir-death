@@ -124,7 +124,7 @@ $("#zeroth_button").click(function() {
           .defer(fhir_load_conditions)
           .defer(fhir_load_observations)
           .await(init);
-        //$('#patient-links').hide();
+        $('#patient-links').hide();
       });
     }
   });
@@ -985,18 +985,29 @@ function bundle_export() {
 }
 
 function bundle_submit() {
-  dc = bundle_export()
+  var dc = bundle_export()
   
   var ngserver = $('#ng-server').val()
-  var user = $('#user-email').val()
+  var doXml = $('#doXml').is(":checked")
   
-  $.post(
-    ngserver,
-    jQuery.param({ fhir: JSON.stringify(dc), email: user }),
-    function(data) {
-      alert("Response: " + data);
+  var contentType = "application/json; charset=utf-8"
+  if (doXml) {
+    var FHIR_JSONtoXML = new FHIRConverter(2)
+    dc = FHIR_JSONtoXML.toXML(dc)
+    contentType = "application/xml; charset=utf-8"
+  } else {
+    dc = JSON.stringify(dc)
     }
-  );
+
+  $.ajax({
+    type: "POST",
+    url: ngserver,
+    data: dc,
+    success: function(data) {
+      alert("Response: " + data);
+    },
+    contentType: contentType
+  });
 }
 
 function bundle_download() {
