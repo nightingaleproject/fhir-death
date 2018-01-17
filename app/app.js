@@ -192,7 +192,8 @@ function init(err, pat, cond, obs) {
   fhirdata.active = []; 
   
   // save the observations
-  fhirdata.observations = obs.entry || [];
+  // fhirdata.observations = obs.entry || [];
+  fhirdata.observations = []; // We don't care about observations from FHIR server for this test
   
   // write in the patient info as appropriate
   
@@ -1010,9 +1011,10 @@ function bundle_export() {
   fhirdata.conditions.filter(function(c){
     return fhirdata.active.indexOf(c.resource.id)>-1;
   }).forEach(function(c){
+    var text = c.resource.code.text || c.resource.code.coding[0].display;
     c.resource.text = {
       "status": "additional",
-      "div": '<div xmlns="http://www.w3.org/1999/xhtml">' + c.resource.code.coding[0].display + '</div>'
+      "div": '<div xmlns="http://www.w3.org/1999/xhtml">' + text + '</div>'
     };
     c.resource.onsetString = c.app_interval_display;
     dc.entry.push({"fullUrl":  "Condition/"+c.resource.id,
