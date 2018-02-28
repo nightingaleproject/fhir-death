@@ -151,11 +151,12 @@ function init(err, pat, cond, obs) {
   }
   
   
-  if (DEBUG) console.log(cond);
-  fhirdata.conditions = cond.entry.filter(function(element) {
-    return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
-    //return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
-  });
+  //if (DEBUG) console.log(cond);
+  //fhirdata.conditions = cond.entry.filter(function(element) {
+  //  return element.resource.subject.reference.split("/").pop() === fhirdata.patient.id;
+  //  //return element.resource.patient.reference.split("/").pop() === fhirdata.patient.id;
+  //});
+  fhirdata.conditions = cond.entry;
   
   date_time_init();
   process_condition_metadata()
@@ -1041,6 +1042,20 @@ function bundle_download() {
   var dlAnchorElem = document.getElementById('downloadAnchorElem');
   dlAnchorElem.setAttribute("href", dataStr);
   dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".json");
+  dlAnchorElem.click();
+}
+
+function bundle_download_xml() {
+  dc = bundle_export()
+
+  dc = JSON.stringify(dc);
+  dc = runLuaSafe('in_fhir_xml' + "([[" + dc + "]], {pretty = true})")[0];
+
+  // attach it to the phantom link and download
+  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(dc);
+  var dlAnchorElem = document.getElementById('downloadAnchorElem');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "bundle_dc_"+fhirdata.patient.id+".xml");
   dlAnchorElem.click();
 }
 

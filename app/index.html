@@ -28,7 +28,7 @@
     <h2 class="fs-title">Search for Decedent Record</h2>
     <h3 class="fs-subtitle">Specify FHIR server and patient name to search for</h3>
     <!-- <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://epic7/Interconnect-FHIR/api/FHIR/DSTU2"></p> -->
-    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://syntheticmass.mitre.org/fhir"></p>
+    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://199.204.56.248/Interconnect-FHIR/api/FHIR/DSTU2"></p>
     <p>Decedent name: <input class="centered" type="text" id="decedent-name" name="decedent-name"></p>
     <input type="button" name="next" class="action-button" value="Search" id="zeroth_button"/>
   </div>
@@ -41,9 +41,9 @@
     <h2 class="fs-title">Welcome</h2>
     <p class="instructions">This prototype application was developed as a collaboration between the <a href="http://miblab.bme.gatech.edu">Wang Lab</a> at Georgia Tech's Wallace H. Coulter Department of Biomedical Engineering and the Centers for Disease Control.</p>
     <p class="instructions">The purpose of this application is to provide visualization, context, and decision support at the point of a patient's death, with the aim of improving the timeliness, accuracy, and completeness of mortality reporting.</p>
-    <p class="instructions">Some advanced features of this application require a free <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a> account to function. Please enter your UMLS login credentials here before continuing:</p>
-    <p>Username: <input class="centered" type="text" id="umls-username" name="umls-username"></p> 
-    <p>Password: <input class="centered" type="password" id="umls-password" name="umls-password"></p> 
+    <p style="display: none;" class="instructions">Some advanced features of this application require a free <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a> account to function. Please enter your UMLS login credentials here before continuing:</p>
+    <p style="display: none;">Username: <input class="centered" type="text" id="umls-username" name="umls-username"></p>
+    <p style="display: none;">Password: <input class="centered" type="password" id="umls-password" name="umls-password"></p>
     <p id="setup_status"  class="instructions">Loading...</p>
     <input type="button" name="next" class="next action-button" value="Loading" id="first_button" disabled/>
   </fieldset>
@@ -196,7 +196,8 @@
     <h2 class="fs-title">Submission</h2>
     <p>Thank you for using our system!</p><br><br>
     <input type="button" name="previous" class="previous action-button" value="Previous" />
-    <input type="button" name="export" class="export action-button" value="Export" onclick="bundle_download()"/>
+    <input type="button" name="export" class="export action-button" value="Export JSON" onclick="bundle_download()"/>
+    <input type="button" name="export" class="export action-button" value="Export XML" onclick="bundle_download_xml()"/>
     <div>
       <h2 class="fs-title">Submit Death Record</h2>
       <h3 class="fs-subtitle">Specify EDRS endpoint and user email to submit</h3>
@@ -233,11 +234,11 @@
     <script type="text/javascript" charset="utf-8"
             src="./lib/fhir-convert.js"></script>
     
-    <script src="https://fhir-formats.github.io/lua.vm.js/dist/lua.vm.js"></script>
+    <script src="./lib/lua.vm.js"></script>
     <script type="text/lua">
         -- has to be a global
-        in_fhir_json = require("https://fhir-formats.github.io/fhir-formats/src/fhirformats.web.lua").to_json
-        in_fhir_xml = require("https://fhir-formats.github.io/fhir-formats/src/fhirformats.web.lua").to_xml
+        in_fhir_json = require("https://nightingaleproject.github.io/fhir-death/himss/lib/fhirformats.web.lua").to_json
+        in_fhir_xml = require("https://nightingaleproject.github.io/fhir-death/himss/lib/fhirformats.web.lua").to_xml
         -- warm up FHIR resources cache
         in_fhir_xml'{}'
     </script>
