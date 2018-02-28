@@ -1,0 +1,263 @@
+
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="styles/jquery-ui.structure.min.css">
+  <link rel="stylesheet" type="text/css" href="styles/style2.css">
+  <link rel="stylesheet" type="text/css" href="styles/app.css">
+</head>
+<body>
+<!-- multistep form -->
+<form id="msform">
+    <title>CDC Death Certificate Input Form</title>
+        <h1><header>U.S. Standard Certificate of Death Form</header></h1><br>
+    <div class="infohead">
+  Patient Name: <span class="data" id="patient_name"></span> <br>
+  Patient ID: <span class="data" id="patient_id"></span><br>
+  Patient Age: <span class="data" id="patient_age"></span> <br>
+  </div>
+  <!-- progressbar -->
+  <ul id="progressbar">
+    <li class = "active">Welcome</li>
+    <li>Death Certification</li>
+    <li>Causes of Death</li>
+    <li>Manner of Death</li>
+    <li>Submission</li>
+  </ul>
+  <div id="patient-search">
+    <h2 class="fs-title">Search for Decedent Record</h2>
+    <h3 class="fs-subtitle">Specify FHIR server and patient name to search for</h3>
+    <!-- <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://epic7/Interconnect-FHIR/api/FHIR/DSTU2"></p> -->
+    <p>FHIR server: <input class="centered" type="text" id="fhir-server" name="fhir-server" value="https://199.204.56.248/Interconnect-FHIR/api/FHIR/DSTU2"></p>
+    <p>Decedent name: <input class="centered" type="text" id="decedent-name" name="decedent-name"></p>
+    <input type="button" name="next" class="action-button" value="Search" id="zeroth_button"/>
+  </div>
+  <div id="patient-links">
+    <h2 class="fs-title">Select Decedent Record</h2>
+    <p class="loading">Loading...</p>
+  </div>
+  <!-- fieldsets -->
+  <fieldset>
+    <h2 class="fs-title">Welcome</h2>
+    <p class="instructions">This prototype application was developed as a collaboration between the <a href="http://miblab.bme.gatech.edu">Wang Lab</a> at Georgia Tech's Wallace H. Coulter Department of Biomedical Engineering and the Centers for Disease Control.</p>
+    <p class="instructions">The purpose of this application is to provide visualization, context, and decision support at the point of a patient's death, with the aim of improving the timeliness, accuracy, and completeness of mortality reporting.</p>
+    <p style="display: none;" class="instructions">Some advanced features of this application require a free <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a> account to function. Please enter your UMLS login credentials here before continuing:</p>
+    <p style="display: none;">Username: <input class="centered" type="text" id="umls-username" name="umls-username"></p>
+    <p style="display: none;">Password: <input class="centered" type="password" id="umls-password" name="umls-password"></p>
+    <p id="setup_status"  class="instructions">Loading...</p>
+    <input type="button" name="next" class="next action-button" value="Loading" id="first_button" disabled/>
+  </fieldset>
+  <fieldset>
+    <h2 class="fs-title">Death Certification</h2>
+    <h3 class="fs-subtitle">[Items 24-28] - Must be completed by person who pronounced or certifies death</h3>
+    Date Pronounced Dead:<br>
+    <input class="centered" type="text" name="pronounced_death_date"><br>
+    Time Pronounced Dead<span class="tod-timezone"></span>:<br>
+    <input class="centered" type="text" name="pronounced_death_time"><br>
+    
+    Actual or Presumed Date of Death: <br>
+    <input class="centered" type="text" name="actual_death_date"><br>
+    Actual or Presumed Time of Death<span class="tod-timezone"></span>: <br>
+    <input class="centered" type="text" name="actual_death_time"><br>
+
+    Was Medical Examiner or Coroner Contacted?: <br>
+    <input type="radio" name="examiner_contacted" value="yes" /> Yes<br />
+    <input type="radio" name="examiner_contacted" value="no" /> No<br />
+
+    Was an Autopsy Performed?: <br>
+    <input type="radio" name="autopsy" value="yes" /> Yes<br />
+    <input type="radio" name="autopsy" value="no" /> No<br />
+
+    Were Autopsy Findings Available to Complete the Case of Death?: <br>
+    <input type="radio" name="autopsy_available" value="yes" /> Yes<br />
+    <input type="radio" name="autopsy_available" value="no" /> No<br /> <br>
+    
+    <h2 class="fs-title">Person Pronouncing Death</h2>
+    Type your full name to electronically sign this document:<br>
+    <input class="centered" type="text" name="certifier_name"><br>
+    License Number: <br>
+    <input class="centered" type="text" name="certifier_number"><br>
+    
+    <br><br>
+    <input type="button" name="previous" class="previous action-button" value="Previous" />
+    <input type="button" name="next" class="next action-button" value="Next" />
+    
+  </fieldset>
+  <fieldset>
+    <h2 class="fs-title">Causes of Death</h2>
+    <h3 class="fs-subtitle">[Item 32] - Must be completed by person who pronounced or certifies death</h3>
+    
+          <div class="layout-row" id="timeline-row">
+            <!-- left totally empty, D3 will draw the SVG canvas here -->
+          </div>
+
+          <div class="layout-row" id="cause-of-death-row">
+            <!-- cause of death grid section -->
+            <div class="right" id="cod-comments-contain">
+              <p class="small label">Other Significant Conditions</p>
+              <textarea id="cod-comments">Enter text here.</textarea>
+            </div>
+            <div class="cod-row" id="cod-header">
+              <span class="cod-field label">Cause of Death:</span>
+              <span class="cod-time label right">Onset to Death:</span>
+
+            </div>
+            <div class="cod-row" id="cod-row1">
+              <input id="cod1-text" class="cod-field" type="text">
+              <input id="cod1-time" class="cod-time right" type="text">
+            </div>
+            <div class="cod-row" id="cod-row2">
+              <input id="cod2-text" class="cod-field" type="text">
+              <input id="cod2-time" class="cod-time right" type="text">
+            </div>
+            <div class="cod-row" id="cod-row3">
+              <input id="cod3-text" class="cod-field" type="text">
+              <input id="cod3-time" class="cod-time right" type="text">
+            </div>
+            <div class="cod-row" id="cod-row4">
+              <input id="cod4-text" class="cod-field" type="text">
+              <input id="cod4-time" class="cod-time right" type="text">
+            </div>
+          </div>
+          
+          
+    <input type="button" name="previous" class="previous action-button" value="Previous" />
+    <input type="button" name="next" class="next action-button" value="Next" />
+  </fieldset>
+  <fieldset>
+    <h2 class="fs-title">Manner of Death</h2>
+    
+    
+    <span id ="formatbod">Did tobacco use contribute to death?: <br>
+  		<input type="radio" name="tobacco" value="373066001" /> Yes<br />
+  		<input type="radio" name="tobacco" value="373067005" /> No<br />
+  		<input type="radio" name="tobacco" value="2931005" /> Probably<br />
+  		<input type="radio" name="tobacco" value="UNK" /> Unknown<br /> <br>
+
+  		If female: <br>
+  		<input type="radio" name="pregnancy" value="PHC1260" /> Not pregnant within past year<br />
+  		<input type="radio" name="pregnancy" value="PHC1261" /> Pregnant at time of death<br />
+  		<input type="radio" name="pregnancy" value="PHC1262" /> Not pregnant, but pregnant within 42 days of death<br />
+  		<input type="radio" name="pregnancy" value="PHC1263" /> Not pregnant, but pregnant 43 days to 1 year before death<br />
+  		<input type="radio" name="pregnancy" value="PHC1264" /> Unknown if pregnant within the past year<br /> <br>
+
+  		Manner of Death: <br>
+  		<input type="radio" name="death_manner" value="38605008" /> Natural<br />
+  		<input type="radio" name="death_manner" value="27935005" /> Homicide<br />
+  		<input type="radio" name="death_manner" value="7878000" /> Accident<br />
+  		<input type="radio" name="death_manner" value="44301001" /> Suicide<br />
+  		<input type="radio" name="death_manner" value="185973002" /> Pending Investigation<br />
+  		<input type="radio" name="death_manner" value="65037004" /> Could not be Determined<br /></span>
+
+  		Date of Injury: <br>
+	  	<input class="centered" type="text" name="injury_date"><br>
+	  	Time of Injury<span class="tod-timezone"></span>: <br>
+	  	<input class="centered" type="text" name="injury_time"><br>
+	  	Place of Injury: <br>
+	  	<input class="centered" type="text" name="injury_location"><br>
+	  	Injury at Work?: <br>
+  		<input type="radio" name="injury_workrelated" value="yes" /> Yes<br />
+  		<input type="radio" name="injury_workrelated" value="no" /> No<br /> <br>
+
+  		Location of Injury:<br>
+  		<input class="centered" type="text" name="injury_state"><br>
+  		County:<br>
+  		<input class="centered" type="text" name="injury_county"><br>
+  		City/Town:<br>
+  		<input class="centered" type="text" name="injury_city"><br>
+  		Street and Number:<br>
+  		<input class="centered" type="text" name="injury_street"><br>
+  		Apartment Number:<br>
+  		<input class="centered" type="text" name="injury_apt"><br>
+  		Zip Code:<br>
+  		<input class="centered" type="text" name="injury_zip"><br>
+  		Country: <br>
+  		<input class="centered" type="text" name="injury_country"><br>
+
+  		Injury Description:<br>
+  		<textarea rows="3" cols="20" placeholder="Describe how injury occurred..."></textarea><br><br>
+
+		If Transportation Injury, Specify: <br>
+	  	<select name="injury_transportation">
+	  		<option></option>
+	  		<option value="236320001">Driver/Operator</option>
+	  		<option value="257500003">Passenger</option>
+	  		<option value="257518000">Pedestrial</option>
+			<option value="OTH">Entombment</option>
+		</select>
+		If Other (specify):
+	  	<input type="text" name="injury_transportation" /><br>
+
+    
+    <input type="button" name="previous" class="previous action-button" value="Previous" />
+    <input type="button" name="next" class="next action-button" value="Next" />
+  </fieldset>
+  <fieldset>
+    <h2 class="fs-title">Submission</h2>
+    <p>Thank you for using our system!</p><br><br>
+    <input type="button" name="previous" class="previous action-button" value="Previous" />
+    <input type="button" name="export" class="export action-button" value="Export JSON" onclick="bundle_download()"/>
+    <input type="button" name="export" class="export action-button" value="Export XML" onclick="bundle_download_xml()"/>
+    <div>
+      <h2 class="fs-title">Submit Death Record</h2>
+      <h3 class="fs-subtitle">Specify EDRS endpoint and user email to submit</h3>
+      <!-- <p>EDRS endpoint: <input class="centered" type="text" id="ng-server" name="ng-server" value="http://localhost:3000/fhir/v1/death_records"></p> -->
+      <p>EDRS endpoint: <input class="centered" type="text" id="ng-server" name="ng-server" value="http://10.242.128.77:9001/dstu2/Bundle"></p>
+      <p><input type="checkbox" id="doXml" name="doXml" value="">
+      <label for="doXml">Send XML (default is JSON)?</label></p>
+      <input type="button" name="submit" class="submit action-button" value="Submit" onclick="bundle_submit()"/>
+    </div>
+  </fieldset>
+</form>
+
+
+
+    <!-- stackoverflow 19721439 -->
+    <a id="downloadAnchorElem" style="display:none"></a>
+
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/jquery.min.js"></script>
+<!--
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/jquery.easing.js"></script>
+-->
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/jquery-ui.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/d3.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/d3-tip.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/fhir-client.min.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/queue.min.js"></script>
+    <script type="text/javascript" charset="utf-8"
+            src="./lib/fhir-convert.js"></script>
+    
+    <script src="./lib/lua.vm.js"></script>
+    <script type="text/lua">
+        -- has to be a global
+        in_fhir_json = require("https://nightingaleproject.github.io/fhir-death/himss/lib/fhirformats.web.lua").to_json
+        in_fhir_xml = require("https://nightingaleproject.github.io/fhir-death/himss/lib/fhirformats.web.lua").to_xml
+        -- warm up FHIR resources cache
+        in_fhir_xml'{}'
+    </script>
+ 
+    <!--  FINALLY, LOAD MAIN JS FILES TO RUN THE APP  -->
+    
+    <script type="text/javascript" charset="utf-8" 
+            src="app.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="umls.js"></script>
+    <script type="text/javascript" charset="utf-8" 
+            src="animations.js"></script>
+
+
+
+    <div id="fade"></div>
+    <div id="login-container"></div>
+  
+  
+  
+</body>
+</html>

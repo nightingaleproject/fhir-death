@@ -1,0 +1,216 @@
+{
+    "resourceType": "Bundle",
+    "id": "536ffa27-3943-45c3-9493-5564e51172f7",
+    "meta": {
+        "lastUpdated": "2016-02-22T00:00:00.000-05:00"
+    },
+    "total": 7,
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc001",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "73211009",
+                            "display": "Diabetes mellitus"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetQuantity": {
+                    "value": 35
+                }
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc001"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc002",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "29889000",
+                            "display": "Rupture of heart"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetDateTime": "2016-02-14T02:21:00.000-05:00"
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc002"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc003",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "57054005",
+                            "display": "Acute myocardial infarction"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetDateTime": "2016-02-10T21:00:00.000-05:00"
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc003"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc004",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "398274000",
+                            "display": "Coronary artery thrombosis"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetQuantity": {
+                    "value": 50
+                }
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc004"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc005",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "371915000",
+                            "display": "Diffuse disease of coronary artery"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetQuantity": {
+                    "value": 48
+                }
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc005"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc006",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp001"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "54556006",
+                            "display": "Fracture of ulna"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetQuantity": {
+                    "value": 52
+                }
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc006"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Condition",
+                "id": "gtc007",
+                "meta": {
+                    "versionId": "1"
+                },
+                "patient": {
+                    "reference": "Patient/gtp002"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "93934004",
+                            "display": "Malignant neoplasm of ovary"
+                        }
+                    ]
+                },
+                "clinicalStatus": "active",
+                "verificationStatus": "confirmed",
+                "onsetQuantity": {
+                    "value": 61
+                }
+            },
+            "request": {
+                "method": "GET",
+                "url": "http://cdcfire.bme.gatech.edu/fhir/Condition/gtc007"
+            }
+        }
+    ]
+}

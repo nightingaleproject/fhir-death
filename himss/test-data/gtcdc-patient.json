@@ -1,0 +1,51 @@
+{
+    "resourceType":"Patient",
+    "id":"gtp001",
+    "meta":{
+        "versionId":"1"
+    },
+    "identifier":[
+        {
+            "use":"usual",
+            "system":"urn:oid:2.16.840.1.113883.4.642.2.30",
+            "value":"078-05-1120",
+            "assigner":{
+                "display":"U.S. Social Security Administration"
+            }
+        }
+    ],
+    "active":true,
+    "name":[
+        {
+            "use":"official",
+            "family":[
+                "Johnston"
+            ],
+            "given":[
+                "Jonathan",
+                "James"
+            ]
+        }
+    ],
+    "telecom":[
+        {
+            "system":"phone",
+            "value":"8885551234",
+            "use":"home"
+        }
+    ],
+    "gender":"Male",
+    "birthDate":"1951-09-14",
+    "deceasedDateTime":"2016-02-14T02:34:06.000-05:00",
+    "address":[
+        {
+            "use":"home",
+            "line":[
+                "123 Main Street North"
+            ],
+            "city":"Everytown",
+            "state":"USA",
+            "postalCode":"99999"
+        }
+    ]
+}
