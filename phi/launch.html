@@ -1,0 +1,125 @@
+<!--
+  -- Timeline-App/index.html
+  --   Ryan Hoffman, 2016
+  -- 
+  -- Landing page for death app.
+  -- 
+  -->
+<html>
+  <head>
+    
+    <title>GT / CDC Death Reporting FHIR Application</title>
+    <link rel="stylesheet" type="text/css" href="styles/app.css">
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    
+  </head>
+  <body>
+    
+    <div class="landing-form">
+      
+      <h2>Death Certificate App</h2>
+      <p class="small">Georgia Tech / CDC Death Reporting FHIR Prototype</p>
+      <p>Connected to FHIR server: <span id="fhir-server">connecting....</span></p>
+      <p>Patient ID: <input id="fhir-id"></p>
+      <button class="nav" id="pt-select" onclick="window.alert('unimplemented!')">Patient Search</button>
+      <button class="nav" id="load" onclick="app_launch()">Launch</button>
+      
+    </div>
+    
+    <!--  LOAD IN EXTERNAL JS RESOURCES  -->
+    
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/d3.min.js"></script> <!-- should really just use jquery -->
+    <script type="text/javascript" charset="utf-8" 
+            src="./lib/fhir-client.min.js"></script> <!-- should really just use jquery -->
+    
+
+    <script type="text/javascript">
+      
+      // adapted from smart-on-fhir demo app
+      
+      var connected = false;
+      var clientId = "f00253d9-0c57-47cd-880f-cbeffb8ee0c3"
+      var secret = null;
+      
+      var urlparams = {}
+      location.search.substr(1).split("&").forEach(function(element) {
+        urlparams[element.split("=")[0]] = decodeURIComponent(element.split("=")[1]);
+      }); // stackoverflow 5448545
+      
+      var serviceUrl = urlparams.iss;
+      var launchUrl = window.location.href;
+      var redirectUrl = launchUrl.replace("launch.html","");
+      
+      var launchContextId = urlparams.launch;
+      
+      var scope = [
+        "patient/AllergyIntolerance.read",
+        "patient/Appointment.read",
+        "patient/Binary.read",
+        "patient/CarePlan.read",
+        "patient/Condition.read",
+        "patient/Contract.read",
+        "patient/Device.read",
+        "patient/DiagnosticReport.read",
+        "patient/DocumentReference.read",
+        "patient/Encounter.read",
+        "patient/Goal.read",
+        "patient/Immunization.read",
+        "patient/MedicationOrder.read",
+        "patient/MedicationStatement.read",
+        "patient/Observation.read",
+        "patient/OperationDefinition.read",
+        "patient/Patient.read",
+        "patient/Person.read",
+        "patient/Practitioner.read",
+        "patient/Procedure.read",
+        "patient/RelatedPerson.read",
+        "patient/StructureDefinition.read",
+        "patient/AllergyIntolerance.write",
+        "patient/Condition.write",
+        "patient/DocumentReference.write",
+        "patient/MedicationStatement.write",
+        "launch"
+      ].join(" ");
+      
+      var state = Math.round(Math.random()*100000000).toString();
+      
+      var conformanceUrl = serviceUrl + "/metadata"
+      
+      d3.json(conformanceUrl, function(d) {
+        
+        var authUrl, tokenUrl;
+        
+        var smart = d.rest[0].security.extension.filter(function (e) {
+           return (e.url === "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris");
+        });
+        smart[0].extension.forEach(function(arg, index, array){
+          if (arg.url === "authorize") {
+            authUrl = arg.valueUri;
+          } else if (arg.url === "token") {
+            tokenUrl = arg.valueUri;
+          }
+        });
+        
+        sessionStorage[state] = JSON.stringify({
+            clientId: clientId,
+            secret: secret,
+            serviceUrl: serviceUrl,
+            redirectUrl: redirectUrl,
+            tokenUrl: tokenUrl
+        });
+        
+        FHIR.oauth2.authorize({
+          client_id: clientId,
+          scope: scope,
+          state: state
+        });
+        
+      });
+      
+    </script>
+    
+  </body>
+</html>
